@@ -829,7 +829,7 @@ gui_input_delete_next_char (struct t_gui_buffer *buffer)
 }
 
 static char *
-gui_input_find_previous_word_from (char *input_buffer, char *start)
+gui_input_find_previous_word_from (char *input_buffer, char *start, int and_space)
 {
     char *string;
     string = start;
@@ -846,7 +846,7 @@ gui_input_find_previous_word_from (char *input_buffer, char *start)
         {
             string = (char *)utf8_prev_char (input_buffer, string);
         }
-        if (string)
+        if (string && and_space)
         {
             // kill remaining non-words (e.g. until after 'r' in "bar      ")
             while (string && !string_is_word_char_input (string))
@@ -857,13 +857,20 @@ gui_input_find_previous_word_from (char *input_buffer, char *start)
     }
 
     if (string)
-        return (char *)utf8_next_char (utf8_next_char (string));
+    {
+        if (and_space)
+        {
+            string = (char *)utf8_next_char (string);
+        }
+
+        return (char *)utf8_next_char (string);
+    }
     else
         return input_buffer;
 }
 
 static void
-gui_input_delete_previous_helper (struct t_gui_buffer *buffer)
+gui_input_delete_previous_helper (struct t_gui_buffer *buffer, int and_space)
 {
     int length_deleted, size_deleted;
     char *start, *string;
@@ -874,7 +881,7 @@ gui_input_delete_previous_helper (struct t_gui_buffer *buffer)
         start = (char *)utf8_add_offset (buffer->input_buffer,
                                          buffer->input_buffer_pos - 1);
 
-        string = gui_input_find_previous_word_from(buffer->input_buffer, start);
+        string = gui_input_find_previous_word_from (buffer->input_buffer, start, and_space);
 
         size_deleted = utf8_next_char (start) - string;
         length_deleted = utf8_strnlen (string, size_deleted);
@@ -901,7 +908,17 @@ gui_input_delete_previous_helper (struct t_gui_buffer *buffer)
 void
 gui_input_delete_previous_word (struct t_gui_buffer *buffer)
 {
-    gui_input_delete_previous_helper(buffer);
+    gui_input_delete_previous_helper (buffer, 1);
+}
+
+/*
+ * Deletes until the space before a word (default key: meta-backspace).
+ */
+
+void
+gui_input_delete_backwards_until_space (struct t_gui_buffer *buffer)
+{
+    gui_input_delete_previous_helper (buffer, 0);
 }
 
 /*
