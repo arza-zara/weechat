@@ -829,7 +829,7 @@ gui_input_delete_next_char (struct t_gui_buffer *buffer)
 }
 
 static char *
-gui_input_find_previous_word_from(char *input_buffer, char *start)
+gui_input_find_previous_word_from (char *input_buffer, char *start)
 {
     char *string;
     string = start;
@@ -858,12 +858,8 @@ gui_input_find_previous_word_from(char *input_buffer, char *start)
         return input_buffer;
 }
 
-/*
- * Deletes previous word (default key: ctrl-W).
- */
-
-void
-gui_input_delete_previous_word (struct t_gui_buffer *buffer)
+static void
+gui_input_delete_previous_helper (struct t_gui_buffer *buffer)
 {
     int length_deleted, size_deleted;
     char *start, *string;
@@ -892,6 +888,16 @@ gui_input_delete_previous_word (struct t_gui_buffer *buffer)
                                                     1, /* save undo */
                                                     1); /* stop completion */
     }
+}
+
+/*
+ * Deletes previous word (default key: ctrl-W).
+ */
+
+void
+gui_input_delete_previous_word (struct t_gui_buffer *buffer)
+{
+    gui_input_delete_previous_helper(buffer);
 }
 
 /*
