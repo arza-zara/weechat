@@ -833,18 +833,22 @@ gui_input_find_previous_word_from (char *input_buffer, char *start)
 {
     char *string;
     string = start;
+
+    // kill non-words (e.g. until after 'r' in "bar    ")
     while (string && !string_is_word_char_input (string))
     {
         string = (char *)utf8_prev_char (input_buffer, string);
     }
     if (string)
     {
+        // kill words (e.g. until after ' ' in "bar foo")
         while (string && string_is_word_char_input (string))
         {
             string = (char *)utf8_prev_char (input_buffer, string);
         }
         if (string)
         {
+            // kill remaining non-words (e.g. until after 'r' in "bar      ")
             while (string && !string_is_word_char_input (string))
             {
                 string = (char *)utf8_prev_char (input_buffer, string);
