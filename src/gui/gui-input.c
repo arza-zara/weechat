@@ -828,6 +828,36 @@ gui_input_delete_next_char (struct t_gui_buffer *buffer)
     }
 }
 
+static char *
+gui_input_find_previous_word_from(char *input_buffer, char *start)
+{
+    char *string;
+    string = start;
+    while (string && !string_is_word_char_input (string))
+    {
+        string = (char *)utf8_prev_char (input_buffer, string);
+    }
+    if (string)
+    {
+        while (string && string_is_word_char_input (string))
+        {
+            string = (char *)utf8_prev_char (input_buffer, string);
+        }
+        if (string)
+        {
+            while (string && !string_is_word_char_input (string))
+            {
+                string = (char *)utf8_prev_char (input_buffer, string);
+            }
+        }
+    }
+
+    if (string)
+        return (char *)utf8_next_char (utf8_next_char (string));
+    else
+        return input_buffer;
+}
+
 /*
  * Deletes previous word (default key: ctrl-W).
  */
@@ -843,30 +873,8 @@ gui_input_delete_previous_word (struct t_gui_buffer *buffer)
         gui_buffer_undo_snap (buffer);
         start = (char *)utf8_add_offset (buffer->input_buffer,
                                          buffer->input_buffer_pos - 1);
-        string = start;
-        while (string && !string_is_word_char_input (string))
-        {
-            string = (char *)utf8_prev_char (buffer->input_buffer, string);
-        }
-        if (string)
-        {
-            while (string && string_is_word_char_input (string))
-            {
-                string = (char *)utf8_prev_char (buffer->input_buffer, string);
-            }
-            if (string)
-            {
-                while (string && !string_is_word_char_input (string))
-                {
-                    string = (char *)utf8_prev_char (buffer->input_buffer, string);
-                }
-            }
-        }
 
-        if (string)
-            string = (char *)utf8_next_char (utf8_next_char (string));
-        else
-            string = buffer->input_buffer;
+        string = gui_input_find_previous_word_from(buffer->input_buffer, start);
 
         size_deleted = utf8_next_char (start) - string;
         length_deleted = utf8_strnlen (string, size_deleted);
