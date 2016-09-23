@@ -99,6 +99,7 @@ struct t_config_option *config_look_buffer_search_regex;
 struct t_config_option *config_look_buffer_search_where;
 struct t_config_option *config_look_buffer_time_format;
 struct t_config_option *config_look_color_basic_force_bold;
+struct t_config_option *config_look_color_inactive_bar;
 struct t_config_option *config_look_color_inactive_buffer;
 struct t_config_option *config_look_color_inactive_message;
 struct t_config_option *config_look_color_inactive_prefix;
@@ -197,6 +198,7 @@ struct t_config_option *config_look_word_chars_input;
 
 /* config, colors section */
 
+struct t_config_option *config_color_bar_inactive_window;
 struct t_config_option *config_color_bar_more;
 struct t_config_option *config_color_chat;
 struct t_config_option *config_color_chat_bg;
@@ -2601,6 +2603,15 @@ config_weechat_init_options ()
         NULL, NULL, NULL,
         &config_change_color, NULL, NULL,
         NULL, NULL, NULL);
+    config_look_color_inactive_bar = config_file_new_option (
+        weechat_config_file, ptr_section,
+        "color_inactive_bar", "boolean",
+        N_("use a different color for bars in inactive window (when window "
+           "is not current window)"),
+        NULL, 0, 0, "off", NULL, 0,
+        NULL, NULL, NULL,
+        &config_change_buffers, NULL, NULL,
+        NULL, NULL, NULL);
     config_look_color_inactive_buffer = config_file_new_option (
         weechat_config_file, ptr_section,
         "color_inactive_buffer", "boolean",
@@ -3514,6 +3525,15 @@ config_weechat_init_options ()
     weechat_config_section_color = ptr_section;
 
     /* bar colors */
+    config_color_bar_inactive_window = config_file_new_option (
+        weechat_config_file, ptr_section,
+        "bar_inactive_window", "color",
+        N_("background color for bar when window is inactive (not current selected "
+           "window)"),
+        NULL, -1, 0, "darkgray", NULL, 0,
+        NULL, NULL, NULL,
+        &config_change_color, NULL, NULL,
+        NULL, NULL, NULL);
     config_color_bar_more = config_file_new_option (
         weechat_config_file, ptr_section,
         "bar_more", "color",
