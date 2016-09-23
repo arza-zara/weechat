@@ -3005,6 +3005,8 @@ COMMAND_CALLBACK(input)
         gui_input_delete_next_char (buffer);
     else if (string_strcasecmp (argv[1], "delete_previous_word") == 0)
         gui_input_delete_previous_word (buffer);
+    else if (string_strcasecmp (argv[1], "delete_backwards_until_space") == 0)
+        gui_input_delete_backwards_until_space (buffer);
     else if (string_strcasecmp (argv[1], "delete_next_word") == 0)
         gui_input_delete_next_word (buffer);
     else if (string_strcasecmp (argv[1], "delete_beginning_of_line") == 0)
