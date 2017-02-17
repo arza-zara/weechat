@@ -138,7 +138,7 @@ gui_line_prefix_is_same_nick_as_previous (struct t_gui_line *line)
      * if line is not displayed, has a highlight, or does not have a tag
      * beginning with "prefix_nick" => display standard prefix
      */
-    if (!line->data->displayed || line->data->highlight
+    if (!line->data->displayed //|| line->data->highlight
         || !gui_line_search_tag_starting_with (line, "prefix_nick"))
         return 0;
 
