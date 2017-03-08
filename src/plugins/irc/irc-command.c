@@ -4990,9 +4990,15 @@ irc_command_display_server (struct t_irc_server *server, int with_detail)
         {
             num_channels = irc_server_get_channel_count (server);
             num_pv = irc_server_get_pv_count (server);
+            char pv_string[10];
+            if (num_pv > 0)
+                snprintf(pv_string, 10, ", %d pv", num_pv);
+            else
+                pv_string[0] = '\0';
+
             weechat_printf (
                 NULL,
-                " %s %s%s %s[%s%s%s]%s%s, %d %s, %d pv",
+                " %s %s%s %s[%s%s%s]%s%s, %d %s%s",
                 (server->is_connected) ? "*" : " ",
                 IRC_COLOR_CHAT_SERVER,
                 server->name,
@@ -5005,7 +5011,7 @@ irc_command_display_server (struct t_irc_server *server, int with_detail)
                 (server->temp_server) ? _(" (temporary)") : "",
                 num_channels,
                 NG_("channel", "channels", num_channels),
-                num_pv);
+                pv_string);
         }
         else
         {
