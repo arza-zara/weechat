@@ -1162,7 +1162,7 @@ config_file_option_reset (struct t_config_option *option, int run_callback)
                                 (char *)option->default_value) != 0))
                     rc = WEECHAT_CONFIG_OPTION_SET_OK_CHANGED;
                 FREE(option->value);
-                option->value = NULL;
+                //option->value = NULL;
                 option->value = strdup ((char *)option->default_value);
                 if (!option->value)
                     rc = WEECHAT_CONFIG_OPTION_SET_ERROR;
@@ -1197,7 +1197,7 @@ config_file_option_reset (struct t_config_option *option, int run_callback)
             if (option->value)
             {
                 FREE(option->value);
-                option->value = NULL;
+                //option->value = NULL;
                 rc = WEECHAT_CONFIG_OPTION_SET_OK_CHANGED;
             }
             else
