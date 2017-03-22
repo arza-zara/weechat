@@ -37,7 +37,6 @@
 #include <sys/time.h>
 #include <time.h>
 
-#include "../../core/wee-string.h"
 #include "../weechat-plugin.h"
 #include "irc.h"
 #include "irc-protocol.h"
@@ -57,9 +56,6 @@
 #include "irc-server.h"
 #include "irc-notify.h"
 
-
-static const char irc_protocol_safe_caps[] =
-  "account-notify,away-notify,cap-notify,multi-prefix,server-time,znc.in/server-time-iso,znc.in/self-message";
 
 /*
  * Checks if a command is numeric.
@@ -344,12 +340,12 @@ IRC_PROTOCOL_CALLBACK(away)
 
 IRC_PROTOCOL_CALLBACK(cap)
 {
-    char *ptr_caps, **caps_supported, **caps_requested, **caps_added, *capabilities;
-    char **caps_removed, *cap_option, *cap_req, str_msg_auth[512], **cap_arr, *caps;
+    char *ptr_caps, **caps_supported, **caps_requested, **caps_added;
+    char **caps_removed, *cap_option, *cap_req, str_msg_auth[512];
     const char *ptr_cap_option;
     int num_caps_supported, num_caps_requested, num_caps_added;
     int num_caps_removed, sasl_requested, sasl_to_do, sasl_mechanism;
-    int sasl_fail, i, j, timeout, length, cap_count;
+    int sasl_fail, i, j, timeout, length;
 
     IRC_PROTOCOL_MIN_ARGS(4);
 
@@ -370,40 +366,18 @@ IRC_PROTOCOL_CALLBACK(cap)
             {
                 sasl_requested = irc_server_sasl_enabled (server);
                 sasl_to_do = 0;
-                capabilities = string_replace (
-                    IRC_SERVER_OPTION_STRING(server, IRC_SERVER_OPTION_CAPABILITIES),
-                    "*", irc_protocol_safe_caps);
-                cap_arr = string_split (
-                    capabilities,
-                    ",", 0, 0, &cap_count);
-                free (capabilities);
-                /* This code disgusts me, but it makes sense */
-                for (i = 0; i < cap_count; i++)
-                {
-                    if ((*(cap_arr + i))[0] == '!')
-                    {
-                        for (j = 0; j < i; j++)
-                        {
-                            if (strcmp(*(cap_arr + j), *(cap_arr + i) + 1) == 0)
-                            {
-                                **(cap_arr + j) = '\0';
-                            }
-                        }
-                        **(cap_arr + i) = '\0';
-                    }
-                }
-                caps = string_build_with_split_string ((const char**)cap_arr, ",");
-                string_free_split(cap_arr);
-                length = ((caps && caps[0]) ?
-                          strlen (caps) : 0) + 16;
+                ptr_cap_option = IRC_SERVER_OPTION_STRING(
+                    server,
+                    IRC_SERVER_OPTION_CAPABILITIES);
+                length = ((ptr_cap_option && ptr_cap_option[0]) ?
+                          strlen (ptr_cap_option) : 0) + 16;
                 cap_option = malloc (length);
                 cap_req = malloc (length);
                 if (cap_option && cap_req)
                 {
                     cap_option[0] = '\0';
-                    if (caps && caps[0])
-                        strcat (cap_option, caps);
-                    free ((void *)caps);
+                    if (ptr_cap_option && ptr_cap_option[0])
+                        strcat (cap_option, ptr_cap_option);
                     if (sasl_requested)
                     {
                         if (cap_option[0])
@@ -474,8 +448,6 @@ IRC_PROTOCOL_CALLBACK(cap)
                     free (cap_option);
                 if (cap_req)
                     free (cap_req);
-                if (caps)
-                  free (caps);
             }
         }
     }
@@ -980,14 +952,14 @@ IRC_PROTOCOL_CALLBACK(kick)
     IRC_PROTOCOL_MIN_ARGS(4);
     IRC_PROTOCOL_CHECK_HOST;
 
-    nick_kicked = argv[3];
-
     pos_comment = (argc > 4) ?
         ((argv_eol[4][0] == ':') ? argv_eol[4] + 1 : argv_eol[4]) : NULL;
 
     ptr_channel = irc_channel_search (server, argv[2]);
     if (!ptr_channel)
         return WEECHAT_RC_OK;
+
+    nick_kicked = argv[3];
 
     ptr_nick = irc_nick_search (server, ptr_channel, nick);
     ptr_nick_kicked = irc_nick_search (server, ptr_channel, nick_kicked);
@@ -1538,7 +1510,7 @@ IRC_PROTOCOL_CALLBACK(notice)
 
             /*
              * unmask a smart filtered join if it is in hashtable
-             * "join_smart_filtered" of channel, and set speaking time
+             * "join_smart_filtered" of channel, set speaking time
              */
             if (ptr_channel)
             {
@@ -2029,10 +2001,11 @@ IRC_PROTOCOL_CALLBACK(privmsg)
                     pos_args);
             }
 
-            irc_channel_nick_speaking_add (ptr_channel,
-                                           nick,
-                                           weechat_string_has_highlight (pos_args,
-                                                                         server->nick));
+            irc_channel_nick_speaking_add (
+                ptr_channel,
+                nick,
+                weechat_string_has_highlight (pos_args,
+                                              server->nick));
         }
     }
     else

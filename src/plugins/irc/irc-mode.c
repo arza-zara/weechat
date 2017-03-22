@@ -288,7 +288,8 @@ irc_mode_smart_filtered (struct t_irc_server *server, char mode)
         return 1;
 
     /* if var has "+", modes from server prefixes are filtered */
-    if (strchr (ptr_modes, '+') && strchr (irc_server_get_prefix_modes (server), mode))
+    if (strchr (ptr_modes, '+')
+        && strchr (irc_server_get_prefix_modes (server), mode))
         return 1;
 
     /*
@@ -457,7 +458,7 @@ irc_mode_channel_set (struct t_irc_server *server,
                                 irc_nick_set_mode (server, channel, ptr_target_nick,
                                                    (set_flag == '+'), pos[0]);
                                 /*
-                                 * disable smart filtering if the mode is sent to me,
+                                 * disable smart filtering if the mode is sent to me
                                  * or if the mode recipient has spoken recently
                                  */
                                 if (smart_filter
