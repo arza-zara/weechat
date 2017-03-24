@@ -177,6 +177,8 @@ struct t_gui_buffer
     struct t_gui_history *ptr_history; /* current command in history        */
     int num_history;                   /* number of commands in history     */
 
+    int max_buffer_lines_number;
+
     /* text search */
     int text_search;                   /* text search type                  */
     int text_search_exact;             /* exact search (case sensitive) ?   */

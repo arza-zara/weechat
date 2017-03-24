@@ -476,6 +476,11 @@ upgrade_weechat_read_buffer (struct t_infolist *infolist)
     else
         ptr_buffer->clear = (ptr_buffer->type == GUI_BUFFER_TYPE_FREE) ? 0 : 1;
 
+    if (infolist_search_var (infolist, "max_buffer_lines_number"))
+        ptr_buffer->max_buffer_lines_number = infolist_integer (infolist, "max_buffer_lines_number");
+    else
+        ptr_buffer->max_buffer_lines_number = -1;
+
     /* "filter" is new in WeeChat 1.0 */
     if (infolist_search_var (infolist, "filter"))
         ptr_buffer->filter = infolist_integer (infolist, "filter");
