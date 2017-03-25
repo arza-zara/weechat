@@ -1301,6 +1301,7 @@ gui_chat_display_line (struct t_gui_window *window, struct t_gui_line *line,
                 gui_chat_display_new_line (window, num_lines, count,
                                            &lines_displayed, simulate);
                 pre_lines_displayed++;
+                y++;
             }
         }
     }
