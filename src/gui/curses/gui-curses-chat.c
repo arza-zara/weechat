@@ -1088,13 +1088,13 @@ gui_chat_display_time_to_prefix (struct t_gui_window *window,
         if (prefix_highlighted)
             free (prefix_highlighted);
 
-        if (!simulate)
+        /*if (!simulate)
         {
             gui_chat_reset_style (window, line, 0, 1,
                                   GUI_COLOR_CHAT_INACTIVE_WINDOW,
                                   GUI_COLOR_CHAT_INACTIVE_BUFFER,
                                   GUI_COLOR_CHAT);
-        }
+        }*/
 
         for (i = 0; i < extra_spaces; i++)
         {
