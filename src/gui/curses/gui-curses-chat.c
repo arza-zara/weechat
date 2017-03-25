@@ -999,7 +999,7 @@ gui_chat_display_time_to_prefix (struct t_gui_window *window,
             && gui_line_has_offline_nick (line);
 
         prefix_highlighted = NULL;
-        if (line->data->highlight && 0)
+        if (line->data->highlight)
         {
             prefix_no_color = gui_color_decode (ptr_prefix, NULL);
             if (prefix_no_color)
@@ -1272,6 +1272,13 @@ gui_chat_display_line (struct t_gui_window *window, struct t_gui_line *line,
     pre_lines_displayed = 0;
     lines_displayed = 0;
 
+    /* calculate marker position (maybe not used for this line!) */
+    if (window->buffer->time_for_each_line && line->data->str_time)
+        read_marker_x = x + gui_chat_strlen_screen (line->data->str_time);
+    else
+        read_marker_x = x;
+    read_marker_y = y;
+
     /* display message before first line of buffer if date is not today */
     if ((line->data->date != 0)
         && CONFIG_BOOLEAN(config_look_day_change)
@@ -1301,17 +1308,11 @@ gui_chat_display_line (struct t_gui_window *window, struct t_gui_line *line,
                 gui_chat_display_new_line (window, num_lines, count,
                                            &lines_displayed, simulate);
                 pre_lines_displayed++;
-                y++;
+                read_marker_y++;
             }
         }
     }
 
-    /* calculate marker position (maybe not used for this line!) */
-    if (window->buffer->time_for_each_line && line->data->str_time)
-        read_marker_x = x + gui_chat_strlen_screen (line->data->str_time);
-    else
-        read_marker_x = x;
-    read_marker_y = y;
 
     /* display time and prefix */
     gui_chat_display_time_to_prefix (window, line, num_lines, count,
