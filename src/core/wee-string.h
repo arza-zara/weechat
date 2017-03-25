@@ -20,11 +20,24 @@
 #ifndef WEECHAT_STRING_H
 #define WEECHAT_STRING_H 1
 
+#include <stdint.h>
 #include <regex.h>
+
+typedef uint32_t string_shared_count_t;
+
+typedef uint32_t string_dyn_size_t;
+struct t_string_dyn
+{
+    char *string;                      /* the string                        */
+    string_dyn_size_t size_alloc;      /* allocated size                    */
+    string_dyn_size_t size;            /* size of string (including '\0')   */
+};
 
 struct t_hashtable;
 
 extern char *string_strndup (const char *string, int length);
+extern char *string_cut (const char *string, int length,
+                         const char *cut_suffix);
 extern void string_tolower (char *string);
 extern void string_toupper (char *string);
 extern int string_strcasecmp (const char *string1, const char *string2);
@@ -99,11 +112,16 @@ extern const char *string_input_for_buffer (const char *string);
 extern char *string_replace_with_callback (const char *string,
                                            const char *prefix,
                                            const char *suffix,
+                                           const char **list_prefix_no_replace,
                                            char *(*callback)(void *data, const char *text),
                                            void *callback_data,
                                            int *errors);
 extern const char *string_shared_get (const char *string);
 extern void string_shared_free (const char *string);
+extern char **string_dyn_alloc (int size_alloc);
+extern int string_dyn_copy (char **string, const char *new_string);
+extern int string_dyn_concat (char **string, const char *add);
+extern void string_dyn_free (char **string, int free_string);
 extern void string_end ();
 
 #endif /* WEECHAT_STRING_H */

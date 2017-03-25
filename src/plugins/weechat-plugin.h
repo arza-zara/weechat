@@ -44,6 +44,7 @@ struct t_gui_completion;
 struct t_infolist;
 struct t_infolist_item;
 struct t_weelist;
+struct t_arraylist;
 struct t_hashtable;
 struct t_hdata;
 struct timeval;
@@ -58,7 +59,7 @@ struct timeval;
  * please change the date with current one; for a second change at same
  * date, increment the 01, otherwise please keep 01.
  */
-#define WEECHAT_PLUGIN_API_VERSION "20160618-01"
+#define WEECHAT_PLUGIN_API_VERSION "20170312-01"
 
 /* macros for defining plugin infos */
 #define WEECHAT_PLUGIN_NAME(__name)                                     \
@@ -324,6 +325,10 @@ struct t_weechat_plugin
                                      struct t_hashtable *pointers,
                                      struct t_hashtable *extra_vars,
                                      struct t_hashtable *options);
+    char **(*string_dyn_alloc) (int size_alloc);
+    int (*string_dyn_copy) (char **string, const char *new_string);
+    int (*string_dyn_concat) (char **string, const char *add);
+    void (*string_dyn_free) (char **string, int free_string);
 
     /* UTF-8 strings */
     int (*utf8_has_8bits) (const char *string);
@@ -386,6 +391,30 @@ struct t_weechat_plugin
                          struct t_weelist_item *item);
     void (*list_remove_all) (struct t_weelist *weelist);
     void (*list_free) (struct t_weelist *weelist);
+
+    /* array lists */
+    struct t_arraylist *(*arraylist_new) (int initial_size,
+                                          int sorted,
+                                          int allow_duplicates,
+                                          int (*callback_cmp)(void *data,
+                                                              struct t_arraylist *arraylist,
+                                                              void *pointer1,
+                                                              void *pointer2),
+                                          void *callback_cmp_data,
+                                          void (*callback_free)(void *data,
+                                                                struct t_arraylist *arraylist,
+                                                                void *pointer),
+                                          void *callback_free_data);
+    int (*arraylist_size) (struct t_arraylist *arraylist);
+    void *(*arraylist_get) (struct t_arraylist *arraylist, int index);
+    void *(*arraylist_search) (struct t_arraylist *arraylist, void *pointer,
+                               int *index, int *index_insert);
+    int (*arraylist_insert) (struct t_arraylist *arraylist, int index,
+                             void *pointer);
+    int (*arraylist_add) (struct t_arraylist *arraylist, void *pointer);
+    int (*arraylist_remove) (struct t_arraylist *arraylist, int index);
+    int (*arraylist_clear) (struct t_arraylist *arraylist);
+    void (*arraylist_free) (struct t_arraylist *arraylist);
 
     /* hash tables */
     struct t_hashtable *(*hashtable_new) (int size,
@@ -1185,6 +1214,14 @@ extern int weechat_plugin_end (struct t_weechat_plugin *plugin);
                                        __extra_vars, __options)         \
     (weechat_plugin->string_eval_expression)(__expr, __pointers,        \
                                              __extra_vars, __options)
+#define weechat_string_dyn_alloc(__size_alloc)                          \
+    (weechat_plugin->string_dyn_alloc)(__size_alloc)
+#define weechat_string_dyn_copy(__string, __new_string)                 \
+    (weechat_plugin->string_dyn_copy)(__string, __new_string)
+#define weechat_string_dyn_concat(__string, __add)                      \
+    (weechat_plugin->string_dyn_concat)(__string, __add)
+#define weechat_string_dyn_free(__string, __free_string)                \
+    (weechat_plugin->string_dyn_free)(__string, __free_string)
 
 /* UTF-8 strings */
 #define weechat_utf8_has_8bits(__string)                                \
@@ -1279,6 +1316,34 @@ extern int weechat_plugin_end (struct t_weechat_plugin *plugin);
     (weechat_plugin->list_remove_all)(__list)
 #define weechat_list_free(__list)                                       \
     (weechat_plugin->list_free)(__list)
+
+/* array lists */
+#define weechat_arraylist_new(__initial_size, __sorted,                 \
+                              __allow_duplicates, __callback_cmp,       \
+                              __callback_cmp_data, __callback_free,     \
+                              __callback_free_data)                     \
+    (weechat_plugin->arraylist_new)(__initial_size, __sorted,           \
+                              __allow_duplicates, __callback_cmp,       \
+                              __callback_cmp_data, __callback_free,     \
+                              __callback_free_data)
+#define weechat_arraylist_size(__arraylist)                             \
+    (weechat_plugin->arraylist_size)(__arraylist)
+#define weechat_arraylist_get(__arraylist, __index)                     \
+    (weechat_plugin->arraylist_get)(__arraylist, __index)
+#define weechat_arraylist_search(__arraylist, __pointer, __index,       \
+                                 __index_insert)                        \
+    (weechat_plugin->arraylist_search)(__arraylist, __pointer, __index, \
+                                       __index_insert)
+#define weechat_arraylist_insert(__arraylist, __index, __pointer)       \
+    (weechat_plugin->arraylist_insert)(__arraylist, __index, __pointer)
+#define weechat_arraylist_add(__arraylist, __pointer)                   \
+    (weechat_plugin->arraylist_add)(__arraylist, __pointer)
+#define weechat_arraylist_remove(__arraylist, __index)                  \
+    (weechat_plugin->arraylist_remove)(__arraylist, __index)
+#define weechat_arraylist_clear(__arraylist)                            \
+    (weechat_plugin->arraylist_clear)(__arraylist)
+#define weechat_arraylist_free(__arraylist)                             \
+    (weechat_plugin->arraylist_free)(__arraylist)
 
 /* hash tables */
 #define weechat_hashtable_new(__size, __type_keys, __type_values,       \

@@ -218,6 +218,16 @@ TEST(Eval, EvalExpression)
     WEE_CHECK_EVAL("********", "${hide:*,password}");
     WEE_CHECK_EVAL("\u2603\u2603\u2603", "${hide:${esc:\u2603},abc}");
 
+    /* test cut of chars */
+    WEE_CHECK_EVAL("", "${cut:0,,}");
+    WEE_CHECK_EVAL("", "${cut:0,+,}");
+    WEE_CHECK_EVAL("", "${cut:0,,test}");
+    WEE_CHECK_EVAL("+", "${cut:0,+,test}");
+    WEE_CHECK_EVAL("te", "${cut:2,,test}");
+    WEE_CHECK_EVAL("te+", "${cut:2,+,test}");
+    WEE_CHECK_EVAL("éà", "${cut:2,,éàô}");
+    WEE_CHECK_EVAL("éà+", "${cut:2,+,éàô}");
+
     /* test color */
     WEE_CHECK_EVAL(gui_color_get_custom ("green"), "${color:green}");
     WEE_CHECK_EVAL(gui_color_get_custom ("*214"), "${color:*214}");
@@ -247,6 +257,17 @@ TEST(Eval, EvalExpression)
                              pointers, extra_vars, options);
     LONGS_EQUAL(8, strlen (value));
     free (value);
+
+    /* test ternary operator */
+    WEE_CHECK_EVAL("1", "${if:5>2}");
+    WEE_CHECK_EVAL("0", "${if:1>7}");
+    WEE_CHECK_EVAL("yes", "${if:5>2?yes:no}");
+    WEE_CHECK_EVAL("no", "${if:1>7?yes:no}");
+    WEE_CHECK_EVAL("yes", "${if:5>2 && 6>3?yes:no}");
+    WEE_CHECK_EVAL("yes-yes", "${if:5>2?${if:6>3?yes-yes:yes-no}:${if:9>4?no-yes:no-no}}");
+    WEE_CHECK_EVAL("yes-no", "${if:5>2?${if:1>7?yes-yes:yes-no}:${if:9>4?no-yes:no-no}}");
+    WEE_CHECK_EVAL("no-yes", "${if:1>7?${if:6>3?yes-yes:yes-no}:${if:9>4?no-yes:no-no}}");
+    WEE_CHECK_EVAL("no-no", "${if:1>7?${if:1>7?yes-yes:yes-no}:${if:1>7?no-yes:no-no}}");
 
     /* test option */
     snprintf (str_value, sizeof (str_value),

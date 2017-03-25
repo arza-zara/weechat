@@ -638,6 +638,10 @@ plugin_load (const char *filename, int init_plugin, int argc, char **argv)
         new_plugin->string_is_command_char = &string_is_command_char;
         new_plugin->string_input_for_buffer = &string_input_for_buffer;
         new_plugin->string_eval_expression = &eval_expression;
+        new_plugin->string_dyn_alloc = &string_dyn_alloc;
+        new_plugin->string_dyn_copy = &string_dyn_copy;
+        new_plugin->string_dyn_concat = &string_dyn_concat;
+        new_plugin->string_dyn_free = &string_dyn_free;
 
         new_plugin->utf8_has_8bits = &utf8_has_8bits;
         new_plugin->utf8_is_valid = &utf8_is_valid;
@@ -684,6 +688,16 @@ plugin_load (const char *filename, int init_plugin, int argc, char **argv)
         new_plugin->list_remove = &weelist_remove;
         new_plugin->list_remove_all = &weelist_remove_all;
         new_plugin->list_free = &weelist_free;
+
+        new_plugin->arraylist_new = arraylist_new;
+        new_plugin->arraylist_size = arraylist_size;
+        new_plugin->arraylist_get = arraylist_get;
+        new_plugin->arraylist_search = arraylist_search;
+        new_plugin->arraylist_insert = arraylist_insert;
+        new_plugin->arraylist_add = arraylist_add;
+        new_plugin->arraylist_remove = arraylist_remove;
+        new_plugin->arraylist_clear = arraylist_clear;
+        new_plugin->arraylist_free = arraylist_free;
 
         new_plugin->hashtable_new = &hashtable_new;
         new_plugin->hashtable_set_with_size = &hashtable_set_with_size;

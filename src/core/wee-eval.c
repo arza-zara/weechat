@@ -49,10 +49,17 @@ char *logical_ops[EVAL_NUM_LOGICAL_OPS] =
 char *comparisons[EVAL_NUM_COMPARISONS] =
 { "=~", "!~", "==", "!=", "<=", "<", ">=", ">" };
 
+
 char *eval_replace_vars (const char *expr, struct t_hashtable *pointers,
                          struct t_hashtable *extra_vars, int extra_vars_eval,
                          const char *prefix, const char *suffix,
                          struct t_eval_regex *eval_regex);
+char *eval_expression_condition (const char *expr,
+                                 struct t_hashtable *pointers,
+                                 struct t_hashtable *extra_vars,
+                                 int extra_vars_eval,
+                                 const char *prefix,
+                                 const char *suffix);
 
 
 /*
@@ -68,6 +75,66 @@ int
 eval_is_true (const char *value)
 {
     return (value && value[0] && (strcmp (value, "0") != 0)) ? 1 : 0;
+}
+
+/*
+ * Searches a string in another at same level (skip sub-expressions between
+ * prefix/suffix).
+ *
+ * If escape is 1, the prefix can be escaped with '\' (and then is ignored).
+ *
+ * For example: eval_strstr_level ("(x || y) || z", "||")
+ * will return a pointer on  "|| z" (because the first "||" is
+ * in a sub-expression, which is skipped).
+ *
+ * Returns pointer to string found, or NULL if not found.
+ */
+
+const char *
+eval_strstr_level (const char *string, const char *search,
+                   const char *prefix, const char *suffix, int escape)
+{
+    const char *ptr_string;
+    int level, length_search, length_prefix, length_suffix;
+
+    if (!string || !search)
+        return NULL;
+
+    length_search = strlen (search);
+    length_prefix = strlen (prefix);
+    length_suffix = strlen (suffix);
+
+    ptr_string = string;
+    level = 0;
+    while (ptr_string[0])
+    {
+        if (escape && (ptr_string[0] == '\\') && (ptr_string[1] == prefix[0]))
+        {
+            ptr_string++;
+        }
+        else if (strncmp (ptr_string, prefix, length_prefix) == 0)
+        {
+            level++;
+            ptr_string += length_prefix;
+        }
+        else if (strncmp (ptr_string, suffix, length_suffix) == 0)
+        {
+            if (level > 0)
+                level--;
+            ptr_string += length_suffix;
+        }
+        else if ((level == 0)
+                 && (strncmp (ptr_string, search, length_search) == 0))
+        {
+            return ptr_string;
+        }
+        else
+        {
+            ptr_string++;
+        }
+    }
+
+    return NULL;
 }
 
 /*
@@ -228,14 +295,16 @@ end:
  *   2. a string to evaluate (format: eval:xxx)
  *   3. a string with escaped chars (format: esc:xxx or \xxx)
  *   4. a string with chars to hide (format: hide:char,string)
- *   5. a regex group captured (format: re:N (0.99) or re:+)
- *   6. a color (format: color:xxx)
- *   7. an info (format: info:name,arguments)
- *   8. current date/time (format: date or date:xxx)
- *   9. an environment variable (format: env:XXX)
- *  10. an option (format: file.section.option)
- *  11. a buffer local variable
- *  12. a hdata variable (format: hdata.var1.var2 or hdata[list].var1.var2
+ *   5. a string with max chars (format: cut:max,suffix,string)
+ *   6. a regex group captured (format: re:N (0.99) or re:+)
+ *   7. a color (format: color:xxx)
+ *   8. an info (format: info:name,arguments)
+ *   9. current date/time (format: date or date:xxx)
+ *  10. an environment variable (format: env:XXX)
+ *  11. a ternary operator (format: if:condition?value_if_true:value_if_false)
+ *  12. an option (format: file.section.option)
+ *  13. a buffer local variable
+ *  14. a hdata variable (format: hdata.var1.var2 or hdata[list].var1.var2
  *                        or hdata[ptr].var1.var2)
  *
  * See /help in WeeChat for examples.
@@ -251,7 +320,7 @@ eval_replace_vars_cb (void *data, const char *text)
     struct t_config_option *ptr_option;
     struct t_gui_buffer *ptr_buffer;
     char str_value[512], *value, *pos, *pos1, *pos2, *hdata_name, *list_name;
-    char *tmp, *info_name, *hide_char, *hidden_string, *error;
+    char *tmp, *info_name, *hide_char, *hidden_string, *error, *condition;
     const char *prefix, *suffix, *ptr_value, *ptr_arguments, *ptr_string;
     struct t_hdata *hdata;
     void *pointer;
@@ -276,10 +345,17 @@ eval_replace_vars_cb (void *data, const char *text)
         {
             if (extra_vars_eval)
             {
-                return eval_replace_vars (ptr_value, pointers,
-                                          extra_vars, extra_vars_eval,
-                                          prefix, suffix,
-                                          eval_regex);
+                tmp = strdup (ptr_value);
+                if (!tmp)
+                    return NULL;
+                hashtable_remove (extra_vars, text);
+                value = eval_replace_vars (tmp, pointers,
+                                           extra_vars, extra_vars_eval,
+                                           prefix, suffix,
+                                           eval_regex);
+                hashtable_set (extra_vars, text, tmp);
+                free (tmp);
+                return value;
             }
             else
             {
@@ -336,7 +412,37 @@ eval_replace_vars_cb (void *data, const char *text)
         return (hidden_string) ? hidden_string : strdup ("");
     }
 
-    /* 5. regex group captured */
+    /*
+     * 5. cut chars: max number of chars, and add an optional suffix when the
+     * string is cut
+     */
+    if (strncmp (text, "cut:", 4) == 0)
+    {
+        pos = strchr (text + 4, ',');
+        if (!pos)
+            return strdup ("");
+        pos2 = strchr (pos + 1, ',');
+        if (!pos2)
+            return strdup ("");
+        tmp = strndup (text + 4, pos - text - 4);
+        if (!tmp)
+            return strdup ("");
+        number = strtol (tmp, &error, 10);
+        if (!error || error[0] || (number < 0))
+        {
+            free (tmp);
+            return strdup ("");
+        }
+        free (tmp);
+        tmp = strndup (pos + 1, pos2 - pos - 1);
+        if (!tmp)
+            return strdup ("");
+        value = string_cut (pos2 + 1, number, tmp);
+        free (tmp);
+        return value;
+    }
+
+    /* 6. regex group captured */
     if (strncmp (text, "re:", 3) == 0)
     {
         if (eval_regex && eval_regex->result)
@@ -359,7 +465,7 @@ eval_replace_vars_cb (void *data, const char *text)
         return strdup ("");
     }
 
-    /* 6. color code */
+    /* 7. color code */
     if (strncmp (text, "color:", 6) == 0)
     {
         ptr_value = gui_color_search_config (text + 6);
@@ -369,7 +475,7 @@ eval_replace_vars_cb (void *data, const char *text)
         return strdup ((ptr_value) ? ptr_value : "");
     }
 
-    /* 7. info */
+    /* 8. info */
     if (strncmp (text, "info:", 5) == 0)
     {
         ptr_value = NULL;
@@ -389,7 +495,7 @@ eval_replace_vars_cb (void *data, const char *text)
         return strdup ((ptr_value) ? ptr_value : "");
     }
 
-    /* 8. current date/time */
+    /* 9. current date/time */
     if ((strncmp (text, "date", 4) == 0) && (!text[4] || (text[4] == ':')))
     {
         date = time (NULL);
@@ -402,7 +508,7 @@ eval_replace_vars_cb (void *data, const char *text)
         return strdup ((rc > 0) ? str_value : "");
     }
 
-    /* 9. environment variable */
+    /* 10. environment variable */
     if (strncmp (text, "env:", 4) == 0)
     {
         ptr_value = getenv (text + 4);
@@ -410,7 +516,71 @@ eval_replace_vars_cb (void *data, const char *text)
             return strdup (ptr_value);
     }
 
-    /* 10. option: if found, return this value */
+    /* 11: ternary operator: if:condition?value_if_true:value_if_false */
+    if (strncmp (text, "if:", 3) == 0)
+    {
+        value = NULL;
+        pos = (char *)eval_strstr_level (text + 3, "?", prefix, suffix, 1);
+        pos2 = (pos) ?
+            (char *)eval_strstr_level (pos + 1, ":", prefix, suffix, 1) : NULL;
+        condition = (pos) ?
+            strndup (text + 3, pos - (text + 3)) : strdup (text + 3);
+        if (!condition)
+            return strdup ("");
+        tmp = eval_expression_condition (condition, pointers,
+                                         extra_vars, extra_vars_eval,
+                                         prefix, suffix);
+        rc = (tmp && strcmp (tmp, "1") == 0);
+        if (tmp)
+            free (tmp);
+        if (rc)
+        {
+            /*
+             * condition is true: return the "value_if_true"
+             * (or EVAL_STR_TRUE if value is missing)
+             */
+            if (pos)
+            {
+                tmp = (pos2) ?
+                    strndup (pos + 1, pos2 - pos - 1) : strdup (pos + 1);
+                if (tmp)
+                {
+                    value = eval_replace_vars (tmp, pointers,
+                                               extra_vars, extra_vars_eval,
+                                               prefix, suffix,
+                                               eval_regex);
+                    free (tmp);
+                }
+            }
+            else
+            {
+                value = strdup (EVAL_STR_TRUE);
+            }
+        }
+        else
+        {
+            /*
+             * condition is false: return the "value_if_false"
+             * (or EVAL_STR_FALSE if both values are missing)
+             */
+            if (pos2)
+            {
+                value = eval_replace_vars (pos2 + 1, pointers,
+                                           extra_vars, extra_vars_eval,
+                                           prefix, suffix,
+                                           eval_regex);
+            }
+            else
+            {
+                if (!pos)
+                    value = strdup (EVAL_STR_FALSE);
+            }
+        }
+        free (condition);
+        return (value) ? value : strdup ("");
+    }
+
+    /* 12. option: if found, return this value */
     if (strncmp (text, "sec.data.", 9) == 0)
     {
         ptr_value = hashtable_get (secure_hashtable_data, text + 9);
@@ -443,7 +613,7 @@ eval_replace_vars_cb (void *data, const char *text)
         }
     }
 
-    /* 11. local variable in buffer */
+    /* 13. local variable in buffer */
     ptr_buffer = hashtable_get (pointers, "buffer");
     if (ptr_buffer)
     {
@@ -452,7 +622,7 @@ eval_replace_vars_cb (void *data, const char *text)
             return strdup (ptr_value);
     }
 
-    /* 12. hdata */
+    /* 14. hdata */
     value = NULL;
     hdata_name = NULL;
     list_name = NULL;
@@ -536,6 +706,7 @@ eval_replace_vars (const char *expr, struct t_hashtable *pointers,
                    struct t_eval_regex *eval_regex)
 {
     const void *ptr[6];
+    const char *no_replace_prefix_list[] = { "if:", NULL };
 
     ptr[0] = pointers;
     ptr[1] = extra_vars;
@@ -545,6 +716,7 @@ eval_replace_vars (const char *expr, struct t_hashtable *pointers,
     ptr[5] = eval_regex;
 
     return string_replace_with_callback (expr, prefix, suffix,
+                                         no_replace_prefix_list,
                                          &eval_replace_vars_cb, ptr, NULL);
 }
 
@@ -651,51 +823,6 @@ end:
 }
 
 /*
- * Searches a string in another at same level (skip sub-expressions between
- * parentheses).
- *
- * For example: eval_strstr_level ("(x || y) || z", "||")
- * will return a pointer on  "|| z" (because the first "||" is
- * in a sub-expression, which is skipped).
- *
- * Returns pointer to string found, or NULL if not found.
- */
-
-const char *
-eval_strstr_level (const char *string, const char *search)
-{
-    const char *ptr_string;
-    int level, length;
-
-    if (!string || !search)
-        return NULL;
-
-    length = strlen (search);
-
-    ptr_string = string;
-    level = 0;
-    while (ptr_string[0])
-    {
-        if (ptr_string[0] == '(')
-        {
-            level++;
-        }
-        else if (ptr_string[0] == ')')
-        {
-            if (level > 0)
-                level--;
-        }
-
-        if ((level == 0) && (strncmp (ptr_string, search, length) == 0))
-            return ptr_string;
-
-        ptr_string++;
-    }
-
-    return NULL;
-}
-
-/*
  * Evaluates a condition (this function must not be called directly).
  *
  * For return value, see function eval_expression().
@@ -751,7 +878,7 @@ eval_expression_condition (const char *expr,
      */
     for (logic = 0; logic < EVAL_NUM_LOGICAL_OPS; logic++)
     {
-        pos = eval_strstr_level (expr2, logical_ops[logic]);
+        pos = eval_strstr_level (expr2, logical_ops[logic], "(", ")", 0);
         if (pos > expr2)
         {
             pos_end = pos - 1;
@@ -804,7 +931,7 @@ eval_expression_condition (const char *expr,
      */
     for (comp = 0; comp < EVAL_NUM_COMPARISONS; comp++)
     {
-        pos = eval_strstr_level (expr2, comparisons[comp]);
+        pos = eval_strstr_level (expr2, comparisons[comp], "(", ")", 0);
         if (pos > expr2)
         {
             pos_end = pos - 1;

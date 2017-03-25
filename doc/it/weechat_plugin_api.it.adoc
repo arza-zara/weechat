@@ -2027,7 +2027,7 @@ str3 = weechat.string_input_for_buffer("//test")  # "/test"
 ==== string_eval_expression
 
 // TRANSLATION MISSING
-_WeeChat ≥ 0.4.0, updated in 0.4.2, 1.0, 1.1, 1.2 and 1.3._
+_WeeChat ≥ 0.4.0, updated in 0.4.2, 1.0, 1.1, 1.2, 1.3 and 1.8._
 
 // TRANSLATION MISSING
 Evaluate an expression and return result as a string.
@@ -2098,7 +2098,6 @@ expanded to last):
   `+${name}+` |
   `+value+`
 
-// TRANSLATION MISSING
 | `+${eval:xxx}+` +
   (_WeeChat ≥ 1.3_) |
   String to evaluate. |
@@ -2114,10 +2113,18 @@ expanded to last):
   `+prefix<TAB>message+` +
   `+©+`
 
-| `+${hide:x,value}+` |
-  String with hidden chars (all chars in `value` replaced `x`). |
+| `+${hide:x,string}+` |
+  String with hidden chars (all chars in `string` replaced `x`). |
   `+${hide:*,password}+` |
   `+********+`
+
+| `+${cut:max,suffix,string}+` +
+  (_WeeChat ≥ 1.8_) |
+  String with `max` chars displayed, and optional `suffix` if string is cut. |
+  `+${cut:4,…,this is a test}+` +
+  `+${cut:2,>>,àéçôî}+` |
+  `+this…+` +
+  `+àé>>+`
 
 | `+${re:N}+` |
   Regex captured group: `0` = whole string matching, `1` to `99` = group
@@ -2141,7 +2148,6 @@ expanded to last):
   `+1.0+` +
   `+lightblue+`
 
-// TRANSLATION MISSING
 | `+${date}+` +
   `+${date:xxx}+` +
   (_WeeChat ≥ 1.3_) |
@@ -2157,6 +2163,16 @@ expanded to last):
   Value of the environment variable `NAME`. |
   `+${env:HOME}+` |
   `+/home/user+`
+
+| `+${if:condition}+` +
+  `+${if:condition?true}+`
+  `+${if:condition?true:false}+` +
+  (_WeeChat ≥ 1.8_) |
+  Ternary operator with a condition, a value if the condition is true (optional)
+  and another value if the condition is false (optional). If values are not
+  given, "1" or "0" are returned, according to the result of the condition. |
+  `+${if:${info:term_width}>80?big:small}+` |
+  `+big+`
 
 | `+${sec.data.name}+` |
   Value of the secured data `name`. |
@@ -2247,6 +2263,180 @@ options = {
 }
 str5 = weechat.string_eval_expression("password=abc password=def", {}, {}, options)  # "password=*** password=***"
 ----
+
+==== string_dyn_alloc
+
+_WeeChat ≥ 1.8._
+
+// TRANSLATION MISSING
+Allocate a dynamic string, with a variable length. +
+Internally, a structure is allocated with the string pointer, the allocated size
+and current length of string.
+
+// TRANSLATION MISSING
+Only the pointer to string pointer (_**string_) is used in all the
+_pass:[string_dyn_*]_ functions.
+
+Prototipo:
+
+[source,C]
+----
+char **weechat_dyn_alloc (int size_alloc);
+----
+
+Argomenti:
+
+// TRANSLATION MISSING
+* _size_alloc_: the initial allocated size (must be greater than zero)
+
+Valore restituito:
+
+// TRANSLATION MISSING
+* pointer to the dynamic string
+
+Esempio in C:
+
+[source,C]
+----
+char **string = weechat_dyn_alloc (256);
+----
+
+[NOTE]
+Questa funzione non è disponibile nelle API per lo scripting.
+
+==== string_dyn_copy
+
+_WeeChat ≥ 1.8._
+
+// TRANSLATION MISSING
+Copy a string in a dynamic string.
+
+// TRANSLATION MISSING
+The pointer _*string_ can change if the string is reallocated (if there is
+not enough space to copy the string).
+
+Prototipo:
+
+[source,C]
+----
+int weechat_dyn_copy (char **string, const char *new_string);
+----
+
+Argomenti:
+
+// TRANSLATION MISSING
+* _string_: pointer to dynamic string
+* _new_string_: the string to copy
+
+Valore restituito:
+
+// TRANSLATION MISSING
+* 1 if OK, 0 if error
+
+Esempio in C:
+
+[source,C]
+----
+char **string = weechat_dyn_alloc (256);
+if (weechat_dyn_copy (string, "test"))
+{
+    /* OK */
+}
+else
+{
+    /* error */
+}
+----
+
+[NOTE]
+Questa funzione non è disponibile nelle API per lo scripting.
+
+==== string_dyn_concat
+
+_WeeChat ≥ 1.8._
+
+// TRANSLATION MISSING
+Concatenate a string to a dynamic string.
+
+// TRANSLATION MISSING
+The pointer _*string_ can change if the string is reallocated (if there is
+not enough space to concatenate the string).
+
+Prototipo:
+
+[source,C]
+----
+int weechat_dyn_concat (char **string, const char *add);
+----
+
+Argomenti:
+
+// TRANSLATION MISSING
+* _string_: pointer to dynamic string
+* _add_: the string to add
+
+Valore restituito:
+
+// TRANSLATION MISSING
+* 1 if OK, 0 if error
+
+Esempio in C:
+
+[source,C]
+----
+char **string = weechat_dyn_alloc (256);
+if (weechat_dyn_copy (string, "test"))
+{
+    if (weechat_dyn_concat (string, "abc"))
+    {
+        /* ... */
+    }
+}
+----
+
+[NOTE]
+Questa funzione non è disponibile nelle API per lo scripting.
+
+==== string_dyn_free
+
+_WeeChat ≥ 1.8._
+
+// TRANSLATION MISSING
+Free a dynamic string.
+
+Prototipo:
+
+[source,C]
+----
+void weechat_dyn_free (char **string, int free_string);
+----
+
+Argomenti:
+
+// TRANSLATION MISSING
+* _string_: pointer to dynamic string
+* _free_string_: free the string itself; if 0, the content of _*string_ remains
+  valid after the call to this function
+
+Esempio in C:
+
+[source,C]
+----
+char **string = weechat_dyn_alloc (256);
+if (weechat_dyn_concat (string, "test"))
+{
+    /* OK */
+}
+else
+{
+    /* error */
+}
+/* ... */
+weechat_dyn_free (string, 1);
+----
+
+[NOTE]
+Questa funzione non è disponibile nelle API per lo scripting.
 
 [[utf-8]]
 === UTF-8
@@ -3767,6 +3957,374 @@ weechat.list_free(list)
 # esempio
 weechat.list_free(list)
 ----
+
+[[array_lists]]
+=== Array lists
+
+// TRANSLATION MISSING
+Array list functions.
+
+An array list is a list of pointers with a dynamic size and optional sort.
+
+==== arraylist_new
+
+_WeeChat ≥ 1.8._
+
+// TRANSLATION MISSING
+Create a new array list.
+
+Prototipo:
+
+[source,C]
+----
+struct t_arraylist *weechat_arraylist_new (int initial_size,
+                                           int sorted,
+                                           int allow_duplicates,
+                                           int (*callback_cmp)(void *data,
+                                                               struct t_arraylist *arraylist,
+                                                               void *pointer1,
+                                                               void *pointer2),
+                                           void *callback_cmp_data,
+                                           void (*callback_free)(void *data,
+                                                                 struct t_arraylist *arraylist,
+                                                                 void *pointer),
+                                           void *callback_free_data);
+----
+
+Argomenti:
+
+// TRANSLATION MISSING
+* _initial_size_: initial size of the array list (not the number of items)
+* _sorted_: 1 to sort the array list, 0 for no sort
+* _allow_duplicates_: 1 to allow duplicate entries, 0 to prevent a same entry
+  to be added again
+* _callback_cmp_: callback used to compare two items, arguments and return value:
+** _void *data_: pointer
+** _struct t_arraylist *arraylist_: array list pointer
+** _void *pointer1_: pointer to first item
+** _void *pointer2_: pointer to second item
+** return value:
+*** negative number if first item is less than second item
+*** 0 if first item equals second item
+*** positive number if first item is greater than second item
+* _callback_cmp_data_: pointer given to callback when it is called by WeeChat
+* _callback_free_: callback used to free an item (optional), arguments:
+** _void *data_: pointer
+** _struct t_arraylist *arraylist_: array list pointer
+** _void *pointer_: pointer to item
+* _callback_free_data_: pointer given to callback when it is called by WeeChat
+
+Valore restituito:
+
+// TRANSLATION MISSING
+* pointer to new array list
+
+Esempio in C:
+
+[source,C]
+----
+int
+cmp_cb (void *data, struct t_arraylist *arraylist,
+        void *pointer1, void *pointer2)
+{
+    if (...)
+        return -1;
+    else if (...)
+        return 1;
+    else
+        return 0;
+}
+
+struct t_arraylist *list = weechat_arraylist_new (32, 1, 1,
+                                                  &cmp_cb, NULL, NULL, NULL);
+----
+
+[NOTE]
+Questa funzione non è disponibile nelle API per lo scripting.
+
+==== arraylist_size
+
+_WeeChat ≥ 1.8._
+
+// TRANSLATION MISSING
+Return size of array list (number of item pointers).
+
+Prototipo:
+
+[source,C]
+----
+int weechat_list_size (struct t_arraylist *arraylist);
+----
+
+Argomenti:
+
+// TRANSLATION MISSING
+* _arraylist_: array list pointer
+
+Valore restituito:
+
+// TRANSLATION MISSING
+* size of array list (number of items), 0 if array list is empty
+
+Esempio in C:
+
+[source,C]
+----
+weechat_printf (NULL, "size of array list: %d", weechat_arraylist_size (arraylist));
+----
+
+[NOTE]
+Questa funzione non è disponibile nelle API per lo scripting.
+
+==== arraylist_get
+
+_WeeChat ≥ 1.8._
+
+// TRANSLATION MISSING
+Return an item pointer by position.
+
+Prototipo:
+
+[source,C]
+----
+void *weechat_arraylist_get (struct t_arraylist *arraylist, int index);
+----
+
+Argomenti:
+
+// TRANSLATION MISSING
+* _arraylist_: array list pointer
+* _index_: index in list (first pointer is 0)
+
+Valore restituito:
+
+// TRANSLATION MISSING
+* pointer found, NULL if pointer was not found
+
+Esempio in C:
+
+[source,C]
+----
+void *pointer = weechat_arraylist_get (arraylist, 0);  /* first item */
+----
+
+[NOTE]
+Questa funzione non è disponibile nelle API per lo scripting.
+
+==== arraylist_search
+
+_WeeChat ≥ 1.8._
+
+// TRANSLATION MISSING
+Search an item in an array list.
+
+Prototipo:
+
+[source,C]
+----
+void *weechat_arraylist_search (struct t_arraylist *arraylist, void *pointer,
+                                int *index, int *index_insert);
+----
+
+Argomenti:
+
+// TRANSLATION MISSING
+* _arraylist_: array list pointer
+* _pointer_: pointer to the item to search in array list
+* _index_: pointer to integer that will be set to the index found, or -1 if not found
+  (optional)
+* _index_insert_: pointer to integer that will be set with the index that must be
+  used to insert the element in the arraylist (to keep arraylist sorted) (optional)
+
+Valore restituito:
+
+// TRANSLATION MISSING
+* pointer to item found, NULL if item was not found
+
+Esempio in C:
+
+[source,C]
+----
+int index, index_insert;
+void *item = weechat_arraylist_search (arraylist, pointer, &index, &index_insert);
+----
+
+[NOTE]
+Questa funzione non è disponibile nelle API per lo scripting.
+
+==== arraylist_insert
+
+_WeeChat ≥ 1.8._
+
+// TRANSLATION MISSING
+Insert an item in an array list.
+
+Prototipo:
+
+[source,C]
+----
+int weechat_arraylist_insert (struct t_arraylist *arraylist, int index, void *pointer);
+----
+
+Argomenti:
+
+// TRANSLATION MISSING
+* _arraylist_: array list pointer
+* _index_: position of the item in array list or -1 to add at the end
+  (this argument is used only if the array list is not sorted, it is ignored if
+  the array list is sorted)
+* _pointer_: pointer to the item to insert
+
+Valore restituito:
+
+// TRANSLATION MISSING
+* index of new item (>= 0), -1 if error.
+
+Esempio in C:
+
+[source,C]
+----
+int index = weechat_arraylist_insert (arraylist, -1, pointer);  /* insert at the end if not sorted */
+----
+
+[NOTE]
+Questa funzione non è disponibile nelle API per lo scripting.
+
+==== arraylist_add
+
+_WeeChat ≥ 1.8._
+
+// TRANSLATION MISSING
+Add an item in an array list.
+
+Prototipo:
+
+[source,C]
+----
+int weechat_arraylist_add (struct t_arraylist *arraylist, void *pointer);
+----
+
+Argomenti:
+
+// TRANSLATION MISSING
+* _arraylist_: array list pointer
+* _pointer_: pointer to the item to add
+
+Valore restituito:
+
+// TRANSLATION MISSING
+* index of new item (>= 0), -1 if error.
+
+Esempio in C:
+
+[source,C]
+----
+int index = weechat_arraylist_add (arraylist, pointer);
+----
+
+[NOTE]
+Questa funzione non è disponibile nelle API per lo scripting.
+
+==== arraylist_remove
+
+_WeeChat ≥ 1.8._
+
+// TRANSLATION MISSING
+Remove an item from an array list.
+
+Prototipo:
+
+[source,C]
+----
+int weechat_arraylist_remove (struct t_arraylist *arraylist, int index);
+----
+
+Argomenti:
+
+// TRANSLATION MISSING
+* _arraylist_: array list pointer
+* _index_: index of the item to remove
+
+Valore restituito:
+
+// TRANSLATION MISSING
+* index of item removed, -1 if error.
+
+Esempio in C:
+
+[source,C]
+----
+int index_removed = weechat_arraylist_remove (arraylist, index);
+----
+
+[NOTE]
+Questa funzione non è disponibile nelle API per lo scripting.
+
+==== arraylist_clear
+
+_WeeChat ≥ 1.8._
+
+// TRANSLATION MISSING
+Remove all items from an array list.
+
+Prototipo:
+
+[source,C]
+----
+int weechat_arraylist_clear (struct t_arraylist *arraylist);
+----
+
+Argomenti:
+
+// TRANSLATION MISSING
+* _arraylist_: array list pointer
+
+Valore restituito:
+
+// TRANSLATION MISSING
+* 1 if OK, 0 if error
+
+Esempio in C:
+
+[source,C]
+----
+if (weechat_arraylist_clear (arraylist))
+{
+    /* OK */
+}
+----
+
+[NOTE]
+Questa funzione non è disponibile nelle API per lo scripting.
+
+==== arraylist_free
+
+_WeeChat ≥ 1.8._
+
+// TRANSLATION MISSING
+Free an array list.
+
+Prototipo:
+
+[source,C]
+----
+void weechat_arraylist_free (struct t_arraylist *arraylist);
+----
+
+Argomenti:
+
+// TRANSLATION MISSING
+* _arraylist_: array list pointer
+
+Esempio in C:
+
+[source,C]
+----
+weechat_arraylist_free (arraylist);
+----
+
+[NOTE]
+Questa funzione non è disponibile nelle API per lo scripting.
 
 [[hashtables]]
 === Tabelle hash
@@ -8734,6 +9292,12 @@ List of signals sent by WeeChat and plugins:
 | irc | irc_server_disconnected |
   String: nome server. |
   Disconnesso dal server.
+
+// TRANSLATION MISSING
+| irc | irc_server_lag_changed +
+  _(WeeChat ≥ 1.8)_ |
+  String: server name. |
+  Lag changed on the server.
 
 | irc | irc_ignore_removing |
   Puntatore: ignore. |
@@ -15890,7 +16454,7 @@ weechat_hdata_set (hdata, pointer, "message", "test");
 ----
 
 [NOTE]
-This function is not available in scripting API.
+Questa funzione non è disponibile nelle API per lo scripting.
 
 // TRANSLATION MISSING
 ==== hdata_update

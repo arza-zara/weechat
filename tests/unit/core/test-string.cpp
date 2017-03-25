@@ -80,11 +80,12 @@ extern "C"
 
 #define WEE_REPLACE_CB(__result_replace, __result_errors,               \
                        __str, __prefix, __suffix,                       \
+                       __list_prefix_no_replace,                        \
                        __callback, __callback_data, __errors)           \
     errors = -1;                                                        \
     result = string_replace_with_callback (                             \
-        __str, __prefix, __suffix, __callback, __callback_data,         \
-        __errors);                                                      \
+        __str, __prefix, __suffix, __list_prefix_no_replace,            \
+        __callback, __callback_data, __errors);                         \
     if (__result_replace == NULL)                                       \
     {                                                                   \
         POINTERS_EQUAL(NULL, result);                                   \
@@ -676,6 +677,9 @@ test_replace_cb (void *data, const char *text)
     if (strcmp (text, "xxx") == 0)
         return strdup ("");
 
+    if (strncmp (text, "no_replace:", 11) == 0)
+        return strdup (text);
+
     return NULL;
 }
 
@@ -734,48 +738,55 @@ TEST(String, ReplaceRegex)
 TEST(String, ReplaceWithCallback)
 {
     char *result;
+    const char *list_prefix_no_replace[] = { "no_replace:", NULL };
     int errors;
 
     /* tests with invalid arguments */
-    WEE_REPLACE_CB(NULL, -1, NULL, NULL, NULL, NULL, NULL, NULL);
-    WEE_REPLACE_CB(NULL, -1, "", NULL, NULL, NULL, NULL, NULL);
-    WEE_REPLACE_CB(NULL, -1, NULL, "", NULL, NULL, NULL, NULL);
-    WEE_REPLACE_CB(NULL, -1, NULL, NULL, "", NULL, NULL, NULL);
-    WEE_REPLACE_CB(NULL, -1, NULL, NULL, NULL, &test_replace_cb, NULL, NULL);
-    WEE_REPLACE_CB(NULL, 0, NULL, NULL, NULL, NULL, NULL, &errors);
-    WEE_REPLACE_CB(NULL, -1, "test", NULL, NULL, NULL, NULL, NULL);
-    WEE_REPLACE_CB(NULL, -1, "test", "${", NULL, NULL, NULL, NULL);
-    WEE_REPLACE_CB(NULL, -1, "test", NULL, "}", NULL, NULL, NULL);
-    WEE_REPLACE_CB(NULL, -1, "test", NULL, NULL, &test_replace_cb, NULL, NULL);
-    WEE_REPLACE_CB(NULL, 0, "test", NULL, NULL, NULL, NULL, &errors);
-    WEE_REPLACE_CB(NULL, -1, "test", "${", "}", NULL, NULL, NULL);
+    WEE_REPLACE_CB(NULL, -1, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    WEE_REPLACE_CB(NULL, -1, "", NULL, NULL, NULL, NULL, NULL, NULL);
+    WEE_REPLACE_CB(NULL, -1, NULL, "", NULL, NULL, NULL, NULL, NULL);
+    WEE_REPLACE_CB(NULL, -1, NULL, NULL, "", NULL, NULL, NULL, NULL);
+    WEE_REPLACE_CB(NULL, -1, NULL, NULL, NULL, NULL, &test_replace_cb, NULL, NULL);
+    WEE_REPLACE_CB(NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, &errors);
+    WEE_REPLACE_CB(NULL, -1, "test", NULL, NULL, NULL, NULL, NULL, NULL);
+    WEE_REPLACE_CB(NULL, -1, "test", "${", NULL, NULL, NULL, NULL, NULL);
+    WEE_REPLACE_CB(NULL, -1, "test", NULL, "}", NULL, NULL, NULL, NULL);
+    WEE_REPLACE_CB(NULL, -1, "test", NULL, NULL, NULL, &test_replace_cb, NULL, NULL);
+    WEE_REPLACE_CB(NULL, 0, "test", NULL, NULL, NULL, NULL, NULL, &errors);
+    WEE_REPLACE_CB(NULL, -1, "test", "${", "}", NULL, NULL, NULL, NULL);
 
     /* valid arguments */
-    WEE_REPLACE_CB("test", -1, "test", "${", "}",
+    WEE_REPLACE_CB("test", -1, "test", "${", "}", NULL,
                    &test_replace_cb, NULL, NULL);
-    WEE_REPLACE_CB("test", 0, "test", "${", "}",
+    WEE_REPLACE_CB("test", 0, "test", "${", "}", NULL,
                    &test_replace_cb, NULL, &errors);
-    WEE_REPLACE_CB("test def", 0, "test ${abc}", "${", "}",
+    WEE_REPLACE_CB("test def", 0, "test ${abc}", "${", "}", NULL,
                    &test_replace_cb, NULL, &errors);
-    WEE_REPLACE_CB("test ", 0, "test ${xxx}", "${", "}",
+    WEE_REPLACE_CB("test ", 0, "test ${xxx}", "${", "}", NULL,
                    &test_replace_cb, NULL, &errors);
-    WEE_REPLACE_CB("test ${aaa}", 1, "test ${aaa}", "${", "}",
+    WEE_REPLACE_CB("test ${aaa}", 1, "test ${aaa}", "${", "}", NULL,
                    &test_replace_cb, NULL, &errors);
     WEE_REPLACE_CB("test def  ${aaa}", 1, "test ${abc} ${xxx} ${aaa}",
-                   "${", "}", &test_replace_cb, NULL, &errors);
-    WEE_REPLACE_CB("test ", 1, "test ${abc", "${", "}",
+                   "${", "}", NULL, &test_replace_cb, NULL, &errors);
+    WEE_REPLACE_CB("test ", 1, "test ${abc", "${", "}", NULL,
                    &test_replace_cb, NULL, &errors);
-    WEE_REPLACE_CB("test abc}", 0, "test abc}", "${", "}",
+    WEE_REPLACE_CB("test abc}", 0, "test abc}", "${", "}", NULL,
                    &test_replace_cb, NULL, &errors);
-    WEE_REPLACE_CB("test ${}", 1, "test ${}", "${", "}",
+    WEE_REPLACE_CB("test ${}", 1, "test ${}", "${", "}", NULL,
                    &test_replace_cb, NULL, &errors);
-    WEE_REPLACE_CB("test ${ }", 1, "test ${ }", "${", "}",
+    WEE_REPLACE_CB("test ${ }", 1, "test ${ }", "${", "}", NULL,
                    &test_replace_cb, NULL, &errors);
-    WEE_REPLACE_CB("def", 0, "${abc}", "${", "}",
+    WEE_REPLACE_CB("def", 0, "${abc}", "${", "}", NULL,
                    &test_replace_cb, NULL, &errors);
-    WEE_REPLACE_CB("", 0, "${xxx}", "${", "}",
+    WEE_REPLACE_CB("", 0, "${xxx}", "${", "}", NULL,
                    &test_replace_cb, NULL, &errors);
-    WEE_REPLACE_CB("${aaa}", 1, "${aaa}", "${", "}",
+    WEE_REPLACE_CB("${aaa}", 1, "${aaa}", "${", "}", NULL,
+                   &test_replace_cb, NULL, &errors);
+    WEE_REPLACE_CB("no_replace:def", 0, "${no_replace:${abc}}", "${", "}",
+                   NULL,
+                   &test_replace_cb, NULL, &errors);
+    WEE_REPLACE_CB("no_replace:${abc}", 0, "${no_replace:${abc}}", "${", "}",
+                   list_prefix_no_replace,
                    &test_replace_cb, NULL, &errors);
 }
 
@@ -1344,4 +1355,119 @@ TEST(String, Shared)
 
     string_shared_free (str3);
     LONGS_EQUAL(count + 0, string_hashtable_shared->items_count);
+}
+
+/*
+ * Tests functions:
+ *    string_dyn_alloc
+ *    string_dyn_copy
+ *    string_dyn_concat
+ *    string_dyn_free
+ */
+
+TEST(String, Dyn)
+{
+    char **str, *str_ptr;
+    struct t_string_dyn *ptr_string_dyn;
+
+    POINTERS_EQUAL(NULL, string_dyn_alloc (-1));
+    POINTERS_EQUAL(NULL, string_dyn_alloc (0));
+
+    str = string_dyn_alloc (1);
+    CHECK(str);
+    CHECK(*str);
+    STRCMP_EQUAL("", *str);
+
+    /* check internal structure content */
+    ptr_string_dyn = (struct t_string_dyn *)str;
+    LONGS_EQUAL(1, ptr_string_dyn->size_alloc);
+    LONGS_EQUAL(1, ptr_string_dyn->size);
+    STRCMP_EQUAL("", ptr_string_dyn->string);
+
+    /* check copy with NULL */
+    LONGS_EQUAL(1, string_dyn_copy (str, NULL));
+    LONGS_EQUAL(1, ptr_string_dyn->size_alloc);
+    LONGS_EQUAL(1, ptr_string_dyn->size);
+    POINTERS_EQUAL(ptr_string_dyn->string, *str);
+    STRCMP_EQUAL("", ptr_string_dyn->string);
+    STRCMP_EQUAL("", *str);
+
+    /* check copy with an empty string */
+    LONGS_EQUAL(1, string_dyn_copy (str, ""));
+    LONGS_EQUAL(1, ptr_string_dyn->size_alloc);
+    LONGS_EQUAL(1, ptr_string_dyn->size);
+    POINTERS_EQUAL(ptr_string_dyn->string, *str);
+    STRCMP_EQUAL("", ptr_string_dyn->string);
+    STRCMP_EQUAL("", *str);
+
+    /* check copy with some strings */
+    LONGS_EQUAL(1, string_dyn_copy (str, "a"));
+    LONGS_EQUAL(2, ptr_string_dyn->size_alloc);
+    LONGS_EQUAL(2, ptr_string_dyn->size);
+    POINTERS_EQUAL(ptr_string_dyn->string, *str);
+    STRCMP_EQUAL("a", ptr_string_dyn->string);
+    STRCMP_EQUAL("a", *str);
+
+    LONGS_EQUAL(1, string_dyn_copy (str, "abcd"));
+    LONGS_EQUAL(5, ptr_string_dyn->size_alloc);
+    LONGS_EQUAL(5, ptr_string_dyn->size);
+    POINTERS_EQUAL(ptr_string_dyn->string, *str);
+    STRCMP_EQUAL("abcd", ptr_string_dyn->string);
+    STRCMP_EQUAL("abcd", *str);
+
+    string_dyn_free (str, 1);
+
+    str = string_dyn_alloc (1);
+
+    /* check concat with NULL */
+    LONGS_EQUAL(1, string_dyn_concat (str, NULL));
+    LONGS_EQUAL(1, ptr_string_dyn->size_alloc);
+    LONGS_EQUAL(1, ptr_string_dyn->size);
+    POINTERS_EQUAL(ptr_string_dyn->string, *str);
+    STRCMP_EQUAL("", ptr_string_dyn->string);
+    STRCMP_EQUAL("", *str);
+
+    /* check concat with an empty string */
+    LONGS_EQUAL(1, string_dyn_concat (str, ""));
+    LONGS_EQUAL(1, ptr_string_dyn->size_alloc);
+    LONGS_EQUAL(1, ptr_string_dyn->size);
+    POINTERS_EQUAL(ptr_string_dyn->string, *str);
+    STRCMP_EQUAL("", ptr_string_dyn->string);
+    STRCMP_EQUAL("", *str);
+
+    /* check concat with some strings */
+    LONGS_EQUAL(1, string_dyn_concat (str, "a"));
+    LONGS_EQUAL(2, ptr_string_dyn->size_alloc);
+    LONGS_EQUAL(2, ptr_string_dyn->size);
+    POINTERS_EQUAL(ptr_string_dyn->string, *str);
+    STRCMP_EQUAL("a", ptr_string_dyn->string);
+    STRCMP_EQUAL("a", *str);
+
+    LONGS_EQUAL(1, string_dyn_concat (str, "bcd"));
+    LONGS_EQUAL(5, ptr_string_dyn->size_alloc);
+    LONGS_EQUAL(5, ptr_string_dyn->size);
+    POINTERS_EQUAL(ptr_string_dyn->string, *str);
+    STRCMP_EQUAL("abcd", ptr_string_dyn->string);
+    STRCMP_EQUAL("abcd", *str);
+
+    LONGS_EQUAL(1, string_dyn_concat (str, "e"));
+    LONGS_EQUAL(7, ptr_string_dyn->size_alloc);
+    LONGS_EQUAL(6, ptr_string_dyn->size);
+    POINTERS_EQUAL(ptr_string_dyn->string, *str);
+    STRCMP_EQUAL("abcde", ptr_string_dyn->string);
+    STRCMP_EQUAL("abcde", *str);
+
+    LONGS_EQUAL(1, string_dyn_concat (str, "fg"));
+    LONGS_EQUAL(10, ptr_string_dyn->size_alloc);
+    LONGS_EQUAL(8, ptr_string_dyn->size);
+    POINTERS_EQUAL(ptr_string_dyn->string, *str);
+    STRCMP_EQUAL("abcdefg", ptr_string_dyn->string);
+    STRCMP_EQUAL("abcdefg", *str);
+
+    str_ptr = *str;
+    string_dyn_free (str, 0);
+
+    STRCMP_EQUAL("abcdefg", str_ptr);
+
+    free (str_ptr);
 }
