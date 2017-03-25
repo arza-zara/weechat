@@ -1112,8 +1112,8 @@ gui_chat_display_time_to_prefix (struct t_gui_window *window,
         {
             if (!simulate)
             {
-                gui_window_set_weechat_color (GUI_WINDOW_OBJECTS(window)->win_chat,
-                                              GUI_COLOR_CHAT_PREFIX_MORE);
+                //gui_window_set_weechat_color (GUI_WINDOW_OBJECTS(window)->win_chat,
+                //                              GUI_COLOR_CHAT_PREFIX_MORE);
             }
             gui_chat_display_word (window, line,
                                    CONFIG_STRING(config_look_prefix_align_more),
