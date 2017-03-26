@@ -1640,7 +1640,7 @@ gui_window_search_start (struct t_gui_window *window,
     window->scroll->text_search_start_line = text_search_start_line;
     window->buffer->text_search =
         (window->buffer->type == GUI_BUFFER_TYPE_FORMATTED) ?
-        GUI_TEXT_SEARCH_EITHER : GUI_TEXT_SEARCH_BACKWARD;
+        GUI_TEXT_SEARCH_EITHER : GUI_TEXT_SEARCH_FORWARD;
 
     if ((window->buffer->text_search_where == 0)
         ||  CONFIG_BOOLEAN(config_look_buffer_search_force_default))
