@@ -1602,7 +1602,8 @@ gui_window_search_text (struct t_gui_window *window)
                 ((window->buffer->text_search == GUI_TEXT_SEARCH_FORWARD) ?
                     gui_line_get_next_displayed (window->scroll->start_line) :
                     window->scroll->start_line) :
-                (window->buffer->type == GUI_BUFFER_TYPE_FORMATTED ? NULL : gui_line_get_first_displayed (window->buffer));
+                ((window->buffer->type == GUI_BUFFER_TYPE_FORMATTED) ?
+                     NULL : gui_line_get_first_displayed (window->buffer));
             while (ptr_line)
             {
                 if (gui_line_search_text (window->buffer, ptr_line))
@@ -1636,7 +1637,7 @@ gui_window_search_start (struct t_gui_window *window,
     window->scroll->text_search_start_line = text_search_start_line;
     window->buffer->text_search =
         (window->buffer->type == GUI_BUFFER_TYPE_FORMATTED) ?
-        GUI_TEXT_SEARCH_EITHER : GUI_TEXT_SEARCH_BACKWARD;
+        GUI_TEXT_SEARCH_EITHER : GUI_TEXT_SEARCH_FORWARD;
 
     if ((window->buffer->text_search_where == 0)
         ||  CONFIG_BOOLEAN(config_look_buffer_search_force_default))
