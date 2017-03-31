@@ -1569,58 +1569,57 @@ gui_window_search_text (struct t_gui_window *window)
 
     if (!window)
         return 0;
+    if (!window->buffer->lines->first_line)
+        return 0;
+    if (!window->buffer->input_buffer)
+        return 0;
+    if (!window->buffer->input_buffer[0])
+        return 0;
 
     if (window->buffer->text_search == GUI_TEXT_SEARCH_BACKWARD
         || window->buffer->text_search == GUI_TEXT_SEARCH_EITHER)
     {
-        if (window->buffer->lines->first_line
-            && window->buffer->input_buffer && window->buffer->input_buffer[0])
+        ptr_line = (window->scroll->start_line) ?
+            ((window->buffer->text_search == GUI_TEXT_SEARCH_BACKWARD) ?
+                gui_line_get_prev_displayed (window->scroll->start_line) :
+                window->scroll->start_line) :
+            ((window->buffer->type == GUI_BUFFER_TYPE_FORMATTED) ?
+                 gui_line_get_last_displayed (window->buffer) : NULL);
+        while (ptr_line)
         {
-            ptr_line = (window->scroll->start_line) ?
-                ((window->buffer->text_search == GUI_TEXT_SEARCH_BACKWARD) ?
-                    gui_line_get_prev_displayed (window->scroll->start_line) :
-                    window->scroll->start_line) :
-                gui_line_get_last_displayed (window->buffer);
-            while (ptr_line)
+            if (gui_line_search_text (window->buffer, ptr_line))
             {
-                if (gui_line_search_text (window->buffer, ptr_line))
-                {
-                    window->scroll->start_line = ptr_line;
-                    window->scroll->start_line_pos = 0;
-                    window->scroll->first_line_displayed =
-                        (window->scroll->start_line == gui_line_get_first_displayed (window->buffer));
-                    gui_buffer_ask_chat_refresh (window->buffer, 2);
-                    return 1;
-                }
-                ptr_line = gui_line_get_prev_displayed (ptr_line);
+                window->scroll->start_line = ptr_line;
+                window->scroll->start_line_pos = 0;
+                window->scroll->first_line_displayed =
+                    (window->scroll->start_line == gui_line_get_first_displayed (window->buffer));
+                gui_buffer_ask_chat_refresh (window->buffer, 2);
+                return 1;
             }
+            ptr_line = gui_line_get_prev_displayed (ptr_line);
         }
     }
     if (window->buffer->text_search == GUI_TEXT_SEARCH_FORWARD
         || window->buffer->text_search == GUI_TEXT_SEARCH_EITHER)
     {
-        if (window->buffer->lines->first_line
-            && window->buffer->input_buffer && window->buffer->input_buffer[0])
+        ptr_line = (window->scroll->start_line) ?
+            ((window->buffer->text_search == GUI_TEXT_SEARCH_FORWARD) ?
+                gui_line_get_next_displayed (window->scroll->start_line) :
+                window->scroll->start_line) :
+            ((window->buffer->type == GUI_BUFFER_TYPE_FORMATTED) ?
+                NULL : gui_line_get_first_displayed (window->buffer));
+        while (ptr_line)
         {
-            ptr_line = (window->scroll->start_line) ?
-                ((window->buffer->text_search == GUI_TEXT_SEARCH_FORWARD) ?
-                    gui_line_get_next_displayed (window->scroll->start_line) :
-                    window->scroll->start_line) :
-                ((window->buffer->type == GUI_BUFFER_TYPE_FORMATTED) ?
-                     NULL : gui_line_get_first_displayed (window->buffer));
-            while (ptr_line)
+            if (gui_line_search_text (window->buffer, ptr_line))
             {
-                if (gui_line_search_text (window->buffer, ptr_line))
-                {
-                    window->scroll->start_line = ptr_line;
-                    window->scroll->start_line_pos = 0;
-                    window->scroll->first_line_displayed =
-                        (window->scroll->start_line == window->buffer->lines->first_line);
-                    gui_buffer_ask_chat_refresh (window->buffer, 2);
-                    return 1;
-                }
-                ptr_line = gui_line_get_next_displayed (ptr_line);
+                window->scroll->start_line = ptr_line;
+                window->scroll->start_line_pos = 0;
+                window->scroll->first_line_displayed =
+                    (window->scroll->start_line == window->buffer->lines->first_line);
+                gui_buffer_ask_chat_refresh (window->buffer, 2);
+                return 1;
             }
+            ptr_line = gui_line_get_next_displayed (ptr_line);
         }
     }
     return 0;
