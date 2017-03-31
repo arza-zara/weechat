@@ -3,14 +3,15 @@
 // DO NOT EDIT BY HAND!
 //
 [[command_buflist_buflist]]
-* `+buflist+`: bar item with list of buffers
+* `+buflist+`: バッファのリストを表示するバー要素
 
 ----
 /buflist  refresh
 
 refresh: force the refresh of the "buflist" bar item
 
-The lines with buffers are displayed using string evaluation (see /help eval for the format), with two main options:
+The lines with buffers are displayed using string evaluation (see /help eval for the format), with these options:
+  - buflist.look.display_conditions: conditions to display a buffer in the list
   - buflist.format.buffer: format for a buffer which is not current buffer
   - buflist.format.buffer_current: format for the current buffer
 
@@ -23,6 +24,7 @@ The following variables can be used in these options:
     - ${buffer.nicklist_nicks_count}
   - extra variables added by buflist for convenience:
     - ${format_buffer}: the evaluated value of option buflist.format.buffer; this can be used in option buflist.format.buffer_current to just change the background color for example
+    - ${format_number}: indented number with separator (evaluation of option buflist.format.number)
     - ${number}: indented number, for example " 1" if there are between 10 and 99 buffers
     - ${indent}: indentation for name (channel and private buffers are indented)
     - ${name}: the short name (if set), with a fallback on the name

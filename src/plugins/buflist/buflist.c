@@ -27,6 +27,7 @@
 #include "buflist-bar-item.h"
 #include "buflist-command.h"
 #include "buflist-config.h"
+#include "buflist-mouse.h"
 
 
 WEECHAT_PLUGIN_NAME(BUFLIST_PLUGIN_NAME);
@@ -221,41 +222,12 @@ buflist_sort_buffers ()
 }
 
 /*
- * Callback for a signal on a buffer.
- */
-
-int
-buflist_signal_buffer_cb (const void *pointer, void *data,
-                          const char *signal, const char *type_data,
-                          void *signal_data)
-{
-    /* make C compiler happy */
-    (void) pointer;
-    (void) data;
-    (void) signal;
-    (void) type_data;
-    (void) signal_data;
-
-    weechat_bar_item_update (BUFLIST_BAR_ITEM_NAME);
-
-    return WEECHAT_RC_OK;
-}
-
-/*
  * Initializes buflist plugin.
  */
 
 int
 weechat_plugin_init (struct t_weechat_plugin *plugin, int argc, char *argv[])
 {
-    char *signals_buffers[] =
-    { "buffer_opened", "buffer_closed", "buffer_merged", "buffer_unmerged",
-      "buffer_moved", "buffer_renamed", "buffer_switch", "buffer_hidden",
-      "buffer_unhidden", "buffer_localvar_added", "buffer_localvar_changed",
-      "window_switch", "hotlist_changed", NULL
-    };
-    int i;
-
     /* make C compiler happy */
     (void) argc;
     (void) argv;
@@ -275,19 +247,14 @@ weechat_plugin_init (struct t_weechat_plugin *plugin, int argc, char *argv[])
 
     buflist_command_init ();
 
-    /* hook some signals */
-    for (i = 0; signals_buffers[i]; i++)
-    {
-        weechat_hook_signal (signals_buffers[i],
-                             &buflist_signal_buffer_cb, NULL, NULL);
-    }
-
     weechat_bar_new (BUFLIST_BAR_NAME, "off", "0", "root", "", "left",
                      "columns_vertical", "vertical", "0", "0",
                      "default", "default", "default", "on",
                      BUFLIST_BAR_ITEM_NAME);
 
     weechat_bar_item_update (BUFLIST_BAR_ITEM_NAME);
+
+    buflist_mouse_init ();
 
     return WEECHAT_RC_OK;
 }
@@ -301,6 +268,8 @@ weechat_plugin_end (struct t_weechat_plugin *plugin)
 {
     /* make C compiler happy */
     (void) plugin;
+
+    buflist_mouse_end ();
 
     buflist_bar_item_end ();
 

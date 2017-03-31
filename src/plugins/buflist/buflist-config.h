@@ -24,6 +24,13 @@
 
 extern struct t_config_file *buflist_config_file;
 
+extern struct t_config_option *buflist_config_look_display_conditions;
+extern struct t_config_option *buflist_config_look_mouse_jump_visited_buffer;
+extern struct t_config_option *buflist_config_look_mouse_move_buffer;
+extern struct t_config_option *buflist_config_look_mouse_wheel;
+extern struct t_config_option *buflist_config_look_signals_refresh;
+extern struct t_config_option *buflist_config_look_sort;
+
 extern struct t_config_option *buflist_config_format_buffer;
 extern struct t_config_option *buflist_config_format_buffer_current;
 extern struct t_config_option *buflist_config_format_hotlist;
@@ -31,6 +38,7 @@ extern struct t_config_option *buflist_config_format_hotlist_level[4];
 extern struct t_config_option *buflist_config_format_hotlist_level_none;
 extern struct t_config_option *buflist_config_format_hotlist_separator;
 extern struct t_config_option *buflist_config_format_lag;
+extern struct t_config_option *buflist_config_format_number;
 
 extern char **buflist_config_sort_fields;
 extern int buflist_config_sort_fields_count;

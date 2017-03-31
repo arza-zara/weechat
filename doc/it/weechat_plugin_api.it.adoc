@@ -2120,17 +2120,34 @@ expanded to last):
 
 | `+${cut:max,suffix,string}+` +
   (_WeeChat ≥ 1.8_) |
-  String with `max` chars displayed, and optional `suffix` if string is cut. |
+  String with `max` chars, and optional `suffix` if string is cut. |
   `+${cut:4,…,this is a test}+` +
-  `+${cut:2,>>,àéçôî}+` |
+  `+${cut:2,>>,こんにちは世界}+` |
   `+this…+` +
-  `+àé>>+`
+  `+こん>>+`
+
+| `+${cutscr:max,suffix,string}+` +
+  (_WeeChat ≥ 1.8_) |
+  String with `max` chars displayed on screen, and optional `suffix` if string is cut. |
+  `+${cutscr:4,…,this is a test}+` +
+  `+${cutscr:2,>>,こんにちは世界}+` |
+  `+this…+` +
+  `+こ>>+`
 
 | `+${re:N}+` |
   Regex captured group: `0` = whole string matching, `1` to `99` = group
-  captured, `+++` = last group captured. |
-  `+${re:1}+` |
-  `+test+`
+  captured, `+++` = last group captured,
+  `#` = index of last group captured (_WeeChat ≥ 1.8_). |
+  `+${re:0}+` +
+  `+${re:1}+` +
+  `+${re:2}+` +
+  `+${re:+++}+` +
+  `+${re:#}+` |
+  `+test1 test2+` +
+  `+test1+` +
+  `+test2+` +
+  `+test2+` +
+  `+2+`
 
 | `+${color:name}+` |
   WeeChat color code (the name of color has optional attributes),
@@ -3998,7 +4015,8 @@ Argomenti:
 * _sorted_: 1 to sort the array list, 0 for no sort
 * _allow_duplicates_: 1 to allow duplicate entries, 0 to prevent a same entry
   to be added again
-* _callback_cmp_: callback used to compare two items, arguments and return value:
+* _callback_cmp_: callback used to compare two items (optional), arguments and
+  return value:
 ** _void *data_: pointer
 ** _struct t_arraylist *arraylist_: array list pointer
 ** _void *pointer1_: pointer to first item

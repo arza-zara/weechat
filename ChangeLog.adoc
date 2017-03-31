@@ -20,7 +20,7 @@ https://weechat.org/files/releasenotes/ReleaseNotes-devel.html[release notes]
 
 New features::
 
-  * core: add cut of string in evaluation of expressions (${cut:max,suffix,string})
+  * core: add cut of string in evaluation of expressions with "cut:" (number of chars) and "cutscr:" (number of chars displayed on screen)
   * core: add ternary operator (condition) in evaluation of expressions (${if:condition?value_if_true:value_if_false})
   * core: add resize of window parents with /window resize [h/v]size (task #11461, issue #893)
   * buflist: new plugin "buflist" (bar item with list of buffers)
@@ -32,6 +32,7 @@ Improvements::
 
   * core: add hotlist pointer in buffer structure
   * core: add last start date in output of command /version after at least one /upgrade (issue #903)
+  * api: add ${re:#} to get the index of last group captured in function string_eval_expression()
   * irc: send multiple masks by message in commands /ban, /unban, /quiet and /unquiet, use ban mask default for nicks in /quiet and /unquiet, display an error if /quiet and /unquiet are not supported by server (issue #579, issue #15, issue #577)
   * irc: add option "-include" in commands /allchan, /allpv and /allserv (issue #572)
   * irc: don't smart filter modes given to you (issue #530, issue #897)
@@ -40,6 +41,8 @@ Bug fixes::
 
   * core: fix delayed refresh when the signal SIGWINCH is received (terminal resized), send signal "signal_sigwinch" after refreshes (issue #902)
   * irc: fix parsing of message 324 (modes) when there is a colon before the modes (issue #913)
+  * relay: check buffer pointer received in "sync" and "desync" commands (weechat protocol) (issue #936)
+  * relay: remove buffer from synchronized buffers when it is closed (fix memory leak)
 
 Build::
 

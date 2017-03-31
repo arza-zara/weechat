@@ -220,13 +220,46 @@ TEST(Eval, EvalExpression)
 
     /* test cut of chars */
     WEE_CHECK_EVAL("", "${cut:0,,}");
+    WEE_CHECK_EVAL("", "${cutscr:0,,}");
+
     WEE_CHECK_EVAL("", "${cut:0,+,}");
+    WEE_CHECK_EVAL("", "${cutscr:0,+,}");
+
     WEE_CHECK_EVAL("", "${cut:0,,test}");
+    WEE_CHECK_EVAL("", "${cutscr:0,,test}");
+
     WEE_CHECK_EVAL("+", "${cut:0,+,test}");
+    WEE_CHECK_EVAL("+", "${cutscr:0,+,test}");
+
     WEE_CHECK_EVAL("te", "${cut:2,,test}");
+    WEE_CHECK_EVAL("te", "${cutscr:2,,test}");
+
     WEE_CHECK_EVAL("te+", "${cut:2,+,test}");
+    WEE_CHECK_EVAL("te+", "${cutscr:2,+,test}");
+
     WEE_CHECK_EVAL("éà", "${cut:2,,éàô}");
+    WEE_CHECK_EVAL("éà", "${cutscr:2,,éàô}");
+
     WEE_CHECK_EVAL("éà+", "${cut:2,+,éàô}");
+    WEE_CHECK_EVAL("éà+", "${cutscr:2,+,éàô}");
+
+    WEE_CHECK_EVAL("こ+", "${cut:1,+,こんにちは世界}");
+    WEE_CHECK_EVAL("+", "${cutscr:1,+,こんにちは世界}");
+
+    WEE_CHECK_EVAL("こん+", "${cut:2,+,こんにちは世界}");
+    WEE_CHECK_EVAL("こ+", "${cutscr:2,+,こんにちは世界}");
+
+    WEE_CHECK_EVAL("こんに+", "${cut:3,+,こんにちは世界}");
+    WEE_CHECK_EVAL("こ+", "${cutscr:3,+,こんにちは世界}");
+
+    WEE_CHECK_EVAL("こんにち+", "${cut:4,+,こんにちは世界}");
+    WEE_CHECK_EVAL("こん+", "${cutscr:4,+,こんにちは世界}");
+
+    WEE_CHECK_EVAL("こんにちは+", "${cut:5,+,こんにちは世界}");
+    WEE_CHECK_EVAL("こん+", "${cutscr:4,+,こんにちは世界}");
+
+    WEE_CHECK_EVAL("a+", "${cut:1,+,a${\\u0308}}");
+    WEE_CHECK_EVAL("a\u0308", "${cutscr:1,+,a${\\u0308}}");
 
     /* test color */
     WEE_CHECK_EVAL(gui_color_get_custom ("green"), "${color:green}");
@@ -368,6 +401,13 @@ TEST(Eval, EvalReplaceRegex)
     WEE_CHECK_EVAL("password=*** password=***",
                    "password=abc password=def");
     regfree (&regex);
+
+    /* regex groups */
+    hashtable_remove (pointers, "regex");
+    hashtable_set (options, "regex", "([a-z]+) ([a-z]+) ([a-z]+) ([a-z]+)");
+    hashtable_set (options, "regex_replace",
+                   "${re:0} -- ${re:1} ${re:+} (${re:#})");
+    WEE_CHECK_EVAL("abc def ghi jkl -- abc jkl (4)", "abc def ghi jkl");
 
     hashtable_free (pointers);
     hashtable_free (extra_vars);
