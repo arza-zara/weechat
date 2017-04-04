@@ -1961,7 +1961,7 @@ str3 = weechat.string_input_for_buffer("//test")  # "/test"
 
 ==== string_eval_expression
 
-_WeeChat バージョン 0.4.0 以上で利用可、バージョン 0.4.2、1.0、1.1、1.2、1.3、1.8 で更新。_
+_WeeChat バージョン 0.4.0 以上で利用可、バージョン 0.4.2、0.4.3、1.0、1.1、1.2、1.3、1.6、1.8 で更新。_
 
 式を評価して文字列として返す。`+${variable}+`
 という書式で書かれた特殊変数は展開されます (以下の表を参照)。
@@ -2002,7 +2002,7 @@ char *weechat_string_eval_expression (const char *expr,
 ** _extra_: デフォルトの挙動では追加変数 (_extra_vars_)
    を単純に置換するだけですが、この挙動を変更します。設定可能な値は以下です:
 *** _eval_: 置換前に追加変数 (_extra_vars_)
-    を評価します
+    を評価します (_WeeChat バージョン 1.6 以上で利用可_)
 ** _regex_: _expr_ のテキストを置換する正規表現
    (この場合 _expr_ は評価されません)
 ** _regex_replace_: _regex_ と一緒に使われる置換テキスト、_expr_
@@ -2034,41 +2034,41 @@ char *weechat_string_eval_expression (const char *expr,
  内に色コードが存在する場合色付き)
 
 | `+${esc:xxx}+` +
-  `+${\xxx}+` |
+  `+${\xxx}+` +
+  (_WeeChat バージョン 1.0 以上で利用可_) |
   エスケープ文字を含む文字列 |
   `+${esc:prefix\tmessage}+` +
   `+${\ua9}+` |
   `+prefix<TAB>message+` +
   `+©+`
 
-| `+${hide:x,string}+` |
+| `+${hide:x,string}+` +
+  (_WeeChat バージョン 1.1 以上で利用可_) |
   隠す文字を含むテキスト (`string` に含まれる文字をすべて `x` で置換) |
   `+${hide:*,password}+` |
  `+********+`
 
-// TRANSLATION MISSING
 | `+${cut:max,suffix,string}+` +
   (_WeeChat バージョン 1.8 以上で利用可_) |
-  String with `max` chars, and optional `suffix` if string is cut. |
+  `string` の先頭 `max` 文字とオプションの `suffix` 文字 (`string` の文字数が `max` 文字を超える場合) |
   `+${cut:4,…,this is a test}+` +
   `+${cut:2,>>,こんにちは世界}+` |
   `+this…+` +
   `+こん>>+`
 
-// TRANSLATION MISSING
 | `+${cutscr:max,suffix,string}+` +
   (_WeeChat バージョン 1.8 以上で利用可_) |
-  String with `max` chars displayed on screen, and optional `suffix` if string is cut. |
+  `string` の先頭 `max` 文字 (半角文字幅換算) とオプションの `suffix` 文字 (`string` の文字数が `max` 文字を超える場合) |
   `+${cutscr:4,…,this is a test}+` +
   `+${cutscr:2,>>,こんにちは世界}+` |
   `+this…+` +
   `+こ>>+`
 
-// TRANSLATION MISSING
-| `+${re:N}+` |
+| `+${re:N}+` +
+  (_WeeChat バージョン 1.1 以上で利用可_) |
   正規表現のキャプチャグループ: `0` = マッチするすべての文字列、`1` から `99` =
   キャプチャされたグループ、`+++` = 最後にキャプチャされたグループ、
-  `#` = index of last group captured (_WeeChat ≥ 1.8_). |
+  `#` = 最後にキャプチャされたグループのインデックス番号 (_WeeChat バージョン 1.8 以上で利用可_) |
   `+${re:0}+` +
   `+${re:1}+` +
   `+${re:2}+` +
@@ -2080,7 +2080,8 @@ char *weechat_string_eval_expression (const char *expr,
   `+test2+` +
   `+2+`
 
-| `+${color:name}+` |
+| `+${color:name}+` +
+  (_WeeChat バージョン 0.4.2 以上で利用可_) |
   WeeChat 色コード (色名部分はオプション属性をとることも可能です),
   書式を確認するには関数 <<_color,color>> をご確認ください |
   `+${color:red}red text+` +
@@ -2089,7 +2090,8 @@ char *weechat_string_eval_expression (const char *expr,
   `+bold orange text+` (太字オレンジ色で)
 
 | `+${info:name}+` +
-  `+${info:name,arguments}+` |
+  `+${info:name,arguments}+` +
+  (_WeeChat バージョン 0.4.3 以上で利用可_) |
   WeeChat またはプラグインのインフォ、<<_info_get,info_get>>
   を参照 |
   `+${info:version}+` +
@@ -2343,7 +2345,7 @@ _WeeChat バージョン 1.8 以上で利用可_
 
 [source,C]
 ----
-void weechat_dyn_free (char **string, int free_string);
+char *weechat_dyn_free (char **string, int free_string);
 ----
 
 引数:
@@ -2351,6 +2353,10 @@ void weechat_dyn_free (char **string, int free_string);
 * _string_: 動的文字列へのポインタ
 * _free_string_: 文字列の解放; 0 を指定することで、この関数を呼び出した後でも
   _*string_ が指すアドレスのメモリを確保したままにできます。
+
+戻り値:
+
+* _free_string_ が 0 の場合には文字列ポインタ、それ以外の場合は NULL
 
 C 言語での使用例:
 
@@ -3892,9 +3898,8 @@ struct t_arraylist *weechat_arraylist_new (int initial_size,
 * _sorted_: 1 の場合には配列リストをソートし、0 の場合にはソートしません
 * _allow_duplicates_: 1 の場合にはエントリの重複を許可し、0
   の場合にはエントリが重複して追加されることを防ぎます
-// TRANSLATION MISSING
-* _callback_cmp_: callback used to compare two items (optional), arguments and
-  return value:
+* _callback_cmp_: 2 つの要素を比較する際に使われるコールバック
+  (任意)、引数と戻り値は以下:
 ** _void *data_: ポインタ
 ** _struct t_arraylist *arraylist_: 配列リストポインタ
 ** _void *pointer1_: 1 番目の要素へのポインタ
@@ -7119,7 +7124,7 @@ elif rc == weechat.WEECHAT_CONFIG_OPTION_UNSET_ERROR:
 
 ==== key_bind
 
-_WeeChat バージョン 0.3.6 以上で利用可。_
+_WeeChat バージョン 0.3.6 以上で利用可、バージョン 1.8 で更新。_
 
 新しいキー割り当てを追加。
 
@@ -7135,6 +7140,8 @@ _WeeChat バージョン 0.3.6 以上で利用可。_
 int weechat_key_bind (const char *context, struct t_hashtable *keys);
 ----
 
+:key_bind_quiet: __quiet
+
 引数:
 
 * _context_: キーのコンテキスト:
@@ -7142,7 +7149,9 @@ int weechat_key_bind (const char *context, struct t_hashtable *keys);
 ** _search_: 検索コンテキスト (バッファ中のテキストを検索中)
 ** _cursor_: 画面上のカーソルを自由に移動
 ** _mouse_: マウスイベント用のキー
-* _keys_: キー割り当てを収めたハッシュテーブル
+* _keys_: キー割り当てを収めたハッシュテーブル; 以下の特殊キーを収めることが可能です:
+** _{key_bind_quiet}_: コアバッファに追加されたキーを表示しない
+   _(WeeChat バージョン 1.8 以上で利用可)_
 
 戻り値:
 
