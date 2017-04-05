@@ -1638,9 +1638,7 @@ gui_window_search_start (struct t_gui_window *window,
         return;
 
     window->scroll->text_search_start_line = text_search_start_line;
-    window->buffer->text_search =
-        (window->buffer->type == GUI_BUFFER_TYPE_FORMATTED) ?
-        GUI_TEXT_SEARCH_EITHER : GUI_TEXT_SEARCH_FORWARD;
+    window->buffer->text_search = GUI_TEXT_SEARCH_EITHER;
 
     if ((window->buffer->text_search_where == 0)
         ||  CONFIG_BOOLEAN(config_look_buffer_search_force_default))
@@ -1695,9 +1693,7 @@ gui_window_search_restart (struct t_gui_window *window)
 
     window->scroll->start_line = window->scroll->text_search_start_line;
     window->scroll->start_line_pos = 0;
-    window->buffer->text_search =
-        (window->buffer->type == GUI_BUFFER_TYPE_FORMATTED) ?
-        GUI_TEXT_SEARCH_EITHER : GUI_TEXT_SEARCH_FORWARD;
+    window->buffer->text_search = GUI_TEXT_SEARCH_EITHER;
     window->buffer->text_search_found = 0;
     gui_input_search_compile_regex (window->buffer);
     if (gui_window_search_text (window))
