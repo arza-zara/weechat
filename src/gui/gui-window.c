@@ -1577,14 +1577,15 @@ gui_window_search_text (struct t_gui_window *window)
         return 0;
 
     if (window->buffer->text_search == GUI_TEXT_SEARCH_BACKWARD
-        || window->buffer->text_search == GUI_TEXT_SEARCH_EITHER)
+        || (window->buffer->text_search == GUI_TEXT_SEARCH_EITHER
+            && (window->buffer->type == GUI_BUFFER_TYPE_FORMATTED
+                || window->scroll->start_line)))
     {
         ptr_line = (window->scroll->start_line) ?
             ((window->buffer->text_search == GUI_TEXT_SEARCH_BACKWARD) ?
                 gui_line_get_prev_displayed (window->scroll->start_line) :
                 window->scroll->start_line) :
-            ((window->buffer->type == GUI_BUFFER_TYPE_FORMATTED) ?
-                 gui_line_get_last_displayed (window->buffer) : NULL);
+             gui_line_get_last_displayed (window->buffer);
         while (ptr_line)
         {
             if (gui_line_search_text (window->buffer, ptr_line))
@@ -1600,14 +1601,15 @@ gui_window_search_text (struct t_gui_window *window)
         }
     }
     if (window->buffer->text_search == GUI_TEXT_SEARCH_FORWARD
-        || window->buffer->text_search == GUI_TEXT_SEARCH_EITHER)
+        || (window->buffer->text_search == GUI_TEXT_SEARCH_EITHER
+            && (window->buffer->type == GUI_BUFFER_TYPE_FREE
+               || window->scroll->last_line)))
     {
         ptr_line = (window->scroll->start_line) ?
             ((window->buffer->text_search == GUI_TEXT_SEARCH_FORWARD) ?
                 gui_line_get_next_displayed (window->scroll->start_line) :
                 window->scroll->start_line) :
-            ((window->buffer->type == GUI_BUFFER_TYPE_FORMATTED) ?
-                NULL : gui_line_get_first_displayed (window->buffer));
+            gui_line_get_first_displayed (window->buffer);
         while (ptr_line)
         {
             if (gui_line_search_text (window->buffer, ptr_line))
