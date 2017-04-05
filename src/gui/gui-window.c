@@ -1603,7 +1603,7 @@ gui_window_search_text (struct t_gui_window *window)
     if (window->buffer->text_search == GUI_TEXT_SEARCH_FORWARD
         || (window->buffer->text_search == GUI_TEXT_SEARCH_EITHER
             && (window->buffer->type == GUI_BUFFER_TYPE_FREE
-               || window->scroll->last_line)))
+                || window->scroll->start_line)))
     {
         ptr_line = (window->scroll->start_line) ?
             ((window->buffer->text_search == GUI_TEXT_SEARCH_FORWARD) ?
