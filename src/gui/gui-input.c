@@ -578,6 +578,7 @@ gui_input_search_text_here (struct t_gui_buffer *buffer)
     window = gui_window_search_with_buffer (buffer);
     if (window)
     {
+        gui_input_search_stop_here (buffer);
         gui_window_search_start (window, window->scroll->start_line);
         gui_input_search_signal (buffer);
     }
@@ -595,6 +596,7 @@ gui_input_search_text (struct t_gui_buffer *buffer)
     window = gui_window_search_with_buffer (buffer);
     if (window)
     {
+        gui_input_search_stop_here (buffer);
         gui_window_search_start (window, NULL);
         gui_input_search_signal (buffer);
     }
