@@ -329,9 +329,13 @@ trigger_callback_run_command (struct t_trigger *trigger,
  *   2. check conditions (if false, exit)
  *   3. replace text with regex
  *   4. execute command(s)
+ *
+ * Returns:
+ *   1: conditions were true (or no condition set in trigger)
+ *   0: conditions were false
  */
 
-void
+int
 trigger_callback_execute (struct t_trigger *trigger,
                           struct t_gui_buffer *buffer,
                           struct t_hashtable *pointers,
@@ -357,7 +361,11 @@ trigger_callback_execute (struct t_trigger *trigger,
         /* execute command(s) */
         trigger_callback_run_command (trigger, buffer, pointers, extra_vars,
                                       display_monitor);
+
+        return 1;
     }
+
+    return 0;
 }
 
 /*
@@ -452,7 +460,8 @@ trigger_callback_signal_cb (const void *pointer, void *data,
     weechat_hashtable_set (extra_vars, "tg_signal_data", ptr_signal_data);
 
     /* execute the trigger (conditions, regex, command) */
-    trigger_callback_execute (trigger, NULL, pointers, extra_vars);
+    if (!trigger_callback_execute (trigger, NULL, pointers, extra_vars))
+        trigger_rc = WEECHAT_RC_OK;
 
 end:
     TRIGGER_CALLBACK_CB_END(trigger_rc);
@@ -500,7 +509,8 @@ trigger_callback_hsignal_cb (const void *pointer, void *data,
     weechat_hashtable_set (extra_vars, "tg_signal", signal);
 
     /* execute the trigger (conditions, regex, command) */
-    trigger_callback_execute (trigger, NULL, pointers, extra_vars);
+    if (!trigger_callback_execute (trigger, NULL, pointers, extra_vars))
+        trigger_rc = WEECHAT_RC_OK;
 
 end:
     TRIGGER_CALLBACK_CB_END(trigger_rc);
@@ -758,7 +768,8 @@ trigger_callback_print_cb  (const void *pointer, void *data,
         goto end;
 
     /* execute the trigger (conditions, regex, command) */
-    trigger_callback_execute (trigger, buffer, pointers, extra_vars);
+    if (!trigger_callback_execute (trigger, buffer, pointers, extra_vars))
+        trigger_rc = WEECHAT_RC_OK;
 
 end:
     TRIGGER_CALLBACK_CB_END(trigger_rc);
@@ -792,7 +803,8 @@ trigger_callback_command_cb  (const void *pointer, void *data,
     }
 
     /* execute the trigger (conditions, regex, command) */
-    trigger_callback_execute (trigger, buffer, pointers, extra_vars);
+    if (!trigger_callback_execute (trigger, buffer, pointers, extra_vars))
+        trigger_rc = WEECHAT_RC_OK;
 
 end:
     TRIGGER_CALLBACK_CB_END(trigger_rc);
@@ -817,7 +829,8 @@ trigger_callback_command_run_cb  (const void *pointer, void *data,
     weechat_hashtable_set (extra_vars, "tg_command", command);
 
     /* execute the trigger (conditions, regex, command) */
-    trigger_callback_execute (trigger, buffer, pointers, extra_vars);
+    if (!trigger_callback_execute (trigger, buffer, pointers, extra_vars))
+        trigger_rc = WEECHAT_RC_OK;
 
 end:
     TRIGGER_CALLBACK_CB_END(trigger_rc);
@@ -865,7 +878,8 @@ trigger_callback_timer_cb  (const void *pointer, void *data,
     }
 
     /* execute the trigger (conditions, regex, command) */
-    trigger_callback_execute (trigger, NULL, pointers, extra_vars);
+    if (!trigger_callback_execute (trigger, NULL, pointers, extra_vars))
+        trigger_rc = WEECHAT_RC_OK;
 
 end:
     TRIGGER_CALLBACK_CB_END(trigger_rc);
@@ -888,7 +902,8 @@ trigger_callback_config_cb  (const void *pointer, void *data,
     weechat_hashtable_set (extra_vars, "tg_value", value);
 
     /* execute the trigger (conditions, regex, command) */
-    trigger_callback_execute (trigger, NULL, pointers, extra_vars);
+    if (!trigger_callback_execute (trigger, NULL, pointers, extra_vars))
+        trigger_rc = WEECHAT_RC_OK;
 
 end:
     TRIGGER_CALLBACK_CB_END(trigger_rc);
