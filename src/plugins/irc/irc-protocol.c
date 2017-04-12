@@ -1344,8 +1344,8 @@ IRC_PROTOCOL_CALLBACK(nick)
                         {
                             smart_filter = (weechat_config_boolean (irc_config_look_smart_filter)
                                             && weechat_config_boolean (irc_config_look_smart_filter_nick)
-                                            && (irc_channel_nick_speaking_time_search (server, ptr_channel, nick, 1)
-                                                || irc_channel_nick_speaking_time_search (server, ptr_channel, new_nick, 1)));
+                                            && !irc_channel_nick_speaking_time_search (server, ptr_channel, nick, 1)
+                                            && !irc_channel_nick_speaking_time_search (server, ptr_channel, new_nick, 1));
                             snprintf (str_tags, sizeof (str_tags),
                                       "%sirc_nick1_%s,irc_nick2_%s",
                                       (smart_filter) ? "irc_smart_filter," : "",
@@ -1857,19 +1857,17 @@ IRC_PROTOCOL_CALLBACK(pong)
         gettimeofday (&tv, NULL);
         server->lag = (int)(weechat_util_timeval_diff (&(server->lag_check_time),
                                                        &tv) / 1000);
+        if (server->lag != server->lag_displayed)
+        {
+            server->lag_displayed = server->lag;
+            weechat_bar_item_update ("lag");
+        }
 
         /* schedule next lag check */
         server->lag_check_time.tv_sec = 0;
         server->lag_check_time.tv_usec = 0;
         server->lag_next_check = time (NULL) +
             weechat_config_integer (irc_config_network_lag_check);
-
-        /* refresh lag bar item if needed */
-        if (server->lag != server->lag_displayed)
-        {
-            server->lag_displayed = server->lag;
-            irc_server_set_lag (server);
-        }
     }
     else
     {
@@ -2479,7 +2477,7 @@ IRC_PROTOCOL_CALLBACK(wallops)
 IRC_PROTOCOL_CALLBACK(001)
 {
     char *server_command, **commands, **ptr_command, *vars_replaced, *away_msg;
-    char *usermode, *slash_command;
+    char *usermode;
 
     IRC_PROTOCOL_MIN_ARGS(3);
 
@@ -2547,23 +2545,8 @@ IRC_PROTOCOL_CALLBACK(001)
             {
                 vars_replaced = irc_message_replace_vars (server, NULL,
                                                           *ptr_command);
-                if (weechat_string_is_command_char (*ptr_command))
-                {
-                    weechat_command (server->buffer,
-                                     (vars_replaced) ? vars_replaced : *ptr_command);
-                }
-                else
-                {
-                    slash_command = malloc (1 + strlen((vars_replaced) ? vars_replaced : *ptr_command) + 1);
-                    if (slash_command)
-                    {
-                        strcpy (slash_command, "/");
-                        strcat (slash_command, (vars_replaced) ? vars_replaced : *ptr_command);
-                        weechat_command (server->buffer, slash_command);
-                        free (slash_command);
-                    }
-                }
-
+                weechat_command (server->buffer,
+                                 (vars_replaced) ? vars_replaced : *ptr_command);
                 if (vars_replaced)
                     free (vars_replaced);
             }
