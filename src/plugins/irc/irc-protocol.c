@@ -2477,7 +2477,7 @@ IRC_PROTOCOL_CALLBACK(wallops)
 IRC_PROTOCOL_CALLBACK(001)
 {
     char *server_command, **commands, **ptr_command, *vars_replaced, *away_msg;
-    char *usermode;
+    char *usermode, *slash_command;
 
     IRC_PROTOCOL_MIN_ARGS(3);
 
