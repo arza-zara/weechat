@@ -4177,7 +4177,7 @@ gui_buffer_hdata_buffer_cb (const void *pointer, void *data,
         HDATA_VAR(struct t_gui_buffer, local_variables, HASHTABLE, 0, NULL, NULL);
         HDATA_VAR(struct t_gui_buffer, prev_buffer, POINTER, 0, NULL, hdata_name);
         HDATA_VAR(struct t_gui_buffer, next_buffer, POINTER, 0, NULL, hdata_name);
-        HDATA_VAR(struct t_gui_buffer, max_buffer_lines_number, INTEGER, -1, NULL, NULL);
+        HDATA_VAR(struct t_gui_buffer, max_buffer_lines_number, INTEGER, 0, NULL, NULL);
         HDATA_LIST(gui_buffers, WEECHAT_HDATA_LIST_CHECK_POINTERS);
         HDATA_LIST(last_gui_buffer, 0);
         HDATA_LIST(gui_buffer_last_displayed, 0);
