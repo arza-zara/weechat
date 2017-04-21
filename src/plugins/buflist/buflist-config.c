@@ -299,12 +299,15 @@ buflist_config_init ()
         buflist_config_file, ptr_section,
         "display_conditions", "string",
         N_("conditions to display a buffer "
-           "(note: content is evaluated, see /help buflist)"),
+           "(note: content is evaluated, see /help buflist); for example "
+           "to hide server buffers if they are merged with core buffer: "
+           "\"${buffer.hidden}==0 && ((${type}!=server && "
+           "${buffer.full_name}!=core.weechat) || ${buffer.active}==1)\""),
         NULL, 0, 0,
         "${buffer.hidden}==0",
         NULL, 0,
         NULL, NULL, NULL,
-        &buflist_config_change_signals_refresh, NULL, NULL,
+        &buflist_config_change_buflist, NULL, NULL,
         NULL, NULL, NULL);
     buflist_config_look_mouse_jump_visited_buffer = weechat_config_new_option (
         buflist_config_file, ptr_section,
@@ -406,7 +409,7 @@ buflist_config_init ()
         N_("format for the line with current buffer "
            "(note: content is evaluated, see /help buflist)"),
         NULL, 0, 0,
-        "${color:lightgreen,blue}${format_buffer}",
+        "${color:,blue}${format_buffer}",
         NULL, 0,
         NULL, NULL, NULL,
         &buflist_config_change_buflist, NULL, NULL,
