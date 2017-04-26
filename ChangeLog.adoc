@@ -38,9 +38,11 @@ Improvements::
   * irc: send multiple masks by message in commands /ban, /unban, /quiet and /unquiet, use ban mask default for nicks in /quiet and /unquiet, display an error if /quiet and /unquiet are not supported by server (issue #579, issue #15, issue #577)
   * irc: add option "-include" in commands /allchan, /allpv and /allserv (issue #572)
   * irc: don't smart filter modes given to you (issue #530, issue #897)
+  * script: remove option script.scripts.url_force_https, use HTTPS by default in option script.scripts.url
 
 Bug fixes::
 
+  * core: fix command /cursor stop (do not toggle cursor mode) (issue #964)
   * core: fix delayed refresh when the signal SIGWINCH is received (terminal resized), send signal "signal_sigwinch" after refreshes (issue #902)
   * irc: fix parsing of DCC filename
   * irc: fix double decoding of IRC colors in messages sent/displayed by commands /msg and /query (issue #943)
@@ -52,6 +54,13 @@ Build::
 
   * core: fix compilation on FreeBSD with autotools (issue #276)
   * ruby: add detection of Ruby 2.4 (issue #895)
+
+[[v1.7.1]]
+== Version 1.7.1 (2017-04-22)
+
+Bug fixes::
+
+  * irc: fix parsing of DCC filename
 
 [[v1.7]]
 == Version 1.7 (2017-01-15)

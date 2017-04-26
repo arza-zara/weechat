@@ -1674,7 +1674,7 @@ COMMAND_CALLBACK(cursor)
 
     if (string_strcasecmp (argv[1], "stop") == 0)
     {
-        gui_cursor_mode_toggle ();
+        gui_cursor_mode_stop ();
         return WEECHAT_RC_OK;
     }
 
@@ -7271,9 +7271,11 @@ command_init ()
            "  1. an evaluated sub-string (format: \"eval:xxx\")\n"
            "  2. a string with escaped chars (format: \"esc:xxx\" or \"\\xxx\")\n"
            "  3. a string with chars to hide (format: \"hide:char,string\")\n"
-           "  4. a string with max chars (format: \"cut:max,suffix,string\")\n"
+           "  4. a string with max chars (format: \"cut:max,suffix,string\" "
+           "or \"cut:+max,suffix,string\")\n"
            "     or max chars displayed on screen "
-           "(format: \"cutscr:max,suffix,string\")\n"
+           "(format: \"cutscr:max,suffix,string\" or "
+           "\"cutscr:+max,suffix,string\")\n"
            "  5. a color (format: \"color:xxx\", see \"Plugin API "
            "reference\", function \"color\")\n"
            "  6. an info (format: \"info:name,arguments\", arguments are "
@@ -7313,7 +7315,8 @@ command_init ()
            "  /eval -n ${window.buffer.number}               ==> 1\n"
            "  /eval -n ${\\t}                                 ==> <tab>\n"
            "  /eval -n ${hide:-,${relay.network.password}}   ==> --------\n"
-           "  /eval -n ${cut:2,+,test}                       ==> te+\n"
+           "  /eval -n ${cut:3,+,test}                       ==> tes+\n"
+           "  /eval -n ${cut:+3,+,test}                      ==> te+\n"
            "  /eval -n ${date:%H:%M:%S}                      ==> 07:46:40\n"
            "  /eval -n ${if:${info:term_width}>80?big:small} ==> big\n"
            "\n"

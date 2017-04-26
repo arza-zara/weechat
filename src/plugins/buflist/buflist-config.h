@@ -47,7 +47,9 @@ extern struct t_config_option *buflist_config_format_hotlist;
 extern struct t_config_option *buflist_config_format_hotlist_level[4];
 extern struct t_config_option *buflist_config_format_hotlist_level_none;
 extern struct t_config_option *buflist_config_format_hotlist_separator;
+extern struct t_config_option *buflist_config_format_indent;
 extern struct t_config_option *buflist_config_format_lag;
+extern struct t_config_option *buflist_config_format_nick_prefix;
 extern struct t_config_option *buflist_config_format_number;
 
 extern char **buflist_config_sort_fields;

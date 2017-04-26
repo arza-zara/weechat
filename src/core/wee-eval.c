@@ -295,8 +295,9 @@ end:
  *   2. a string to evaluate (format: eval:xxx)
  *   3. a string with escaped chars (format: esc:xxx or \xxx)
  *   4. a string with chars to hide (format: hide:char,string)
- *   5. a string with max chars (format: cut:max,suffix,string)
- *      or max chars on screen (format: cutscr:max,suffix,string)
+ *   5. a string with max chars (format: cut:max,suffix,string or
+ *      cut:+max,suffix,string) or max chars on screen
+ *      (format: cutscr:max,suffix,string or cutscr:+max,suffix,string)
  *   6. a regex group captured (format: re:N (0.99) or re:+)
  *   7. a color (format: color:xxx)
  *   8. an info (format: info:name,arguments)
@@ -326,6 +327,7 @@ eval_replace_vars_cb (void *data, const char *text)
     struct t_hdata *hdata;
     void *pointer;
     int i, length_hide_char, length, index, rc, extra_vars_eval, screen;
+    int count_suffix;
     long number;
     long unsigned int ptr;
     time_t date;
@@ -436,6 +438,12 @@ eval_replace_vars_cb (void *data, const char *text)
         pos = strchr (text + length, ',');
         if (!pos)
             return strdup ("");
+        count_suffix = 0;
+        if (text[length] == '+')
+        {
+            length++;
+            count_suffix = 1;
+        }
         pos2 = strchr (pos + 1, ',');
         if (!pos2)
             return strdup ("");
@@ -452,7 +460,7 @@ eval_replace_vars_cb (void *data, const char *text)
         tmp = strndup (pos + 1, pos2 - pos - 1);
         if (!tmp)
             return strdup ("");
-        value = string_cut (pos2 + 1, number, screen, tmp);
+        value = string_cut (pos2 + 1, number, count_suffix, screen, tmp);
         free (tmp);
         return value;
     }
@@ -551,7 +559,7 @@ eval_replace_vars_cb (void *data, const char *text)
         tmp = eval_expression_condition (condition, pointers,
                                          extra_vars, extra_vars_eval,
                                          prefix, suffix);
-        rc = (tmp && strcmp (tmp, "1") == 0);
+        rc = eval_is_true (tmp);
         if (tmp)
             free (tmp);
         if (rc)
