@@ -1219,8 +1219,13 @@ gui_window_scroll (struct t_gui_window *window, char *scroll)
     }
     else
     {
-        ptr_line = (window->scroll->start_line) ?
-            window->scroll->start_line : window->buffer->lines->first_line;
+        if (window->scroll->start_line)
+            ptr_line = window->scroll->start_line;
+        else if (window->scroll->first_line_displayed)
+            ptr_line = window->buffer->lines->first_line;
+        else
+            return;
+
         while (ptr_line
                && (!gui_line_is_displayed (ptr_line)
                    || ((window->buffer->type == GUI_BUFFER_TYPE_FORMATTED)
@@ -1602,6 +1607,7 @@ gui_window_search_text (struct t_gui_window *window)
             ptr_line = gui_line_get_prev_displayed (ptr_line);
         }
     }
+
     if (window->buffer->text_search == GUI_TEXT_SEARCH_FORWARD
         || (window->buffer->text_search == GUI_TEXT_SEARCH_EITHER
             && (window->buffer->type == GUI_BUFFER_TYPE_FREE
