@@ -274,6 +274,8 @@ expression: Ausdruck welcher verarbeitet werden soll. Variablen im Format ${vari
                 >   größer
                 =~  stimmt mit regulärem POSIX Ausdruck überein
                 !~  stimmt NICHT mit regulärem POSIX Ausdruck überein
+                =*  stimmt mit Maske überein (Platzhalter "*" ist erlaubt)
+                !*  stimmt mit Maske NICHT überein (Platzhalter "*" ist erlaubt)
 
 Ein Ausdruck gilt als "wahr" sofern das Ergebnis weder NULL, leer und von "0" abweichend ist.
 Der Vergleich findet zwischen zwei Integer Werten statt, sofern die beiden Ausdrücke gültige Integer-Werte sind.
@@ -328,6 +330,7 @@ Beispiele (Bedingungen):
   /eval -n -c abcd =~ (?-i)^ABC            ==> 0
   /eval -n -c abcd =~ (?-i)^abc            ==> 1
   /eval -n -c abcd !~ abc                  ==> 0
+  /eval -n -c abcd =* a*d                 ==> 1
 ----
 
 [[command_weechat_filter]]
@@ -521,7 +524,7 @@ Für Kontext "mouse" (Kontext "cursor" ist auch möglich), hat der zu verwendend
     item(*): beliebiges Bar-Item
   item(xxx): Bar-Item mit Namen "xxx"
 Der Platzhalter "*" kann verwendet werden um mehrere unterschiedliche Mausereignisse auszuwählen.
-Für den Kontext "mouse" kann ein besonderer Übergabewert für den zu nutzenden Befehl verwendet werden, "hsignal:name".  Dieses sendet das hsignal "name" und als Inhalt ein Hashtable als Argument.
+Für den Kontext "mouse" kann ein besonderer Übergabewert für den zu nutzenden Befehl verwendet werden, "hsignal:name". Dieses sendet das hsignal "name" und als Inhalt ein Hashtable als Argument.
 Ein weiterer Übergabewert ist "-" und kann genutzt werden um einen Schlüssel zu deaktivieren (der Schlüssel wird bei der Durchführung übersprungen).
 
 Beispiele:

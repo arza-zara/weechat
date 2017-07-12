@@ -313,13 +313,23 @@ kbd:[Ctrl] + kbd:[Alt] + マウス選択です。
 
 WeeChat バージョン 1.0 以上の場合、最小限表示を使うことができます (デフォルトキー: kbd:[Alt+l])。
 
-デフォルトでは、WeeChat
-はそれぞれの行の最初に時間とプレフィックス、さらにチャットエリアを囲むようにオプションバーを表示します。URL
-のクリックを簡単にするには、ニックネームリストを上に移動して、ニックネーム整列機能を無効化する方法があります:
+URL を簡単にクリックできるようにするには、以下を試してみてください:
+
+* ニックネームリストを上方に移動します:
 
 ----
 /set weechat.bar.nicklist.position top
-/set weechat.look.prefix_align none
+----
+
+* 複数行に渡る単語の整列を無効化します (WeeChat バージョン 1.7 以上の場合):
+
+----
+/set weechat.look.align_multiline_words off
+----
+
+* もしくは、すべての折り返された行について整列を無効化します:
+
+----
 /set weechat.look.align_end_of_lines time
 ----
 

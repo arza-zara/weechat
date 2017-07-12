@@ -171,80 +171,6 @@ gui_bar_search_position (const char *position)
 }
 
 /*
- * Returns minimum width of a bar window displayed for a bar.
- *
- * For example, if a bar is displayed in 3 windows, this function returns min
- * width of these 3 bar windows.
- */
-
-int
-gui_bar_get_min_width (struct t_gui_bar *bar)
-{
-    struct t_gui_window *ptr_win;
-    struct t_gui_bar_window *ptr_bar_win;
-    int min_width;
-
-    if (CONFIG_INTEGER(bar->options[GUI_BAR_OPTION_TYPE]) == GUI_BAR_TYPE_ROOT)
-        return bar->bar_window->width;
-
-    min_width = INT_MAX;
-    for (ptr_win = gui_windows; ptr_win; ptr_win = ptr_win->next_window)
-    {
-        for (ptr_bar_win = ptr_win->bar_windows; ptr_bar_win;
-             ptr_bar_win = ptr_bar_win->next_bar_window)
-        {
-            if (ptr_bar_win->bar == bar)
-            {
-                if (ptr_bar_win->width < min_width)
-                    min_width = ptr_bar_win->width;
-            }
-        }
-    }
-
-    if (min_width == INT_MAX)
-        return 0;
-
-    return min_width;
-}
-
-/*
- * Returns minimum height of a bar window displayed for a bar.
- *
- * For example, if a bar is displayed in 3 windows, this function returns min
- * width of these 3 bar windows.
- */
-
-int
-gui_bar_get_min_height (struct t_gui_bar *bar)
-{
-    struct t_gui_window *ptr_win;
-    struct t_gui_bar_window *ptr_bar_win;
-    int min_height;
-
-    if (CONFIG_INTEGER(bar->options[GUI_BAR_OPTION_TYPE]) == GUI_BAR_TYPE_ROOT)
-        return bar->bar_window->height;
-
-    min_height = INT_MAX;
-    for (ptr_win = gui_windows; ptr_win; ptr_win = ptr_win->next_window)
-    {
-        for (ptr_bar_win = ptr_win->bar_windows; ptr_bar_win;
-             ptr_bar_win = ptr_bar_win->next_bar_window)
-        {
-            if (ptr_bar_win->bar == bar)
-            {
-                if (ptr_bar_win->height < min_height)
-                    min_height = ptr_bar_win->height;
-            }
-        }
-    }
-
-    if (min_height == INT_MAX)
-        return 0;
-
-    return min_height;
-}
-
-/*
  * Checks if "add_size" is OK for bar.
  *
  * Returns:
@@ -1782,33 +1708,33 @@ gui_bar_new (const char *name, const char *hidden, const char *priority,
     if (!new_bar)
     {
         if (option_hidden)
-            config_file_option_free (option_hidden);
+            config_file_option_free (option_hidden, 0);
         if (option_priority)
-            config_file_option_free (option_priority);
+            config_file_option_free (option_priority, 0);
         if (option_type)
-            config_file_option_free (option_type);
+            config_file_option_free (option_type, 0);
         if (option_conditions)
-            config_file_option_free (option_conditions);
+            config_file_option_free (option_conditions, 0);
         if (option_position)
-            config_file_option_free (option_position);
+            config_file_option_free (option_position, 0);
         if (option_filling_top_bottom)
-            config_file_option_free (option_filling_top_bottom);
+            config_file_option_free (option_filling_top_bottom, 0);
         if (option_filling_left_right)
-            config_file_option_free (option_filling_left_right);
+            config_file_option_free (option_filling_left_right, 0);
         if (option_size)
-            config_file_option_free (option_size);
+            config_file_option_free (option_size, 0);
         if (option_size_max)
-            config_file_option_free (option_size_max);
+            config_file_option_free (option_size_max, 0);
         if (option_color_fg)
-            config_file_option_free (option_color_fg);
+            config_file_option_free (option_color_fg, 0);
         if (option_color_delim)
-            config_file_option_free (option_color_delim);
+            config_file_option_free (option_color_delim, 0);
         if (option_color_bg)
-            config_file_option_free (option_color_bg);
+            config_file_option_free (option_color_bg, 0);
         if (option_separator)
-            config_file_option_free (option_separator);
+            config_file_option_free (option_separator, 0);
         if (option_items)
-            config_file_option_free (option_items);
+            config_file_option_free (option_items, 0);
     }
 
     return new_bar;
@@ -1864,7 +1790,7 @@ gui_bar_use_temp_bars ()
             {
                 if (ptr_temp_bar->options[i])
                 {
-                    config_file_option_free (ptr_temp_bar->options[i]);
+                    config_file_option_free (ptr_temp_bar->options[i], 0);
                     ptr_temp_bar->options[i] = NULL;
                 }
             }
@@ -2245,7 +2171,7 @@ gui_bar_free (struct t_gui_bar *bar)
     for (i = 0; i < GUI_BAR_NUM_OPTIONS; i++)
     {
         if (bar->options[i])
-            config_file_option_free (bar->options[i]);
+            config_file_option_free (bar->options[i], 1);
     }
     gui_bar_free_items_arrays (bar);
 

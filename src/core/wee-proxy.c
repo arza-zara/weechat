@@ -152,39 +152,6 @@ proxy_search (const char *name)
 }
 
 /*
- * Searches for a proxy by option name.
- *
- * Returns pointer to proxy found, NULL if not found.
- */
-
-struct t_proxy *
-proxy_search_with_option_name (const char *option_name)
-{
-    char *proxy_name, *pos_option;
-    struct t_proxy *ptr_proxy;
-
-    ptr_proxy = NULL;
-
-    pos_option = strchr (option_name, '.');
-    if (pos_option)
-    {
-        proxy_name = string_strndup (option_name, pos_option - option_name);
-        if (proxy_name)
-        {
-            for (ptr_proxy = weechat_proxies; ptr_proxy;
-                 ptr_proxy = ptr_proxy->next_proxy)
-            {
-                if (strcmp (ptr_proxy->name, proxy_name) == 0)
-                    break;
-            }
-            free (proxy_name);
-        }
-    }
-
-    return ptr_proxy;
-}
-
-/*
  * Sets name for a proxy.
  */
 
@@ -436,7 +403,7 @@ proxy_new_with_options (const char *name,
 
     /* add proxy to proxies list */
     new_proxy->prev_proxy = last_weechat_proxy;
-    if (weechat_proxies)
+    if (last_weechat_proxy)
         last_weechat_proxy->next_proxy = new_proxy;
     else
         weechat_proxies = new_proxy;
@@ -491,17 +458,17 @@ proxy_new (const char *name, const char *type, const char *ipv6,
     if (!new_proxy)
     {
         if (option_type)
-            config_file_option_free (option_type);
+            config_file_option_free (option_type, 0);
         if (option_ipv6)
-            config_file_option_free (option_ipv6);
+            config_file_option_free (option_ipv6, 0);
         if (option_address)
-            config_file_option_free (option_address);
+            config_file_option_free (option_address, 0);
         if (option_port)
-            config_file_option_free (option_port);
+            config_file_option_free (option_port, 0);
         if (option_username)
-            config_file_option_free (option_username);
+            config_file_option_free (option_username, 0);
         if (option_password)
-            config_file_option_free (option_password);
+            config_file_option_free (option_password, 0);
     }
 
     return new_proxy;
@@ -549,7 +516,7 @@ proxy_use_temp_proxies ()
             {
                 if (ptr_temp_proxy->options[i])
                 {
-                    config_file_option_free (ptr_temp_proxy->options[i]);
+                    config_file_option_free (ptr_temp_proxy->options[i], 0);
                     ptr_temp_proxy->options[i] = NULL;
                 }
             }
@@ -597,7 +564,7 @@ proxy_free (struct t_proxy *proxy)
         free (proxy->name);
     for (i = 0; i < PROXY_NUM_OPTIONS; i++)
     {
-        config_file_option_free (proxy->options[i]);
+        config_file_option_free (proxy->options[i], 1);
     }
 
     free (proxy);

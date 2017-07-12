@@ -55,13 +55,16 @@ Alphabetically:
 * Kyle Fuller (kylef)
 * Leonid Evdokimov
 * Lázaro A.
+* Linus Heckemann
 * Maarten de Vries
 * Mantas Mikulėnas (grawity)
 * Marco Paolone
 * Mateusz Poszwa
 * Matt Robinson
 * Max Anton Teufel
+* Miroslav Koskar
 * Murilo Opsfelder Araujo
+* Neui
 * Nick (SolitaryCipher)
 * Nicolas Cavigneaux
 * Nils Görs (nils_2)

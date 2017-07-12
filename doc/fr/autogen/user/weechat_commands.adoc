@@ -44,7 +44,7 @@ message : message pour l'absence (si pas de message donné, le statut d'absence
       default : créer une barre par défaut (toutes les barres par défaut si aucun nom de barre n'est donné)
           del : supprimer une barre (ou toutes les barres avec -all)
           set : changer la valeur d'une propriété de la barre
-       option : option à modifier (pour la liste des options, voir /set weechat.bar.<nombarre>.*
+       option : option à modifier (pour la liste des options, voir /set weechat.bar.<nombarre>.*)
        valeur : nouvelle valeur pour l'option
          hide : cacher la barre
          show : montrer une barre cachée
@@ -274,6 +274,8 @@ expression : expression à évaluer, les variables avec le format ${variable} s
                  >   supérieur
                  =~  correspond à l'expression régulière POSIX étendue
                  !~  ne correspond PAS à l'expression régulière POSIX étendue
+                 =*  correspond au masque (le caractère joker "*" est autorisé)
+                 !=  ne correspond PAS au masque (le caractère joker "*" est autorisé)
 
 Une expression est considérée comme "vraie" si elle est non NULL, non vide, et différente de "0".
 La comparaison est faite en utilisant des entiers si les deux expressions sont des entiers valides.
@@ -328,6 +330,7 @@ Exemples (conditions) :
   /eval -n -c abcd =~ (?-i)^ABC           ==> 0
   /eval -n -c abcd =~ (?-i)^abc           ==> 1
   /eval -n -c abcd !~ abc                 ==> 0
+  /eval -n -c abcd =* a*d                 ==> 1
 ----
 
 [[command_weechat_filter]]

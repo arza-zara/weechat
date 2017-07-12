@@ -73,6 +73,12 @@ $HOME/.weechat/charset.conf::
 $HOME/.weechat/exec.conf::
     _exec_ プラグイン用の設定ファイル
 
+$HOME/.weechat/fifo.conf::
+    _fifo_ プラグイン用の設定ファイル
+
+$HOME/.weechat/fset.conf::
+    _fset_ プラグイン用の設定ファイル
+
 $HOME/.weechat/irc.conf::
     _irc_ プラグイン用の設定ファイル
 

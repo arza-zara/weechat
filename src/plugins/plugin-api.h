@@ -22,12 +22,6 @@
 
 #include <time.h>
 
-struct t_plugin_api_hdata
-{
-    char *name;                              /* hdata name                  */
-    struct t_hdata *(*callback_get_hdata)(); /* callback to get hdata       */
-};
-
 /* strings */
 extern void plugin_api_charset_set (struct t_weechat_plugin *plugin,
                                     const char *charset);
@@ -36,6 +30,7 @@ extern const char *plugin_api_ngettext (const char *single, const char *plural,
                                         int count);
 
 /* config */
+extern void plugin_api_config_file_option_free (struct t_config_option *option);
 extern struct t_config_option *plugin_api_config_get (const char *option_name);
 extern const char *plugin_api_config_get_plugin (struct t_weechat_plugin *plugin,
                                            const char *option_name);

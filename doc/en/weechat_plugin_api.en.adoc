@@ -2008,6 +2008,124 @@ Return value:
 * evaluated expression (must be freed by calling "free" after use), or NULL
   if problem (invalid expression or not enough memory)
 
+List of logical operators that can be used in conditions (by order of priority,
+from first used to last):
+
+[width="100%",cols="2,8,4,4",options="header"]
+|===
+| Operator | Description | Examples | Results
+
+| `+&&+` |
+  Logical "and" |
+  `+25 && 77+` +
+  `+25 && 0+` |
+  `+1+` +
+  `+0+`
+
+| `+\|\|+` |
+  Logical "or" |
+  `+25 \|\| 0+` +
+  `+0 \|\| 0+` |
+  `+1+` +
+  `+0+`
+|===
+
+List of comparison operators that can be used in conditions (by order of priority,
+from first used to last):
+
+[width="100%",cols="2,8,4,4",options="header"]
+|===
+| Operator | Description | Examples | Results
+
+| `+=~+` |
+  Is matching POSIX extended regex (optional flags are allowed, see function <<_string_regcomp,string_regcomp>>) |
+  `+abc def =~ ab.*ef+` +
+  `+abc def =~ y.*z+` |
+  `+1+` +
+  `+0+`
+
+| `+!~+` |
+  Is NOT matching POSIX extended regex (optional flags are allowed, see function <<_string_regcomp,string_regcomp>>) |
+  `+abc def !~ ab.*ef+` +
+  `+abc def !~ y.*z+` |
+  `+0+` +
+  `+1+`
+
+| `+=*+` +
+  (_WeeChat ≥ 1.8_) |
+  Is matching mask where "*" is allowed (see function <<_string_match,string_match>>) |
+  `+abc def =* a*f+` +
+  `+abc def =* y*z+` |
+  `+1+` +
+  `+0+`
+
+| `+!*+` +
+  (_WeeChat ≥ 1.8_) |
+  Is NOT wildcard mask where "*" is allowed (see function <<_string_match,string_match>>) |
+  `+abc def !* a*f+` +
+  `+abc def !* y*z+` |
+  `+0+` +
+  `+1+`
+
+| `+==+` |
+  Equal |
+  `+test == test+` +
+  `+test == string+` |
+  `+1+` +
+  `+0+`
+
+| `+!=+` |
+  Not equal |
+  `+test != test+` +
+  `+test != string+` |
+  `+0+` +
+  `+1+`
+
+| `+<=+` |
+  Less or equal |
+  `+abc <= defghi+` +
+  `+abc <= abc+` +
+  `+defghi <= abc+` +
+  `+15 <= 2+` |
+  `+1+` +
+  `+1+` +
+  `+0+` +
+  `+0+`
+
+| `+<+` |
+  Less |
+  `+abc < defghi+` +
+  `+abc < abc+` +
+  `+defghi < abc+` +
+  `+15 < 2+` |
+  `+1+` +
+  `+0+` +
+  `+0+` +
+  `+0+`
+
+| `+>=+` |
+  Greater or equal |
+  `+defghi >= abc+` +
+  `+abc >= abc+` +
+  `+abc >= defghi+` +
+  `+15 >= 2+` |
+  `+1+` +
+  `+1+` +
+  `+0+` +
+  `+1+`
+
+| `+>+` |
+  Greater |
+  `+defghi > abc+` +
+  `+abc > abc+` +
+  `+abc > defghi+` +
+  `+15 > 2+` |
+  `+1+` +
+  `+0+` +
+  `+0+` +
+  `+1+`
+|===
+
 List of variables expanded in expression (by order of priority, from first
 expanded to last):
 
@@ -3053,7 +3171,7 @@ weechat.mkdir_parents("/tmp/my/dir", 0755)
 
 ==== exec_on_files
 
-_Updated in 1.5._
+_Updated in 1.5, 2.0._
 
 Find files in a directory and execute a callback on each file.
 
@@ -3062,6 +3180,7 @@ Prototype:
 [source,C]
 ----
 void weechat_exec_on_files (const char *directory,
+                            int recurse_subdirs,
                             int hidden_files,
                             void (*callback)(void *data,
                                              const char *filename),
@@ -3071,6 +3190,7 @@ void weechat_exec_on_files (const char *directory,
 Arguments:
 
 * _directory_: directory for searching files
+* _recurse_subdirs_: 1 to recurse into sub-directories (_WeeChat ≥ 2.0_)
 * _hidden_files_: 1 to include hidden files, otherwise 0
 * _callback_: function called for each file found, arguments:
 ** _void *data_: pointer
@@ -3086,7 +3206,7 @@ void callback (void *data, const char *filename)
     /* ... */
 }
 ...
-weechat_exec_on_files ("/tmp", 0, &callback, NULL);
+weechat_exec_on_files ("/tmp", 0, 0, &callback, NULL);
 ----
 
 [NOTE]
@@ -5726,7 +5846,13 @@ int weechat_config_option_set (struct t_config_option *option,
 Arguments:
 
 * _option_: option pointer
-* _value_: new value for option
+* _value_: new value for option, special values are possible according to the
+  type of option:
+** _boolean_:
+*** `toggle`: toggle the current value
+** _integer_ or _color_:
+*** `++N`: add `N` (any integer) to the current value
+*** `--N`: subtract `N` (any integer) from the current value
 * _run_callback_: 1 for calling change callback if value of option is changed,
   otherwise 0
 
@@ -5930,6 +6056,49 @@ weechat.config_option_rename(option, new_name)
 # example
 weechat.config_option_rename(option, "new_name")
 ----
+
+==== config_option_get_string
+
+_WeeChat ≥ 1.9._
+
+Return string value of an option property.
+
+Prototype:
+
+[source,C]
+----
+const char *weechat_config_option_get_string (struct t_config_option *option,
+                                              const char *property);
+----
+
+Arguments:
+
+* _option_: option pointer
+* _property_: property name:
+** _config_name_: file name
+** _section_name_: section name
+** _name_: option name
+** _parent_name_: name of parent option
+** _type_: option type, one of:
+*** _boolean_
+*** _integer_
+*** _string_
+*** _color_
+** _description_: option description
+
+Return value:
+
+* string value of property
+
+C example:
+
+[source,C]
+----
+const char *type = weechat_config_option_get_string (option, "type");
+----
+
+[NOTE]
+This function is not available in scripting API.
 
 ==== config_option_get_pointer
 
@@ -7986,16 +8155,12 @@ Arguments:
 ** _const char *command_: the command executed, with its arguments
 ** return value:
 *** _WEECHAT_RC_OK_
-*** _WEECHAT_RC_OK_EAT_
+*** _WEECHAT_RC_OK_EAT_: command will not be executed by WeeChat after callback
 *** _WEECHAT_RC_ERROR_
 * _callback_pointer_: pointer given to callback when it is called by WeeChat
 * _callback_data_: pointer given to callback when it is called by WeeChat;
   if not NULL, it must have been allocated with malloc (or similar function)
   and it is automatically freed when the hook is deleted
-
-[NOTE]
-Callback can return _WEECHAT_RC_OK_ or _WEECHAT_RC_OK_EAT_ (command will not
-be executed by WeeChat after callback).
 
 Return value:
 
@@ -15876,6 +16041,59 @@ hash = weechat.hdata_hashtable(hdata, buffer, "local_variables")
 weechat.prnt("", "local variables in core buffer:")
 for key in hash:
     weechat.prnt("", "  %s == %s" % (key, hash[key]))
+----
+
+==== hdata_compare
+
+_WeeChat ≥ 1.9._
+
+Compare a hdata variable of two objects.
+
+Prototype:
+
+[source,C]
+----
+int weechat_hdata_compare (struct t_hdata *hdata, void *pointer1, void *pointer2, const char *name, int case_sensitive);
+----
+
+Arguments:
+
+* _hdata_: hdata pointer
+* _pointer1_: pointer to first WeeChat/plugin object
+* _pointer2_: pointer to second WeeChat/plugin object
+* _name_: variable name; for arrays, the name can be "N|name" where N is
+  the index in array (starting at 0), for example: "2|name"
+* _case_sensitive_: 1 for case sensitive comparison of strings, otherwise 0
+
+Return value:
+
+* -1 if variable1 < variable2
+* 0 if variable1 == variable2
+* 1 if variable1 > variable2
+
+C example:
+
+[source,C]
+----
+struct t_hdata *hdata = weechat_hdata_get ("buffer");
+struct t_gui_buffer *buffer1 = weechat_buffer_search ("irc", "freenode.#weechat");
+struct t_gui_buffer *buffer2 = weechat_buffer_search ("irc", "freenode.#weechat-fr");
+weechat_printf (NULL, "number comparison = %d",
+                weechat_hdata_compare (hdata, buffer1, buffer2, "number", 0));
+----
+
+Script (Python):
+
+[source,python]
+----
+# prototype
+rc = weechat.hdata_compare(hdata, pointer1, pointer2, name, case_sensitive)
+
+# example
+hdata = weechat.hdata_get("buffer")
+buffer1 = weechat.buffer_search("irc", "freenode.#weechat")
+buffer2 = weechat.buffer_search("irc", "freenode.#weechat-fr")
+weechat.prnt("", "number comparison = %d" % weechat.hdata_compare(hdata, buffer1, buffer2, "number", 0))
 ----
 
 ==== hdata_set
