@@ -392,6 +392,7 @@ API_FUNC(string_eval_expression)
     options = NULL;
     if (!PyArg_ParseTuple (args, "sOOO", &expr, &dict, &dict2, &dict3))
         API_WRONG_ARGS(API_RETURN_EMPTY);
+
     pointers = weechat_python_dict_to_hashtable (dict,
                                                  WEECHAT_SCRIPT_HASHTABLE_DEFAULT_SIZE,
                                                  WEECHAT_HASHTABLE_STRING,
@@ -404,10 +405,8 @@ API_FUNC(string_eval_expression)
                                                 WEECHAT_SCRIPT_HASHTABLE_DEFAULT_SIZE,
                                                 WEECHAT_HASHTABLE_STRING,
                                                 WEECHAT_HASHTABLE_STRING);
-
     result = weechat_string_eval_expression (expr, pointers, extra_vars,
                                              options);
-
     if (pointers)
         weechat_hashtable_free (pointers);
     if (extra_vars)
@@ -431,6 +430,7 @@ API_FUNC(string_eval_path_home)
     options = NULL;
     if (!PyArg_ParseTuple (args, "sOOO", &path, &dict, &dict2, &dict3))
         API_WRONG_ARGS(API_RETURN_EMPTY);
+
     pointers = weechat_python_dict_to_hashtable (dict,
                                                  WEECHAT_SCRIPT_HASHTABLE_DEFAULT_SIZE,
                                                  WEECHAT_HASHTABLE_STRING,
@@ -443,10 +443,8 @@ API_FUNC(string_eval_path_home)
                                                 WEECHAT_SCRIPT_HASHTABLE_DEFAULT_SIZE,
                                                 WEECHAT_HASHTABLE_STRING,
                                                 WEECHAT_HASHTABLE_STRING);
-
     result = weechat_string_eval_path_home (path, pointers, extra_vars,
                                             options);
-
     if (pointers)
         weechat_hashtable_free (pointers);
     if (extra_vars)
@@ -2247,7 +2245,7 @@ weechat_python_api_hook_fd_cb (const void *pointer, void *data, int fd)
 {
     struct t_plugin_script *script;
     void *func_argv[2];
-    char str_fd[32], empty_arg[1] = { '\0' };
+    char empty_arg[1] = { '\0' };
     const char *ptr_function, *ptr_data;
     int *rc, ret;
 
@@ -2256,15 +2254,13 @@ weechat_python_api_hook_fd_cb (const void *pointer, void *data, int fd)
 
     if (ptr_function && ptr_function[0])
     {
-        snprintf (str_fd, sizeof (str_fd), "%d", fd);
-
         func_argv[0] = (ptr_data) ? (char *)ptr_data : empty_arg;
-        func_argv[1] = str_fd;
+        func_argv[1] = &fd;
 
         rc = (int *) weechat_python_exec (script,
                                           WEECHAT_SCRIPT_EXEC_INT,
                                           ptr_function,
-                                          "ss", func_argv);
+                                          "si", func_argv);
 
         if (!rc)
             ret = WEECHAT_RC_ERROR;
@@ -2416,11 +2412,11 @@ API_FUNC(hook_process_hashtable)
     if (!PyArg_ParseTuple (args, "sOiss", &command, &dict, &timeout, &function,
                            &data))
         API_WRONG_ARGS(API_RETURN_EMPTY);
+
     options = weechat_python_dict_to_hashtable (dict,
                                                 WEECHAT_SCRIPT_HASHTABLE_DEFAULT_SIZE,
                                                 WEECHAT_HASHTABLE_STRING,
                                                 WEECHAT_HASHTABLE_STRING);
-
     result = API_PTR2STR(plugin_script_api_hook_process_hashtable (weechat_python_plugin,
                                                                    python_current_script,
                                                                    command,
@@ -2429,7 +2425,6 @@ API_FUNC(hook_process_hashtable)
                                                                    &weechat_python_api_hook_process_cb,
                                                                    function,
                                                                    data));
-
     if (options)
         weechat_hashtable_free (options);
 
@@ -2444,7 +2439,7 @@ weechat_python_api_hook_connect_cb (const void *pointer, void *data,
 {
     struct t_plugin_script *script;
     void *func_argv[6];
-    char str_status[32], str_gnutls_rc[32], str_sock[32], empty_arg[1] = { '\0' };
+    char empty_arg[1] = { '\0' };
     const char *ptr_function, *ptr_data;
     int *rc, ret;
 
@@ -2453,21 +2448,17 @@ weechat_python_api_hook_connect_cb (const void *pointer, void *data,
 
     if (ptr_function && ptr_function[0])
     {
-        snprintf (str_status, sizeof (str_status), "%d", status);
-        snprintf (str_gnutls_rc, sizeof (str_gnutls_rc), "%d", gnutls_rc);
-        snprintf (str_sock, sizeof (str_sock), "%d", sock);
-
         func_argv[0] = (ptr_data) ? (char *)ptr_data : empty_arg;
-        func_argv[1] = str_status;
-        func_argv[2] = str_gnutls_rc;
-        func_argv[3] = str_sock;
+        func_argv[1] = &status;
+        func_argv[2] = &gnutls_rc;
+        func_argv[3] = &sock;
         func_argv[4] = (ip_address) ? (char *)ip_address : empty_arg;
         func_argv[5] = (error) ? (char *)error : empty_arg;
 
         rc = (int *) weechat_python_exec (script,
                                           WEECHAT_SCRIPT_EXEC_INT,
                                           ptr_function,
-                                          "ssssss", func_argv);
+                                          "siiiss", func_argv);
 
         if (!rc)
             ret = WEECHAT_RC_ERROR;
@@ -2544,7 +2535,7 @@ weechat_python_api_hook_print_cb (const void *pointer, void *data,
 
     if (ptr_function && ptr_function[0])
     {
-        snprintf (timebuffer, sizeof (timebuffer), "%ld", (long int)date);
+        snprintf (timebuffer, sizeof (timebuffer), "%lld", (long long)date);
 
         func_argv[0] = (ptr_data) ? (char *)ptr_data : empty_arg;
         func_argv[1] = API_PTR2STR(buffer);
@@ -4231,6 +4222,7 @@ API_FUNC(info_get_hashtable)
     dict = NULL;
     if (!PyArg_ParseTuple (args, "sO", &info_name, &dict))
         API_WRONG_ARGS(API_RETURN_EMPTY);
+
     hashtable = weechat_python_dict_to_hashtable (dict,
                                                   WEECHAT_SCRIPT_HASHTABLE_DEFAULT_SIZE,
                                                   WEECHAT_HASHTABLE_STRING,
@@ -4518,7 +4510,10 @@ API_FUNC(infolist_time)
                                   variable);
     date_tmp = localtime (&time);
     if (date_tmp)
-        strftime (timebuffer, sizeof (timebuffer), "%F %T", date_tmp);
+    {
+        if (strftime (timebuffer, sizeof (timebuffer), "%F %T", date_tmp) == 0)
+            timebuffer[0] = '\0';
+    }
     result = strdup (timebuffer);
 
     API_RETURN_STRING_FREE(result);

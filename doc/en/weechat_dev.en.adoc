@@ -75,10 +75,11 @@ The main WeeChat directories are:
 |       fset/       | Fset (Fast Set) plugin.
 |       guile/      | Guile (scheme) scripting API.
 |       irc/        | IRC (Internet Relay Chat) plugin.
-|       javascript/ | Javascript scripting API.
+|       javascript/ | JavaScript scripting API.
 |       logger/     | Logger plugin (write messages displayed to files).
 |       lua/        | Lua scripting API.
 |       perl/       | Perl scripting API.
+|       php/        | PHP scripting API.
 |       python/     | Python scripting API.
 |       relay/      | Relay plugin (irc proxy + relay for remote interfaces).
 |       ruby/       | Ruby scripting API.
@@ -87,6 +88,8 @@ The main WeeChat directories are:
 |       trigger/    | Trigger plugin.
 |       xfer/       | Xfer plugin (IRC DCC file/chat).
 | tests/            | Tests.
+|    scripts/       | Scripting API tests.
+|       python/     | Python scripts to generate and run the scripting API tests.
 |    unit/          | Unit tests.
 |       core/       | Unit tests for core functions.
 | doc/              | Documentation.
@@ -252,10 +255,10 @@ WeeChat "core" is located in following directories:
 |       irc-sasl.c                  | SASL authentication with IRC server.
 |       irc-server.c                | I/O communication with IRC server.
 |       irc-upgrade.c               | Save/restore of IRC data when upgrading WeeChat.
-|    javascript/                    | Javascript plugin.
-|       weechat-js.cpp              | Main javascript functions (load/unload scripts, execute javascript code).
-|       weechat-js-api.cpp          | Javascript scripting API functions.
-|       weechat-js-v8.cpp           | Javascript v8 functions.
+|    javascript/                    | JavaScript plugin.
+|       weechat-js.cpp              | Main JavaScript functions (load/unload scripts, execute JavaScript code).
+|       weechat-js-api.cpp          | JavaScript scripting API functions.
+|       weechat-js-v8.cpp           | JavaScript v8 functions.
 |    logger/                        | Logger plugin.
 |       logger.c                    | Main logger functions.
 |       logger-buffer.c             | Logger buffer list management.
@@ -268,6 +271,9 @@ WeeChat "core" is located in following directories:
 |    perl/                          | Perl plugin.
 |       weechat-perl.c              | Main perl functions (load/unload scripts, execute perl code).
 |       weechat-perl-api.c          | Perl scripting API functions.
+|    php/                           | PHP plugin.
+|       weechat-php.c               | Main PHP functions (load/unload scripts, execute PHP code).
+|       weechat-php-api.c           | PHP scripting API functions.
 |    python/                        | Python plugin.
 |       weechat-python.c            | Main python functions (load/unload scripts, execute python code).
 |       weechat-python-api.c        | Python scripting API functions.
@@ -335,7 +341,13 @@ WeeChat "core" is located in following directories:
 |===
 | Path/file                   | Description
 | tests/                      | Root of tests.
-|    tests.cpp                | Program used to run tests.
+|    tests.cpp                | Program used to run all tests.
+|    scripts/                 | Root of scripting API tests.
+|       test-scripts.cpp      | Program used to run the scripting API tests.
+|       python/               | Python scripts to generate and run the scripting API tests.
+|          testapigen.py      | Python script generating scripts in all languages to test the scripting API.
+|          testapi.py         | Python script with scripting API tests, used by script testapigen.py.
+|          unparse.py         | Convert Python code to other languages, used by script testapigen.py.
 |    unit/                    | Root of unit tests.
 |       core/                 | Root of unit tests for core.
 |          test-arraylist.cpp | Tests: arraylists.
@@ -364,14 +376,14 @@ Documentation files:
 |    XX/                               | Documentation for language XX (languages: en, fr, de, it, ...).
 |       cmdline_options.XX.adoc        | Command-line options (file included in man page and user's guide).
 |       weechat.1.XX.adoc              | Man page (`man weechat`).
-|       weechat_dev.XX.adoc            | Developer's guide (this document).
-|       weechat_faq.XX.adoc            | FAQ.
-|       weechat_plugin_api.XX.adoc     | Plugin API reference.
-|       weechat_quickstart.XX.adoc     | Quickstart guide.
-|       weechat_relay_protocol.XX.adoc | Relay protocol (for remote interfaces).
-|       weechat_scripting.XX.adoc      | Scripting guide.
-|       weechat_tester.XX.adoc         | Tester's guide.
-|       weechat_user.XX.adoc           | User's guide.
+|       weechat_dev.XX.adoc            | link:weechat_dev.en.html[Developer's guide] (this document).
+|       weechat_faq.XX.adoc            | link:weechat_faq.en.html[FAQ].
+|       weechat_plugin_api.XX.adoc     | link:weechat_plugin_api.en.html[Plugin API reference].
+|       weechat_quickstart.XX.adoc     | link:weechat_quickstart.en.html[Quickstart guide].
+|       weechat_relay_protocol.XX.adoc | link:weechat_relay_protocol.en.html[Relay protocol] (for remote interfaces).
+|       weechat_scripting.XX.adoc      | link:weechat_scripting.en.html[Scripting guide].
+|       weechat_tester.XX.adoc         | link:weechat_tester.en.html[Tester's guide].
+|       weechat_user.XX.adoc           | link:weechat_user.en.html[User's guide].
 |       autogen/                       | Files auto-built with script docgen.py.
 |          user/                       | Files auto-built for user's guide (do *NEVER* update manually!).
 |          plugin_api/                 | Files auto-built for plugin API (do *NEVER* update manually!).

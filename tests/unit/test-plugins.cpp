@@ -60,10 +60,11 @@ TEST(Plugins, Loaded)
     CHECK(hdata_search (hdata, plugins, "${plugin.name} == fset", 1));
     CHECK(hdata_search (hdata, plugins, "${plugin.name} == guile", 1));
     CHECK(hdata_search (hdata, plugins, "${plugin.name} == irc", 1));
-    //CHECK(hdata_search (hdata, plugins, "${plugin.name} == javascript", 1));
+    CHECK(hdata_search (hdata, plugins, "${plugin.name} == javascript", 1));
     CHECK(hdata_search (hdata, plugins, "${plugin.name} == logger", 1));
     CHECK(hdata_search (hdata, plugins, "${plugin.name} == lua", 1));
     CHECK(hdata_search (hdata, plugins, "${plugin.name} == perl", 1));
+    CHECK(hdata_search (hdata, plugins, "${plugin.name} == php", 1));
     CHECK(hdata_search (hdata, plugins, "${plugin.name} == python", 1));
     CHECK(hdata_search (hdata, plugins, "${plugin.name} == relay", 1));
     CHECK(hdata_search (hdata, plugins, "${plugin.name} == ruby", 1));

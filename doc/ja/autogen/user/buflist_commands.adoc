@@ -10,7 +10,7 @@
           refresh
 
     bar: "buflist" バーを追加します
-refresh: 強制的に "buflist" バー要素の内容を最新の状態に更新します
+refresh: 強制的にバー要素 (buflist、buflist2、buflist3) の内容を最新の状態に更新します
 
 各バッファエントリは文字列評価 (書式は /help eval を参照してください) を使って表示されます、以下のオプションで指定します:
   - buflist.look.display_conditions: バッファをリスト内に表示する条件
@@ -18,6 +18,8 @@ refresh: 強制的に "buflist" バー要素の内容を最新の状態に更新
   - buflist.format.buffer_current: 現在のバッファを表示する書式
 
 以下は上記オプションで使用可能な変数です:
+  - バー要素データ (完全なリストは API リファレンスの hdata "bar_item" を参照してください)、例:
+    - ${bar_item.name}
   - バッファデータ (完全なリストは API リファレンスの hdata "buffer" を参照してください)、例:
     - ${buffer.number}
     - ${buffer.name}

@@ -216,7 +216,7 @@ eval_hdata_get_value (struct t_hdata *hdata, void *pointer, const char *path)
             break;
         case WEECHAT_HDATA_TIME:
             snprintf (str_value, sizeof (str_value),
-                      "%ld", (long)hdata_time (hdata, pointer, var_name));
+                      "%lld", (long long)hdata_time (hdata, pointer, var_name));
             value = strdup (str_value);
             break;
         case WEECHAT_HDATA_HASHTABLE:
@@ -249,7 +249,7 @@ eval_hdata_get_value (struct t_hdata *hdata, void *pointer, const char *path)
                             break;
                         case HASHTABLE_TIME:
                             snprintf (str_value, sizeof (str_value),
-                                      "%ld", (long)(*((time_t *)ptr_value)));
+                                      "%lld", (long long)(*((time_t *)ptr_value)));
                             value = strdup (str_value);
                             break;
                         case HASHTABLE_NUM_TYPES:
@@ -769,7 +769,7 @@ eval_compare (const char *expr1, int comparison, const char *expr2)
 {
     int rc, string_compare, length1, length2;
     regex_t regex;
-    long value1, value2;
+    double value1, value2;
     char *error;
 
     rc = 0;
@@ -816,12 +816,14 @@ eval_compare (const char *expr1, int comparison, const char *expr2)
 
     if (!string_compare)
     {
-        value1 = strtol (expr1, &error, 10);
+        value1 = strtod (expr1, &error);
         if (!error || error[0])
+        {
             string_compare = 1;
+        }
         else
         {
-            value2 = strtol (expr2, &error, 10);
+            value2 = strtod (expr2, &error);
             if (!error || error[0])
                 string_compare = 1;
         }

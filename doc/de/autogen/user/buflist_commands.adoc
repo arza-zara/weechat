@@ -18,6 +18,8 @@ Jede Zeile die einen Buffer anzeigt wird mittels Zeichenketten-Evaluation darges
   - buflist.format.buffer_current: Format für den aktuell dargestellten Buffer
 
 Die folgenden Variablen können in den obigen Optionen genutzt werden:
+  - bar item data (siehe hdata "bar_item" in API Dokumentation für eine vollständige Liste), zum Beispiel:
+    - ${bar_item.name}
   - buffer data (siehe hdata "buffer" in API Dokumentation für eine vollständige Liste), zum Beispiel:
     - ${buffer.number}
     - ${buffer.name}
@@ -39,7 +41,7 @@ Die folgenden Variablen können in den obigen Optionen genutzt werden:
     - ${nick_prefix}: der Nick-Präfix für einen Channel (wird nur genutzt falls die Option buflist.look.nick_prefix aktiviert ist)
     - ${format_name}: der formatierte Name (evaluiert aus Option buflist.format.name)
     - ${name}: der Kurzname (falls einer gesetzt ist), Ersatzweise wird auf den Originalnamen zurückgegriffen
-    - ${color_hotlist}: die Farbe mit der höchsten Priorität für den entsprechenden Buffer  (evaluiert aus Option buflist.format.hotlist_xxx wobei xxx der entsprechende Level ist)
+    - ${color_hotlist}: die Farbe mit der höchsten Priorität für den entsprechenden Buffer (evaluiert aus Option buflist.format.hotlist_xxx wobei xxx der entsprechende Level ist)
     - ${format_hotlist}: die formatierte Hotlist (evaluiert aus Option buflist.format.hotlist)
     - ${hotlist}: die Hotlist in der Rohform
     - ${hotlist_priority}: "none", "low", "message", "private" oder "highlight"

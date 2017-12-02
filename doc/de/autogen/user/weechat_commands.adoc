@@ -81,7 +81,7 @@ Beispiele:
          close [<n1>[-<n2>]|<name>]
          notify <level>
          localvar
-         set <property> <value>
+         set <property> [<value>]
          get <property>
          <number>|-|+|<name>
 
@@ -277,8 +277,11 @@ expression: Ausdruck welcher verarbeitet werden soll. Variablen im Format ${vari
                 =*  stimmt mit Maske überein (Platzhalter "*" ist erlaubt)
                 !*  stimmt mit Maske NICHT überein (Platzhalter "*" ist erlaubt)
 
-Ein Ausdruck gilt als "wahr" sofern das Ergebnis weder NULL, leer und von "0" abweichend ist.
-Der Vergleich findet zwischen zwei Integer Werten statt, sofern die beiden Ausdrücke gültige Integer-Werte sind.
+Ein Ausdruck gilt als "wahr" sofern das Ergebnis weder NULL, nicht leer und von "0" abweichend ist.
+Für einen Vergleich werden Fließkommazahlen genutzt sofern es sich bei beiden Ausdrücken um gültige Nummer handelt, die folgendes Format haben müssen:
+  - Integer (Beispiele: 5, -7)
+  - Fließkommazahl (Beispiele: 5.2, -7.5, 2.83e-2)
+  - hexadezimale Zahl (Beispiele: 0xA3, -0xA3)
 Um einen Vergleich zwischen zwei Zeichenketten zu erzwingen, müssen die Ausdrücke in Anführungszeichen gesetzt werden, zum Beispiel:
   50 > 100      ==> 0
   "50" > "100"  ==> 1
@@ -330,7 +333,7 @@ Beispiele (Bedingungen):
   /eval -n -c abcd =~ (?-i)^ABC            ==> 0
   /eval -n -c abcd =~ (?-i)^abc            ==> 1
   /eval -n -c abcd !~ abc                  ==> 0
-  /eval -n -c abcd =* a*d                 ==> 1
+  /eval -n -c abcd =* a*d                  ==> 1
 ----
 
 [[command_weechat_filter]]
@@ -513,7 +516,7 @@ listdefault: zeigt die Standardeinstellung der Tastenbelegung an
    resetall: die Tastenbelegung wird auf die Standardeinstellungen zurück gesetzt. Dies löscht ALLE persönlichen Tastenbelegungen (Vorsicht!)
     missing: fügt fehlende Tastenbelegungen hinzu (dazu wird die Standardbelegung genutzt). Dies kann sinnvoll sein wenn man auf eine neue WeeChat Version umgestiegen ist
 
-Falls einer Taste ein Befehl zugeordnet werden soll ist es ratsam zuerst mit der Tastenkombination alt+k (oder Esc + k) einen Fangmodus zu aktivieren um damit die neu zu belegende Taste zu greifen. Durch diesen Schritt wird der entsprechende Tasten-Code in die Befehlszeile übernommen.
+Falls ein Befehl einer Taste zugeordnet werden soll ist es ratsam zuerst mit der Tastenkombination alt+k (oder Esc + k) einen Fangmodus zu aktivieren um damit die zu belegende Taste zu ermitteln. Durch diesen Schritt wird der benötigte Tasten-Code in die Befehlszeile übernommen.
 
 Für Kontext "mouse" (Kontext "cursor" ist auch möglich), hat der zu verwendende Schlüssel folgendes Format: "@area:Schlüssel" oder "@area1>area2:Schlüssel". "area" kann folgende Werte habe:
           *: jedweder Bereich des Bildschirms
@@ -782,7 +785,7 @@ passphrase: ändern der Passphrase (ohne Passphrase, werden die Daten in der Dat
 Ohne Angabe von Argumenten wird ein neuer Buffer geöffnet und die schutzwürdigen Informationen können dort eingesehen werden.
 
 Tastenbefehle für den secure-Buffer:
-  alt+v  Werte werden ein-ausgeblendet
+  alt+v Werte werden ein-ausgeblendet
 
 Wird eine Passphrase verwendet (Daten liegen verschlüsselt vor), fragt WeeChat beim Start die Passphrase ab.
 Es ist möglich eine Umgebungsvariable "WEECHAT_PASSPHRASE" zu setzen um die Eingabeaufforderung beim Programmstart zu vermeiden (diese Variable wird auch von WeeChat beim /upgrade verwendet).
@@ -814,7 +817,7 @@ Beispiele:
       diff [<option> [<option>...]]
       env [<variable> [<value>]]
 
-option: Name der zu ändernden Einstellung (um mehrere Einstellungen anzuzeigen, kann der Platzhalter "*" verwendet werden)
+option: Name der zu ändernden Einstellung (der Platzhalter "*" kann verwendet werden, um sich mehrere Einstellungen anzeigen zu lassen)
  value: neuer Wert den die Einstellung erhalten soll. Abhängig von der ausgewählten Einstellung, kann die Variable folgenden Inhalt haben:
           boolean: on, off oder toggle
           integer: Nummer, ++Nummer oder --Nummer

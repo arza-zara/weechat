@@ -29,13 +29,14 @@ WeeChat (Wee Enhanced Environment for Chat)
 このマニュアル文書は以下のスクリプト言語を利用して WeeChat
 用のスクリプトを製作する方法を解説しています:
 
-* python
-* perl
-* ruby
-* lua
-* tcl
-* guile (scheme)
-* javascript
+* Python
+* Perl
+* Ruby
+* Lua
+* Tcl
+* Guile (Scheme)
+* JavaScript
+* PHP
 
 [NOTE]
 この文書に含まれるほぼすべての例は Python
@@ -80,7 +81,7 @@ Weechat.config_new_option(config, section, "name", "string", "description of opt
 
 * 関数は `weechat::xxx arg1 arg2 ...` のように呼び出してください。
 
-==== Guile (scheme)
+==== Guile (Scheme)
 
 * 関数は `(weechat:xxx arg1 arg2 ...)` のように呼び出してください。
 * 以下の関数は引数のリストをひとつだけ取ります
@@ -90,9 +91,13 @@ Weechat.config_new_option(config, section, "name", "string", "description of opt
 ** config_new_option
 ** bar_new
 
-==== Javascript
+==== JavaScript
 
 * 関数は `weechat.xxx(arg1, arg2, ...);` のように呼び出してください。
+
+==== PHP
+
+* 関数は `weechat_xxx(arg1, arg2, ...);` のように呼び出してください。
 
 [[register_function]]
 === 関数の登録
@@ -166,7 +171,7 @@ weechat::register "test_tcl" "FlashCode" "1.0" "GPL3" "Test script" "" ""
 weechat::print "" "Hello, from tcl script!"
 ----
 
-* Guile (scheme):
+* Guile (Scheme):
 
 [source,lisp]
 ----
@@ -174,12 +179,20 @@ weechat::print "" "Hello, from tcl script!"
 (weechat:print "" "Hello, from scheme script!")
 ----
 
-* Javascript:
+* JavaScript:
 
 [source,javascript]
 ----
 weechat.register("test_js", "FlashCode", "1.0", "GPL3", "Test script", "", "");
 weechat.print("", "Hello, from javascript script!");
+----
+
+* PHP:
+
+[source,php]
+----
+weechat_register('test_php', 'FlashCode', '1.0', 'GPL3', 'Test script', '', '');
+weechat_print('', 'Hello, from PHP script!');
 ----
 
 [[load_script]]
@@ -195,6 +208,7 @@ weechat.print("", "Hello, from javascript script!");
 /script load script.tcl
 /script load script.scm
 /script load script.js
+/script load script.php
 ----
 
 プログラミング言語ごとの固有コマンドを利用することもできます:
@@ -207,6 +221,7 @@ weechat.print("", "Hello, from javascript script!");
 /tcl load script.tcl
 /guile load script.scm
 /javascript load script.js
+/php load script.php
 ----
 
 WeeChat の開始時にスクリプトを自動ロードするには
@@ -227,8 +242,8 @@ $ ln -s ../script.py
 == C API との違い
 
 スクリプト API は C 言語プラグイン API とほぼ同じです。API
-に含まれる各関数の詳細については、_WeeChat プラグイン API リファレンス_
-をご覧ください: プロトタイプ、引数、戻り値、例。
+に含まれる各関数の詳細 (プロトタイプ、引数、戻り値、例) については
+link:weechat_plugin_api.ja.html[WeeChat プラグイン API リファレンス]を参照してください。
 
 _プラグイン_ と _スクリプト_ の違いを理解することは重要です:
 _プラグイン_ とはコンパイル済みバイナリファイルで `/plugin` コマンドを使ってロードします、これに対して
@@ -355,7 +370,7 @@ proc timer_cb { data remaining_calls } {
 weechat::hook_timer 1000 0 1 timer_cb test
 ----
 
-* Guile (scheme):
+* Guile (Scheme):
 
 [source,lisp]
 ----
@@ -367,7 +382,7 @@ weechat::hook_timer 1000 0 1 timer_cb test
 (weechat:hook_timer 1000 0 1 "timer_cb" "test")
 ----
 
-* Javascript:
+* JavaScript:
 
 [source,javascript]
 ----
@@ -379,11 +394,23 @@ function timer_cb(data, remaining_calls) {
 weechat.hook_timer(1000, 0, 1, "timer_cb", "test");
 ----
 
+* PHP:
+
+[source,php]
+----
+$timer_cb = function ($data, $remaining_calls) {
+    weechat_print('', 'timer! data=' . $data);
+    return WEECHAT_RC_OK;
+};
+
+weechat_hook_timer(1000, 0, 1, $timer_cb, 'test');
+----
+
 [[script_api]]
 == スクリプト API
 
 API に含まれる関数の詳しい情報は
-_WeeChat プラグイン API リファレンス_ をご覧ください。
+link:weechat_plugin_api.ja.html[WeeChat プラグイン API リファレンス]を参照してください。
 
 [[script_api_functions]]
 === 関数
@@ -692,7 +719,7 @@ _WeeChat プラグイン API リファレンス_ をご覧ください。
 
 この章ではいくつかの良くあるタスクを例を交えて紹介します。ここでは
 API の一部の機能を使っています。完全なリファレンスは
-_WeeChat プラグイン API リファレンス_ をご覧ください。
+link:weechat_plugin_api.ja.html[WeeChat プラグイン API リファレンス]を参照してください。
 
 [[buffers]]
 === バッファ
@@ -736,8 +763,7 @@ weechat.prnt(buffer, "message on #weechat channel")
 ----
 
 [NOTE]
-Print 関数は Perl/Ruby/Lua/Tcl/Guile/Javascript では `print` で、Python では
-`prnt` です。
+Print 関数は Python では `prnt`、その他の言語では `print` と呼ばれます。
 
 [[buffers_send_text]]
 ==== バッファにテキストを送信
@@ -952,8 +978,9 @@ weechat.hook_process_hashtable("url:https://weechat.org/files/src/weechat-devel.
                                30 * 1000, "my_process_cb", "")
 ----
 
-URL 転送に関するより詳しい情報と利用可能なオプションを見るには、
-_WeeChat プラグイン API リファレンス_ の `hook_process` と `hook_process_hashtable` をご覧ください。
+URL 転送に関するより詳しい情報と利用可能なオプションは
+link:weechat_plugin_api.ja.html#_hook_process[WeeChat プラグイン API リファレンス]の
+`hook_process` と `hook_process_hashtable` を参照してください。
 
 [[config_options]]
 === 設定 / オプション

@@ -15,6 +15,7 @@
 
 Alphabetically:
 
+* Adam Saponara (adsr)
 * Ailin Nemui (Nei)
 * Aleksey V Zapparov
 * Alex Tarkovsky
@@ -27,6 +28,7 @@ Alphabetically:
 * Benoit Papillault (benoit)
 * Christian Heinz
 * Christopher O'Neill (deltafire)
+* coypoop
 * David Flatz
 * Dmitry Kobylin
 * Dominik Honnef
@@ -38,6 +40,7 @@ Alphabetically:
 * Evgeny Shmarnev
 * Felix Eckhofer
 * Frank Zacharias
+* Grant Wu
 * Gu1ll4um3r0m41n
 * Guido Berhoerster
 * Gwenn
@@ -47,6 +50,7 @@ Alphabetically:
 * JD Horelick (jdhore)
 * Jim Ramsay (lack)
 * Jiri Golembiovsky (GolemJ)
+* Joey Pabalinas (alyptik)
 * Juan Francisco Cantero Hurtado
 * Julien Louis (ptitlouis)
 * Karthik K

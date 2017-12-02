@@ -951,7 +951,7 @@
 ** デフォルト値: `+10+`
 
 * [[option_weechat.look.paste_max_lines]] *weechat.look.paste_max_lines*
-** 説明: pass:none[ユーザへの確認無しにペーストする行数の最大値 (-1 = この機能を無効化)]
+** 説明: pass:none[ユーザへの確認無しにペーストする行数の最大値 (-1 = この機能を無効化); このオプションは少なくとも 1 つ以上のバーでバー要素 "input_paste" が使われている場合のみ使われます (デフォルト状態では "input" バーでバー要素 "input_paste" が使われています)]
 ** タイプ: 整数
 ** 値: -1 .. 2147483647
 ** デフォルト値: `+1+`
@@ -1093,6 +1093,12 @@
 ** タイプ: ブール
 ** 値: on, off
 ** デフォルト値: `+on+`
+
+* [[option_weechat.look.save_config_with_fsync]] *weechat.look.save_config_with_fsync*
+** 説明: pass:none[メモリ上の設定内容をストレージデバイス上のものと同期させるには fsync を使ってください (man fsync を参照してください); fsync は遅いですが、fsync を使えば設定ファイル保存中の停電によるデータ損失を避けられます]
+** タイプ: ブール
+** 値: on, off
+** デフォルト値: `+off+`
 
 * [[option_weechat.look.save_layout_on_exit]] *weechat.look.save_layout_on_exit*
 ** 説明: pass:none[終了時にレイアウトを保存 (バッファ、ウィンドウ、両方)]

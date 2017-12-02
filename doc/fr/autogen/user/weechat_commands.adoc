@@ -81,7 +81,7 @@ Exemples :
          close [<n1>[-<n2>]|<nom>]
          notify <niveau>
          localvar
-         set <propriété> <valeur>
+         set <propriété> [<valeur>]
          get <propriété>
          <nombre>|<nom>
 
@@ -278,8 +278,11 @@ expression : expression à évaluer, les variables avec le format ${variable} s
                  !=  ne correspond PAS au masque (le caractère joker "*" est autorisé)
 
 Une expression est considérée comme "vraie" si elle est non NULL, non vide, et différente de "0".
-La comparaison est faite en utilisant des entiers si les deux expressions sont des entiers valides.
-Pour forcer une comparaison de chaînes, ajoutez des guillemets autour de chaque expression, par exemple :
+La comparaison est faite en utilisant des nombres à virgule si les deux expressions sont des nombres valides, avec l'un de ces formats :
+  - entier (exemples : 5, -7)
+  - nombre à virgule (exemples : 5.2, -7.5, 2.83e-2)
+  - nombre hexadécimal (exemples : 0xA3, -0xA3)
+Pour forcer une comparaison de chaînes, vous pouvez ajouter des guillemets autour de chaque expression, par exemple :
   50 > 100      ==> 0
   "50" > "100"  ==> 1
 
@@ -814,7 +817,7 @@ Exemples :
       diff [<option> [<option>...]]
       env [<variable> [<valeur>]]
 
-option : nom d'une option (le caractère joker "*" est autorisé)
+option : nom d'une option (le caractère joker "*" est autorisé pour lister les options, si aucune valeur n'est spécifiée)
 valeur : nouvelle valeur pour l'option, selon le type :
            booléen : on, off ou toggle
             entier : nombre, ++nombre ou --nombre

@@ -179,6 +179,7 @@ struct t_config_option *config_look_read_marker;
 struct t_config_option *config_look_read_marker_always_show;
 struct t_config_option *config_look_read_marker_string;
 struct t_config_option *config_look_save_config_on_exit;
+struct t_config_option *config_look_save_config_with_fsync;
 struct t_config_option *config_look_save_layout_on_exit;
 struct t_config_option *config_look_scroll_amount;
 struct t_config_option *config_look_scroll_bottom_after_switch;
@@ -1016,9 +1017,10 @@ config_get_item_time (char *text_time, int max_length)
 
     date = time (NULL);
     local_time = localtime (&date);
-    strftime (text_time, max_length,
-              config_item_time_evaluated,
-              local_time);
+    if (strftime (text_time, max_length,
+                  config_item_time_evaluated,
+                  local_time) == 0)
+        text_time[0] = '\0';
 }
 
 /*
@@ -1303,7 +1305,8 @@ config_day_change_timer_cb (const void *pointer, void *data,
         }
 
         /* send signal "day_changed" */
-        strftime (str_time, sizeof (str_time), "%Y-%m-%d", local_time);
+        if (strftime (str_time, sizeof (str_time), "%Y-%m-%d", local_time) == 0)
+            str_time[0] = '\0';
         (void) hook_signal_send ("day_changed",
                                  WEECHAT_HOOK_SIGNAL_STRING, str_time);
     }
@@ -3161,7 +3164,9 @@ config_weechat_init_options ()
         weechat_config_file, ptr_section,
         "paste_max_lines", "integer",
         N_("max number of lines for paste without asking user "
-           "(-1 = disable this feature)"),
+           "(-1 = disable this feature); this option is used only if the bar "
+           "item \"input_paste\" is used in at least one bar (by default it "
+           "is used in \"input\" bar)"),
         NULL, -1, INT_MAX, "1", NULL, 0,
         NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
     config_look_prefix[GUI_CHAT_PREFIX_ERROR] = config_file_new_option (
@@ -3373,6 +3378,17 @@ config_weechat_init_options ()
         "save_config_on_exit", "boolean",
         N_("save configuration file on exit"),
         NULL, 0, 0, "on", NULL, 0,
+        NULL, NULL, NULL,
+        &config_change_save_config_on_exit, NULL, NULL,
+        NULL, NULL, NULL);
+    config_look_save_config_with_fsync = config_file_new_option (
+        weechat_config_file, ptr_section,
+        "save_config_with_fsync", "boolean",
+        N_("use fsync to synchronize the configuration file with the storage "
+           "device (see man fsync); this is slower but should prevent any "
+           "data loss in case of power failure during the save of "
+           "configuration file"),
+        NULL, 0, 0, "off", NULL, 0,
         NULL, NULL, NULL,
         &config_change_save_config_on_exit, NULL, NULL,
         NULL, NULL, NULL);

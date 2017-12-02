@@ -726,7 +726,8 @@ relay_irc_get_line_info (struct t_relay_client *client,
             && time_format && time_format[0])
         {
             tm = localtime (&msg_date);
-            strftime (str_time, sizeof (str_time), time_format, tm);
+            if (strftime (str_time, sizeof (str_time), time_format, tm) == 0)
+                str_time[0] = '\0';
             length = strlen (str_time) + strlen (pos) + 1;
             *message = malloc (length);
             if (*message)
@@ -741,7 +742,8 @@ relay_irc_get_line_info (struct t_relay_client *client,
         && (RELAY_IRC_DATA(client, server_capabilities) & (1 << RELAY_IRC_CAPAB_SERVER_TIME)))
     {
         tm = gmtime (&msg_date);
-        strftime (str_time, sizeof (str_time), "%Y-%m-%dT%H:%M:%S", tm);
+        if (strftime (str_time, sizeof (str_time), "%Y-%m-%dT%H:%M:%S", tm) == 0)
+            str_time[0] = '\0';
         snprintf (str_tag, sizeof (str_tag), "@time=%s.000Z ", str_time);
         *tags = strdup (str_tag);
     }
@@ -906,6 +908,7 @@ relay_irc_send_channel_backlog (struct t_relay_client *client,
                                      (ptr_host) ? "!" : "",
                                      (ptr_host) ? ptr_host : "",
                                      channel);
+                    break;
                 case RELAY_IRC_CMD_QUIT:
                     relay_irc_sendf (client,
                                      "%s:%s%s%s QUIT",
@@ -1225,10 +1228,10 @@ relay_irc_hook_signals (struct t_relay_client *client)
 
 void
 relay_irc_recv_command_capab (struct t_relay_client *client,
-                              int argc, char **argv)
+                              int argc, char **argv, char **argv_eol)
 {
-    char str_capab[1024];
-    int i, capability;
+    char str_capab[1024], *ptr_cap;
+    int i, capability, server_caps, num_caps_received, caps_ok;
 
     if (weechat_strcasecmp (argv[0], "ls") == 0)
     {
@@ -1251,31 +1254,47 @@ relay_irc_recv_command_capab (struct t_relay_client *client,
     else if (weechat_strcasecmp (argv[0], "req") == 0)
     {
         /* client is asking for one or more server capabilities */
-        str_capab[0] = '\0';
+        num_caps_received = 0;
+        caps_ok = 0;
+        server_caps = RELAY_IRC_DATA(client, server_capabilities);
         for (i = 1; i < argc; i++)
         {
-            capability = relay_irc_search_server_capability (
-                (argv[i][0] == ':') ? argv[i] + 1 : argv[i]);
-            if (capability >= 0)
+            ptr_cap = (argv[i][0] == ':') ? argv[i] + 1 : argv[i];
+            if (ptr_cap[0])
             {
-                if (str_capab[0])
-                    strcat (str_capab, " ");
-                strcat (str_capab,
-                        relay_irc_server_capabilities[capability]);
-                RELAY_IRC_DATA(client, server_capabilities) |= 1 << capability;
+                num_caps_received++;
+                capability = relay_irc_search_server_capability (ptr_cap);
+                if (capability >= 0)
+                {
+                    caps_ok = 1;
+                    server_caps |= 1 << capability;
+                }
+                else
+                {
+                    caps_ok = 0;
+                    break;
+                }
             }
         }
+        if (caps_ok)
+            RELAY_IRC_DATA(client, server_capabilities) = server_caps;
+        relay_irc_sendf (
+            client,
+            ":%s CAP %s %s :%s",
+            RELAY_IRC_DATA(client, address),
+            (RELAY_IRC_DATA(client, nick)) ? RELAY_IRC_DATA(client, nick) : "nick",
+            (caps_ok) ? "ACK" : "NAK",
+            (argc >= 2) ? ((argv_eol[1][0] == ':') ? argv_eol[1] + 1 : argv_eol[1]) : "");
+
         /*
-         * if at least one supported capability was enabled, send ACK to
-         * client
+         * if the CAP REQ command is received without arguments, we consider
+         * the CAP END is received; this is a workaround for clients like
+         * Atomic which are sending "CAP REQ :" (see issue #1040)
          */
-        if (str_capab[0])
+        if (num_caps_received == 0)
         {
-            relay_irc_sendf (client,
-                             ":%s CAP %s ACK :%s",
-                             RELAY_IRC_DATA(client, address),
-                             (RELAY_IRC_DATA(client, nick)) ? RELAY_IRC_DATA(client, nick) : "nick",
-                             str_capab);
+            if (!RELAY_IRC_DATA(client, connected))
+                RELAY_IRC_DATA(client, cap_end_received) = 1;
         }
     }
     else if (weechat_strcasecmp (argv[0], "end") == 0)
@@ -1293,7 +1312,7 @@ void
 relay_irc_recv (struct t_relay_client *client, const char *data)
 {
     char str_time[128], str_signal[128], str_server_channel[256];
-    char str_command[128], *target, **irc_argv, *pos, *password;
+    char str_command[128], *target, **irc_argv, **irc_argv_eol, *pos, *password;
     const char *irc_command, *irc_channel, *irc_args, *irc_args2;
     int irc_argc, redirect_msg;
     const char *nick, *irc_is_channel, *isupport, *info, *pos_password;
@@ -1302,6 +1321,7 @@ relay_irc_recv (struct t_relay_client *client, const char *data)
 
     hash_parsed = NULL;
     irc_argv = NULL;
+    irc_argv_eol = NULL;
     irc_argc = 0;
 
     /* display debug message */
@@ -1323,7 +1343,10 @@ relay_irc_recv (struct t_relay_client *client, const char *data)
     irc_channel = weechat_hashtable_get (hash_parsed, "channel");
     irc_args = weechat_hashtable_get (hash_parsed, "arguments");
     if (irc_args)
+    {
         irc_argv = weechat_string_split (irc_args, " ", 0, 0, &irc_argc);
+        irc_argv_eol = weechat_string_split (irc_args, " ", 1, 0, NULL);
+    }
 
     /*
      * first process the "nick" command (it will be processed again in this
@@ -1342,7 +1365,10 @@ relay_irc_recv (struct t_relay_client *client, const char *data)
     if (irc_command && (weechat_strcasecmp (irc_command, "cap") == 0))
     {
         if ((irc_argc > 0) && irc_argv)
-            relay_irc_recv_command_capab (client, irc_argc, irc_argv);
+        {
+            relay_irc_recv_command_capab (client,
+                                          irc_argc, irc_argv, irc_argv_eol);
+        }
     }
     /* if client is not yet "connected" */
     if (!RELAY_IRC_DATA(client, connected))
@@ -1733,6 +1759,8 @@ end:
         weechat_hashtable_free (hash_parsed);
     if (irc_argv)
         weechat_string_free_split (irc_argv);
+    if (irc_argv_eol)
+        weechat_string_free_split (irc_argv_eol);
 }
 
 /*

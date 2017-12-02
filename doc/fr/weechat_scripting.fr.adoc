@@ -25,13 +25,14 @@ rapide et léger, conçu pour différents systèmes d'exploitation.
 Ce manuel documente la façon d'écrire des scripts pour WeeChat, en utilisant
 l'un des langages de script supportés :
 
-* python
-* perl
-* ruby
-* lua
-* tcl
-* guile (scheme)
-* javascript
+* Python
+* Perl
+* Ruby
+* Lua
+* Tcl
+* Guile (Scheme)
+* JavaScript
+* PHP
 
 [NOTE]
 La majorité des exemples de cette documentation sont écrits en Python, mais
@@ -77,7 +78,7 @@ Weechat.config_new_option(config, section, "name", "string", "description of opt
 
 * Les fonctions sont appelées par `weechat::xxx arg1 arg2 ...`.
 
-==== Guile (scheme)
+==== Guile (Scheme)
 
 * Les fonctions sont appelées par `(weechat:xxx arg1 arg2 ...)`.
 * Les fonctions suivantes prennent une liste de paramètres en entrée (au lieu
@@ -87,9 +88,13 @@ Weechat.config_new_option(config, section, "name", "string", "description of opt
 ** config_new_option
 ** bar_new
 
-==== Javascript
+==== JavaScript
 
 * Les fonctions sont appelées par `weechat.xxx(arg1, arg2, ...);`.
+
+==== PHP
+
+* Les fonctions sont appelées par `weechat_xxx(arg1, arg2, ...);`.
 
 [[register_function]]
 === Fonction register
@@ -126,7 +131,7 @@ Exemple, pour chaque langage :
 import weechat
 
 weechat.register("test_python", "FlashCode", "1.0", "GPL3", "Script de test", "", "")
-weechat.prnt("", "Bonjour, du script python !")
+weechat.prnt("", "Bonjour, du script python !")
 ----
 
 * Perl :
@@ -134,7 +139,7 @@ weechat.prnt("", "Bonjour, du script python !")
 [source,perl]
 ----
 weechat::register("test_perl", "FlashCode", "1.0", "GPL3", "Script de test", "", "");
-weechat::print("", "Bonjour, du script perl !");
+weechat::print("", "Bonjour, du script perl !");
 ----
 
 * Ruby :
@@ -143,7 +148,7 @@ weechat::print("", "Bonjour, du script perl !");
 ----
 def weechat_init
   Weechat.register("test_ruby", "FlashCode", "1.0", "GPL3", "Script de test", "", "")
-  Weechat.print("", "Bonjour, du script ruby !")
+  Weechat.print("", "Bonjour, du script ruby !")
   return Weechat::WEECHAT_RC_OK
 end
 ----
@@ -153,7 +158,7 @@ end
 [source,lua]
 ----
 weechat.register("test_lua", "FlashCode", "1.0", "GPL3", "Script de test", "", "")
-weechat.print("", "Bonjour, du script lua !")
+weechat.print("", "Bonjour, du script lua !")
 ----
 
 * Tcl :
@@ -161,23 +166,31 @@ weechat.print("", "Bonjour, du script lua !")
 [source,tcl]
 ----
 weechat::register "test_tcl" "FlashCode" "1.0" "GPL3" "Script de test" "" ""
-weechat::print "" "Bonjour, du script tcl !"
+weechat::print "" "Bonjour, du script tcl !"
 ----
 
-* Guile (scheme) :
+* Guile (Scheme) :
 
 [source,lisp]
 ----
 (weechat:register "test_scheme" "FlashCode" "1.0" "GPL3" "Script de test" "" "")
-(weechat:print "" "Bonjour, du script scheme !")
+(weechat:print "" "Bonjour, du script scheme !")
 ----
 
-* Javascript :
+* JavaScript :
 
 [source,javascript]
 ----
-weechat.register("test_js", "FlashCode", "1.0", "GPL3", "Test script", "", "");
-weechat.print("", "Bonjour, du script javascript !");
+weechat.register("test_js", "FlashCode", "1.0", "GPL3", "Script de test", "", "");
+weechat.print("", "Bonjour, du script javascript !");
+----
+
+* PHP :
+
+[source,php]
+----
+weechat_register('test_php', 'FlashCode', '1.0', 'GPL3', 'Script de test', '', '');
+weechat_print('', 'Bonjour, du script PHP !');
 ----
 
 [[load_script]]
@@ -194,6 +207,7 @@ par exemple :
 /script load script.tcl
 /script load script.scm
 /script load script.js
+/script load script.php
 ----
 
 Chaque langage a également sa propre commande :
@@ -206,6 +220,7 @@ Chaque langage a également sa propre commande :
 /tcl load script.tcl
 /guile load script.scm
 /javascript load script.js
+/php load script.php
 ----
 
 Vous pouvez faire un lien dans le répertoire _langage/autoload_ pour charger
@@ -226,8 +241,9 @@ dans le répertoire _autoload_ est automatiquement créé.
 == Différences avec l'API C
 
 L'API script est quasiment identique à l'API C.
-Vous pouvez consulter la _Référence API Extension WeeChat_ pour le détail de
-chaque fonction de l'API : prototype, paramètres, valeurs de retour, exemples.
+Vous pouvez consulter la link:weechat_plugin_api.fr.html[Référence API extension WeeChat]
+pour le détail de chaque fonction de l'API : prototype, paramètres, valeurs
+de retour, exemples.
 
 Il est important de bien faire la différence entre une _extension_ et un
 _script_ : une _extension_ est un fichier binaire compilé et chargé avec la
@@ -276,7 +292,7 @@ WeeChat), vous pouvez faire :
 
 [source,python]
 ----
-weechat.prnt("", "bonjour !")
+weechat.prnt("", "bonjour !")
 ----
 
 [WARNING]
@@ -358,7 +374,7 @@ proc timer_cb { data remaining_calls } {
 weechat::hook_timer 1000 0 1 timer_cb test
 ----
 
-* Guile (scheme) :
+* Guile (Scheme) :
 
 [source,lisp]
 ----
@@ -370,7 +386,7 @@ weechat::hook_timer 1000 0 1 timer_cb test
 (weechat:hook_timer 1000 0 1 "timer_cb" "test")
 ----
 
-* Javascript :
+* JavaScript :
 
 [source,javascript]
 ----
@@ -382,11 +398,23 @@ function timer_cb(data, remaining_calls) {
 weechat.hook_timer(1000, 0, 1, "timer_cb", "test");
 ----
 
+* PHP :
+
+[source,php]
+----
+$timer_cb = function ($data, $remaining_calls) {
+    weechat_print('', 'timer! data=' . $data);
+    return WEECHAT_RC_OK;
+};
+
+weechat_hook_timer(1000, 0, 1, $timer_cb, 'test');
+----
+
 [[script_api]]
 == API script
 
 Pour plus d'informations sur les fonctions de l'API, merci de consulter la
-_Référence API Extension WeeChat_.
+link:weechat_plugin_api.fr.html[Référence API extension WeeChat].
 
 [[script_api_functions]]
 === Fonctions
@@ -696,7 +724,7 @@ Liste des constantes de l'API script :
 
 Ce chapitre montre quelques tâches courantes, avec des exemples.
 Seule une partie de l'API est utilisée ici, pour une référence complète, voir la
-_Référence API Extension WeeChat_.
+link:weechat_plugin_api.fr.html[Référence API extension WeeChat].
 
 [[buffers]]
 === Tampons
@@ -741,8 +769,8 @@ weechat.prnt(buffer, "message sur le canal #weechat")
 ----
 
 [NOTE]
-La fonction d'affichage est appelée `print` en
-Perl/Ruby/Lua/Tcl/Guile/Javascript et `prnt` en Python.
+La fonction d'affichage est appelée `prnt` en Python et `print` dans les autres
+langages.
 
 [[buffers_send_text]]
 ==== Envoyer du texte au tampon
@@ -967,7 +995,7 @@ weechat.hook_process_hashtable("url:https://weechat.org/files/src/weechat-devel.
 
 Pour plus d'information sur le transfert d'URL et les options disponibles, voir
 les fonctions `hook_process` et `hook_process_hashtable` dans la
-_Référence API Extension WeeChat_.
+link:weechat_plugin_api.fr.html#_hook_process[Référence API extension WeeChat].
 
 [[config_options]]
 === Config / options
@@ -1069,7 +1097,7 @@ def join_cb(data, signal, signal_data):
     msg = weechat.info_get_hashtable("irc_message_parse", {"message": signal_data})
     buffer = weechat.info_get("irc_buffer", "%s,%s" % (server, msg["channel"]))
     if buffer:
-        weechat.prnt(buffer, "%s (%s) a rejoint ce canal !" % (msg["nick"], msg["host"]))
+        weechat.prnt(buffer, "%s (%s) a rejoint ce canal !" % (msg["nick"], msg["host"]))
     return weechat.WEECHAT_RC_OK
 
 # il est pratique ici d'utiliser "*" comme serveur, pour intercepter les
@@ -1087,7 +1115,7 @@ commande IRC) pour un message reçu, de sorte que vous puissiez le modifier.
 ----
 def modifier_cb(data, modifier, modifier_data, string):
     # ajouter le nom du serveur à tous les messages reçus
-    # (ok ce n'est pas très utile, mais c'est juste un exemple !)
+    # (ok ce n'est pas très utile, mais c'est juste un exemple !)
     return "%s %s" % (string, modifier_data)
 
 weechat.hook_modifier("irc_in_privmsg", "modifier_cb", "")
@@ -1095,7 +1123,7 @@ weechat.hook_modifier("irc_in_privmsg", "modifier_cb", "")
 
 [WARNING]
 Un message mal formé peut provoquer un plantage de WeeChat ou de sérieux
-problèmes !
+problèmes !
 
 [[irc_message_parse]]
 ==== Analyser un message

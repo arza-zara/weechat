@@ -309,7 +309,7 @@
 ** デフォルト値: `+auto+`
 
 * [[option_irc.look.notice_welcome_redirect]] *irc.look.notice_welcome_redirect*
-** 説明: pass:none[ようこそ通知メッセージは対象となるバッファに自動リダイレクト; ようこそ通知の通知先はニックネームとなっていますが、通知メッセージの最初チャンネル名が含まれています、freenode サーバが送信する通知メッセージの例: "[#channel\] Welcome to this channel..."]
+** 説明: pass:none[チャンネルからの歓迎メッセージをチャンネルを表示するバッファへ自動リダイレクト; 歓迎メッセージの宛先はニックネームですが、メッセージの先頭に含まれるチャンネル名をもとに、そのチャンネルを表示するバッファへメッセージをリダイレクトします。Atheme IRC サービスが送信する ENTRYMSG 通知の例: "[#channel\] Welcome to this channel..."]
 ** タイプ: ブール
 ** 値: on, off
 ** デフォルト値: `+on+`
@@ -579,7 +579,7 @@
 ** デフォルト値: `+25+`
 
 * [[option_irc.server_default.capabilities]] *irc.server_default.capabilities*
-** 説明: pass:none[サーバで利用可能ならば有効化する "client capabilities" のコンマ区切りリスト (WeeChat がサポートする機能のリストは /help cap を御覧ください) (例: "away-notify,multi-prefix")]
+** 説明: pass:none[サーバで利用可能ならば有効化する "client capabilities" のコンマ区切りリスト (WeeChat がサポートする機能のリストは /help cap を参照してください) (例: "away-notify,multi-prefix")]
 ** タイプ: 文字列
 ** 値: 未制約文字列
 ** デフォルト値: `+""+`

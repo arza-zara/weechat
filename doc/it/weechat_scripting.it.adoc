@@ -31,13 +31,14 @@ veloce e leggero, realizzato per molti sistemi operativi.
 Questo manuale documenta come scrivere script per WeeChat, usando uno dei
 linguaggi di scripting supportati:
 
-* python
-* perl
-* ruby
-* lua
-* tcl
-* guile (scheme)
-* javascript
+* Python
+* Perl
+* Ruby
+* Lua
+* Tcl
+* Guile (Scheme)
+* JavaScript
+* PHP
 
 [NOTE]
 Quasi tutti gli esempi in questo manuale sono scritti in Python, ma l'API
@@ -83,7 +84,7 @@ Weechat.config_new_option(config, section, "name", "string", "description of opt
 
 * Le funzioni sono chiamate con `weechat::xxx arg1 arg2 ...`
 
-==== Guile (scheme)
+==== Guile (Scheme)
 
 * Le funzioni sono chiamate con `(weechat:xxx arg1 arg2 ...)`
 * Le seguenti funzioni prendono un elenco di argomenti (invece di più argomenti
@@ -93,9 +94,13 @@ Weechat.config_new_option(config, section, "name", "string", "description of opt
 ** config_new_option
 ** bar_new
 
-==== Javascript
+==== JavaScript
 
 * Le funzioni sono chiamate con `weechat.xxx(arg1, arg2, ...);`
+
+==== PHP
+
+* Le funzioni sono chiamate con `weechat_xxx(arg1, arg2, ...);`
 
 [[register_function]]
 === Registrare una funzione
@@ -169,7 +174,7 @@ weechat::register "test_tcl" "FlashCode" "1.0" "GPL3" "Test script" "" ""
 weechat::print "" "Hello, from tcl script!"
 ----
 
-* Guile (scheme):
+* Guile (Scheme):
 
 [source,lisp]
 ----
@@ -177,12 +182,20 @@ weechat::print "" "Hello, from tcl script!"
 (weechat:print "" "Hello, from scheme script!")
 ----
 
-* Javascript:
+* JavaScript:
 
 [source,javascript]
 ----
 weechat.register("test_js", "FlashCode", "1.0", "GPL3", "Test script", "", "");
 weechat.print("", "Hello, from javascript script!");
+----
+
+* PHP:
+
+[source,php]
+----
+weechat_register('test_php', 'FlashCode', '1.0', 'GPL3', 'Test script', '', '');
+weechat_print('', 'Hello, from PHP script!');
 ----
 
 [[load_script]]
@@ -198,6 +211,7 @@ Si raccomanda di usare il plugin "script" per caricare gli script, ad esempio:
 /script load script.tcl
 /script load script.scm
 /script load script.js
+/script load script.php
 ----
 
 Ogni linguaggio ha anche il suo comando specifico:
@@ -210,6 +224,7 @@ Ogni linguaggio ha anche il suo comando specifico:
 /tcl load script.tcl
 /guile load script.scm
 /javascript load script.js
+/php load script.php
 ----
 
 È possibile creare un link nella directory _linguaggio/autoload_ per caricare
@@ -229,9 +244,10 @@ directory _autoload_ viene creato automaticamente'.
 [[differences_with_c_api]]
 == Differenze con le API in C
 
-Le API per gli script sono quasi identiche di quelle per i plugin C.
-È possibile consultare _*_ per i dettagli su ogni funzione nelle API:
-prototipo, argomenti, valori restituiti, esempi.
+// TRANSLATION MISSING
+Script API is almost the same as C plugin API.
+You can look at link:weechat_plugin_api.it.html[WeeChat plugin API reference]
+for detail about each function in API: prototype, arguments, return values, examples.
 
 È importante fare la differenza tra un _plugin_ ed uno _script_:
 un plugin è un file binario compilato e caricato con il comando
@@ -362,7 +378,7 @@ proc timer_cb { data remaining_calls } {
 weechat::hook_timer 1000 0 1 timer_cb test
 ----
 
-* Guile (scheme):
+* Guile (Scheme):
 
 [source,lisp]
 ----
@@ -374,7 +390,7 @@ weechat::hook_timer 1000 0 1 timer_cb test
 (weechat:hook_timer 1000 0 1 "timer_cb" "test")
 ----
 
-* Javascript:
+* JavaScript:
 
 [source,javascript]
 ----
@@ -386,11 +402,24 @@ function timer_cb(data, remaining_calls) {
 weechat.hook_timer(1000, 0, 1, "timer_cb", "test");
 ----
 
+* PHP:
+
+[source,php]
+----
+$timer_cb = function ($data, $remaining_calls) {
+    weechat_print('', 'timer! data=' . $data);
+    return WEECHAT_RC_OK;
+};
+
+weechat_hook_timer(1000, 0, 1, $timer_cb, 'test');
+----
+
 [[script_api]]
 == Script API
 
-Per maggiori informazioni sulle funzioni nelle API,
-consultare _Referenze API per Plugin di WeeChat_.
+// TRANSLATION MISSING
+For more information about functions in API, please read the
+link:weechat_plugin_api.it.html[WeeChat plugin API reference].
 
 [[script_api_functions]]
 === Funzioni
@@ -700,10 +729,10 @@ Elenco di costanti nelle API per gli script:
 [[common_tasks]]
 == Compiti comuni
 
-Questo capitolo spiega alcuni compiti comuni, con degli esempi.
-Verranno utilizzati soltanto degli elementi parziali contenuti
-nelle API, per un riferimento completo consultare
-_Referenze API per Plugin di WeeChat_.
+// TRANSLATION MISSING
+This chapter shows some common tasks, with examples.
+Only partial things in API are used here, for full reference, see the
+link:weechat_plugin_api.it.html[WeeChat plugin API reference].
 
 [[buffers]]
 === Buffer
@@ -747,9 +776,9 @@ buffer = weechat.info_get("irc_buffer", "freenode,#weechat")
 weechat.prnt(buffer, "message on #weechat channel")
 ----
 
+// TRANSLATION MISSING
 [NOTE]
-La funzione print si chiama `print` in Perl/Ruby/Lua/Tcl/Guile/Javascript e
-`prnt` in Python.
+Print function is called `prnt` in Python and `print` in other languages.
 
 [[buffers_send_text]]
 ==== Invia testo al buffer
@@ -971,9 +1000,10 @@ weechat.hook_process_hashtable("url:https://weechat.org/files/src/weechat-devel.
                                30 * 1000, "my_process_cb", "")
 ----
 
-Per maggiori informazioni sul trasferimento degli URL e le opzioni disponibili,
-consultare le funzioni `hook_process` e `hook_process_hashtable` in
-_Referenze API per Plugin_.
+// TRANSLATION MISSING
+For more information about URL transfer and available options, see functions
+`hook_process` and `hook_process_hashtable` in
+link:weechat_plugin_api.it.html#_hook_process[WeeChat plugin API reference].
 
 [[config_options]]
 === Configurazione / opzioni

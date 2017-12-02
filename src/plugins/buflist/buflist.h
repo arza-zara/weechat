@@ -17,8 +17,8 @@
  * along with WeeChat.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WEECHAT_BUFLIST_H
-#define WEECHAT_BUFLIST_H 1
+#ifndef WEECHAT_PLUGIN_BUFLIST_H
+#define WEECHAT_PLUGIN_BUFLIST_H
 
 #define weechat_plugin weechat_buflist_plugin
 #define BUFLIST_PLUGIN_NAME "buflist"
@@ -31,6 +31,7 @@ extern struct t_hdata *buflist_hdata_window;
 extern struct t_hdata *buflist_hdata_buffer;
 extern struct t_hdata *buflist_hdata_hotlist;
 extern struct t_hdata *buflist_hdata_bar;
+extern struct t_hdata *buflist_hdata_bar_item;
 extern struct t_hdata *buflist_hdata_bar_window;
 
 extern void buflist_add_bar ();
@@ -38,4 +39,4 @@ extern void buflist_buffer_get_irc_pointers(struct t_gui_buffer *buffer,
                                             void **irc_server, void **irc_channel);
 extern struct t_arraylist *buflist_sort_buffers ();
 
-#endif /* WEECHAT_BUFLIST_H */
+#endif /* WEECHAT_PLUGIN_BUFLIST_H */

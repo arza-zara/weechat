@@ -16,7 +16,7 @@
 
 | exec | exec_commands_ids | IDs (Nummern und Namen) von ausgeführten Befehlen
 
-| fset | fset_options | configuration files, sections, options and words of options
+| fset | fset_options | Konfigurationsdateien, Sektionen, Optionen und Worte von Optionen
 
 | guile | guile_script | Liste der Skripten
 
@@ -57,6 +57,8 @@
 | lua | lua_script | Liste der Skripten
 
 | perl | perl_script | Liste der Skripten
+
+| php | php_script | Liste der Skripten
 
 | python | python_script | Liste der Skripten
 

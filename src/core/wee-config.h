@@ -19,7 +19,7 @@
  */
 
 #ifndef WEECHAT_CONFIG_H
-#define WEECHAT_CONFIG_H 1
+#define WEECHAT_CONFIG_H
 
 #include <regex.h>
 #include <wctype.h>
@@ -230,6 +230,7 @@ extern struct t_config_option *config_look_read_marker;
 extern struct t_config_option *config_look_read_marker_always_show;
 extern struct t_config_option *config_look_read_marker_string;
 extern struct t_config_option *config_look_save_config_on_exit;
+extern struct t_config_option *config_look_save_config_with_fsync;
 extern struct t_config_option *config_look_save_layout_on_exit;
 extern struct t_config_option *config_look_scroll_amount;
 extern struct t_config_option *config_look_scroll_bottom_after_switch;

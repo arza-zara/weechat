@@ -95,32 +95,34 @@ Sous OS X, vous pouvez utiliser http://brew.sh/[Homebrew] :
 Le tableau suivant liste les paquets qui sont requis ou optionnels pour
 compiler WeeChat.
 
-[width="100%",cols="5,^3,^3,.^13",options="header"]
+[width="100%",cols="6,^3,^3,.^13",options="header"]
 |===
-| Paquet ^(1)^           | Version       | Requis | Fonctionnalité
+| Paquet ^(1)^                | Version       | Requis | Fonctionnalité
 | compilateur C
-  (gcc, clang, ...)      |               | *oui*  | Construction.
-| compilateur C++        |               |        | Construction et lancement des tests, extension javascript.
-| cmake                  |               | *oui*  | Construction (autotools toujours possible, mais cmake est recommandé).
-| pkg-config             |               | *oui*  | Détection des bibliothèques installées.
-| libncursesw5-dev ^(2)^ |               | *oui*  | Interface ncurses.
-| libcurl4-gnutls-dev    |               | *oui*  | Transfert d'URL.
-| zlib1g-dev             |               | *oui*  | Compression des paquets dans l'extension relay (protocole weechat), extension script.
-| libgcrypt20-dev        |               | *oui*  | Données sécurisées, authentification IRC SASL (DH-BLOWFISH/DH-AES), extension script.
-| libgnutls28-dev        | ≥ 2.2.0 ^(3)^ |        | Connexion SSL au serveur IRC, support SSL dans l'extension relay, authentification IRC SASL (ECDSA-NIST256P-CHALLENGE).
-| gettext                |               |        | Internationalisation (traduction des messages; la langue de base est l'anglais).
-| ca-certificates        |               |        | Certificats pour les connexions SSL.
+  (gcc, clang, ...)           |               | *oui*  | Construction.
+| compilateur C++             |               |        | Construction et lancement des tests, extension JavaScript.
+| cmake                       |               | *oui*  | Construction (autotools toujours possible, mais cmake est recommandé).
+| pkg-config                  |               | *oui*  | Détection des bibliothèques installées.
+| libncursesw5-dev ^(2)^      |               | *oui*  | Interface ncurses.
+| libcurl4-gnutls-dev         |               | *oui*  | Transfert d'URL.
+| zlib1g-dev                  |               | *oui*  | Compression des paquets dans l'extension relay (protocole weechat), extension script.
+| libgcrypt20-dev             |               | *oui*  | Données sécurisées, authentification IRC SASL (DH-BLOWFISH/DH-AES), extension script.
+| libgnutls28-dev             | ≥ 2.2.0 ^(3)^ |        | Connexion SSL au serveur IRC, support SSL dans l'extension relay, authentification IRC SASL (ECDSA-NIST256P-CHALLENGE).
+| gettext                     |               |        | Internationalisation (traduction des messages; la langue de base est l'anglais).
+| ca-certificates             |               |        | Certificats pour les connexions SSL.
 | libaspell-dev
-  ∥ libenchant-dev       |               |        | Extension aspell.
-| python-dev             | ≥ 2.5 ^(4)^   |        | Extension python.
-| libperl-dev            |               |        | Extension perl.
-| ruby-2.3, ruby2.3-dev  | ≥ 1.8         |        | Extension ruby.
-| liblua5.3-dev          |               |        | Extension lua.
-| tcl-dev                | ≥ 8.5         |        | Extension tcl.
-| guile-2.0-dev          | ≥ 2.0         |        | Extension guile (scheme).
-| libv8-dev              | ≤ 3.24.3      |        | Extension javascript.
-| asciidoctor            | ≥ 1.5.4       |        | Construction de la page man et de la documentation.
-| libcpputest-dev        | ≥ 3.4         |        | Construction et lancement des tests.
+  ∥ libenchant-dev            |               |        | Extension aspell.
+| python-dev                  | ≥ 2.6 ^(4)^   |        | Extension python.
+| libperl-dev                 |               |        | Extension perl.
+| ruby-2.3, ruby2.3-dev       | ≥ 1.8         |        | Extension ruby.
+| liblua5.3-dev               |               |        | Extension lua.
+| tcl-dev                     | ≥ 8.5         |        | Extension tcl.
+| guile-2.0-dev               | ≥ 2.0         |        | Extension guile (scheme).
+| libv8-dev                   | ≤ 3.24.3      |        | Extension javascript.
+| php7.1-dev, libphp7.1-embed | ≥ 7.0         |        | Extension PHP.
+| libxml2-dev                 |               |        | Extension PHP.
+| asciidoctor                 | ≥ 1.5.4       |        | Construction de la page man et de la documentation.
+| libcpputest-dev             | ≥ 3.4         |        | Construction et lancement des tests.
 |===
 
 [NOTE]
@@ -128,12 +130,12 @@ compiler WeeChat.
 nom du paquet peut être différente. +
 ^(2)^ Il est recommandé de compiler avec libncurses**w**5-dev (le *w* est
 important). WeeChat peut compiler avec libncurses5-dev, but ce n'est *PAS*
-recommandé : vous pourriez avoir des bugs d'affichage avec les caractères
+recommandé : vous pourriez avoir des bugs d'affichage avec les caractères
 larges. +
 ^(3)^ Gnutls ≥ 3.0.21 est requis pour l'authentification SASL avec le mécanisme
 ECDSA-NIST256P-CHALLENGE. +
 ^(4)^ La version recommandée de Python est 2.7 (tous les scripts tournent bien
-avec la version 2.7, mais pas avec les versions ≤ 2.6 ou ≥ 3.0).
+avec la version 2.7, mais pas avec les versions < 2.7 ou ≥ 3.0).
 
 Si vous utilisez une distribution basée sur Debian ou Ubuntu, et si vous avez
 des entrées source "deb-src" dans votre fichier _/etc/apt/sources.list_, vous
@@ -231,7 +233,7 @@ Liste des options couramment utilisées :
   Compiler <<irc_plugin,l'extension IRC>>.
 
 | ENABLE_JAVASCRIPT | `ON`, `OFF` | ON |
-  Compiler <<scripts_plugins,l'extension Javascript>>.
+  Compiler <<scripts_plugins,l'extension JavaScript>>.
 
 | ENABLE_LARGEFILE | `ON`, `OFF` | ON |
   Support des gros fichiers.
@@ -251,6 +253,9 @@ Liste des options couramment utilisées :
 | ENABLE_PERL | `ON`, `OFF` | ON |
   Compiler <<scripts_plugins,l'extension Perl>>.
 
+| ENABLE_PHP | `ON`, `OFF` | ON |
+  Compiler <<scripts_plugins,l'extension PHP>>.
+
 | ENABLE_PYTHON | `ON`, `OFF` | ON |
   Compiler <<scripts_plugins,l'extension Python>>.
 
@@ -269,7 +274,7 @@ Liste des options couramment utilisées :
 
 | ENABLE_SCRIPTS | `ON`, `OFF` | ON |
   Compiler <<scripts_plugins,les extensions de script>> (Python, Perl, Ruby,
-  Lua, Tcl, Guile, Javascript).
+  Lua, Tcl, Guile, JavaScript, PHP).
 
 | ENABLE_TCL | `ON`, `OFF` | ON |
   Compiler <<scripts_plugins,l'extension Tcl>>.
@@ -335,11 +340,32 @@ Des options peuvent être utilisées pour le script _configure_, elles peuvent
 $ ./configure --help
 ----
 
+[[run_tests]]
+==== Lancement des tests
+
+Les paquets suivants sont nécessaires pour compiler les tests :
+
+* libcpputest-dev
+* C++ compiler
+
+Les tests doivent être activés pour compiler WeeChat (avec cmake) :
+
+----
+$ cmake .. -DENABLE_TESTS=ON
+----
+
+Ils peuvent être lancés après compilation depuis le répertoire de construction
+(avec cmake) :
+
+----
+$ ctest -V
+----
+
 [[git_sources]]
 === Sources Git
 
 Attention : les sources git sont réservés aux utilisateurs avancés : il se peut
-que WeeChat ne compile pas et qu'il soit très instable. Vous êtes prévenus !
+que WeeChat ne compile pas et qu'il soit très instable. Vous êtes prévenus !
 
 Pour récupérer les sources git, tapez cette commande :
 
@@ -407,7 +433,7 @@ ulimit -c 200000
 Lorsque WeeChat se plante, votre système génère un fichier _core_ ou
 _core.12345_ (_12345_ est l'identifiant du processus).
 Ce fichier est créé dans le répertoire où vous avez lancé WeeChat (ce n'est
-*pas* le répertoire où WeeChat est installé !).
+*pas* le répertoire où WeeChat est installé !).
 
 Par exemple si _weechat_ est installé dans _/usr/bin/_ et que le fichier
 _core_ est dans _/home/xxx/_, alors lancez gdb avec cette commande :
@@ -451,7 +477,7 @@ Copying output to /tmp/crash.txt.
 Vous devez envoyer cette trace aux développeurs, et leur indiquer quelle action
 a été la cause de ce plantage.
 
-Merci pour votre aide !
+Merci pour votre aide !
 
 [[debug_running_weechat]]
 ==== Debug de WeeChat qui tourne
@@ -474,11 +500,7 @@ Ensuite comme pour un crash, utilisez la commande `bt full` :
 == Utilisation
 
 [[running_weechat]]
-=== Lancer WeeChat
-
-Paramètres de ligne de commande :
-
-include::cmdline_options.fr.adoc[]
+=== Lancement de WeeChat
 
 Pour lancer WeeChat, tapez cette commande :
 
@@ -486,13 +508,13 @@ Pour lancer WeeChat, tapez cette commande :
 $ weechat
 ----
 
-Lorsque vous lancez WeeChat pour la première fois, un fichier de configuration
-par défaut est créé, avec les options par défaut.
-Le fichier de configuration par défaut est : _~/.weechat/weechat.conf_.
+Paramètres de ligne de commande :
 
-Vous pouvez éditer ce fichier pour configurer WeeChat à votre convenance ou
-vous pouvez modifier les paramètres dans WeeChat avec la commande `/set`
-(voir <<weechat_commands,commandes WeeChat>>).
+include::cmdline_options.fr.adoc[]
+
+Lorsque vous lancez WeeChat pour la première fois, les fichiers de configuration
+par défaut sont créés dans _~/.weechat_ avec les options et valeurs par défaut
+(voir <<files_and_directories,Fichiers et répertoires>>).
 
 [[environment_variables]]
 === Variables d'environnement
@@ -532,15 +554,17 @@ Les répertoires sont :
 |       autoload/   | Scripts Tcl chargés automatiquement au démarrage ^(1)^.
 |    guile/         | Scripts Guile.
 |       autoload/   | Scripts Guile chargés automatiquement au démarrage ^(1)^.
-|    javascript/    | Scripts Javascript.
-|       autoload/   | Scripts Javascript chargés automatiquement au démarrage ^(1)^.
+|    javascript/    | Scripts JavaScript.
+|       autoload/   | Scripts JavaScript chargés automatiquement au démarrage ^(1)^.
+|    php/           | Scripts PHP.
+|       autoload/   | Scripts PHP chargés automatiquement au démarrage ^(1)^.
 |===
 
 [NOTE]
 ^(1)^ Ce répertoire contient souvent seulement des liens symboliques vers les
 scripts dans le répertoire parent.
 
-Les fichiers dans le répertoire principal sont :
+Les fichiers dans le répertoire principal de WeeChat sont :
 
 [width="100%",cols="1m,3,6",options="header"]
 |===
@@ -579,30 +603,33 @@ valeur et applique les changements immédiatement.
 Exemple de terminal avec WeeChat :
 
 ....
- ▼ barre "title"
-┌───────────────────────────────────────────────────────────────────────────┐
-│Bienvenue sur #test, canal de test                                         │
-│12:52:27   --> | Flashy (flashcode@weechat.org) a rejoint #test    │@Flashy│
-│12:52:27    -- | Pseudos #test: [@Flashy @joe +weebot peter]       │@joe   │
-│12:52:27    -- | Canal #test: 4 pseudos (2 ops, 1 voice, 1 normal) │+weebot│
-│12:52:27    -- | Canal créé le Tue Jan 27 06:30:17 2009            │peter  │
-│12:54:15 peter | bonjour !                                         │       │
-│12:55:01  @joe | salut                                             │       │
-│                                                                   │       │
-│                                                                   │       │
-│                                                                   │       │
-│                                                                   │       │
-│                                                                   │       │
-│                                                                   │       │
-│                                                                   │       │
-│                                                                   │       │
-│                                                                   │       │
-│                                                                   │       │
-│                                                                   │       │
-│[12:55] [6] [irc/freenode] 3:#test(+n){4}* [H: 4:#abc(2,5), 6]             │
-│[@Flashy(i)] salut peter!█                                                 │
-└───────────────────────────────────────────────────────────────────────────┘
- ▲ barres "status" et "input"                            barre "nicklist" ▲
+ ▼ barre "buflist"   ▼ barre "title"
+┌──────────────────────────────────────────────────────────────────────────────────────┐
+│1.freenode│Bienvenue sur #test, canal de test                                         │
+│  weechat │12:52:27   --> | Flashy (flashcode@weechat.org) a rejoint #test    │@Flashy│
+│2.  #test │12:52:27    -- | Pseudos #test: [@Flashy @joe +weebot peter]       │@joe   │
+│3.  #abc  │12:52:27    -- | Canal #test: 4 pseudos (2 ops, 1 voice, 1 normal) │+weebot│
+│4.  #def  │12:52:27    -- | Canal créé le Tue Jan 27 06:30:17 2009            │peter  │
+│5.  #ghi  │12:54:15 peter | bonjour !                                         │       │
+│          │12:55:01  @joe | salut                                             │       │
+│          │                                                                   │       │
+│          │                                                                   │       │
+│          │                                                                   │       │
+│          │                                                                   │       │
+│          │                                                                   │       │
+│          │                                                                   │       │
+│          │                                                                   │       │
+│          │                                                                   │       │
+│          │                                                                   │       │
+│          │                                                                   │       │
+│          │                                                                   │       │
+│          │                                                                   │       │
+│          │                                                                   │       │
+│          │                                                                   │       │
+│          │[12:55] [5] [irc/freenode] 2:#test(+n){4}* [Act: 3:#abc(2,5), 5]           │
+│          │[@Flashy(i)] salut peter !█                                                │
+└──────────────────────────────────────────────────────────────────────────────────────┘
+            ▲ barres "status" et "input"                            barre "nicklist" ▲
 ....
 
 L'écran est composé des zones suivantes :
@@ -613,29 +640,46 @@ L'écran est composé des zones suivantes :
 ** préfixe (avant "|")
 ** message (après "|")
 * barres autour de la zone de discussion, les barres par défaut sont :
+** barre _buflist_, sur la gauche
 ** barre _title_, au dessus de la zone de discussion
 ** barre _status_, sous la zone de discussion
 ** barre _input_, sous la barre de statut
 ** barre _nicklist_, sur la droite
 
+La barre _buflist_ contient les objets (items) suivants par défaut :
+
+[width="100%",cols="^3,^4,10",options="header"]
+|===
+| Objet (item) | Exemple     | Description
+| buflist      | `1.weechat` | Liste des tampons.
+|===
+
+La barre _title_ contient les objets (items) suivants par défaut :
+
+[width="100%",cols="^3,^4,10",options="header"]
+|===
+| Objet (item) | Exemple               | Description
+| buffer_title | `Bienvenue sur #test` | Titre du tampon.
+|===
+
 La barre _status_ contient les objets (items) suivants par défaut :
 
 [width="100%",cols="^3,^4,10",options="header"]
 |===
-| Objet (item)          | Exemple               | Description
-| time                  | `[12:55]`             | Heure.
-| buffer_last_number    | `[6]`                 | Numéro du dernier tampon de la liste.
-| buffer_plugin         | `[irc/freenode]`      | Extension du tampon courant (l'extension irc peut afficher le nom du serveur IRC auquel est rattaché ce tampon).
-| buffer_number         | `3`                   | Numéro du tampon courant.
-| buffer_name           | `#test`               | Nom du tampon courant.
-| buffer_modes          | `+n`                  | Modes du canal IRC.
-| buffer_nicklist_count | `{4}`                 | Nombre de pseudos dans la liste des pseudos.
-| buffer_zoom           | !                     | `!` signifie que le tampon mélangé est zoomé, une valeur vide signifie que tous les tampons mélangés sont affichés.
-| buffer_filter         | `+*+`                 | Indicateur de filtrage : `+*+` signifie que des lignes sont filtrées (cachées), une valeur vide signifie que toutes les lignes sont affichées.
-| scroll                | `-PLUS(50)-`          | Indicateur de scroll, avec le nombre de lignes sous la dernière ligne affichée.
-| lag                   | `[Lag: 2.5]`          | Indicateur de "lag" (ralentissements réseau), en secondes (caché si le lag est faible).
-| hotlist               | `[H: 4:#abc(2,5), 6]` | Liste des tampons où il y a de l'activité (messages non lus) (dans cet exemple, 2 highlights et 5 messages non lus sur _#abc_, un message non lu sur le tampon numéro 6).
-| completion            | `abc(2) def(5)`       | Liste des mots pour la complétion, avec le nombre de complétions possibles pour chaque mot.
+| Objet (item)          | Exemple                 | Description
+| time                  | `[12:55]`               | Heure.
+| buffer_last_number    | `[5]`                   | Numéro du dernier tampon de la liste.
+| buffer_plugin         | `[irc/freenode]`        | Extension du tampon courant (l'extension irc peut afficher le nom du serveur IRC auquel est rattaché ce tampon).
+| buffer_number         | `2`                     | Numéro du tampon courant.
+| buffer_name           | `#test`                 | Nom du tampon courant.
+| buffer_modes          | `+n`                    | Modes du canal IRC.
+| buffer_nicklist_count | `{4}`                   | Nombre de pseudos dans la liste des pseudos.
+| buffer_zoom           | !                       | `!` signifie que le tampon mélangé est zoomé, une valeur vide signifie que tous les tampons mélangés sont affichés.
+| buffer_filter         | `+*+`                   | Indicateur de filtrage : `+*+` signifie que des lignes sont filtrées (cachées), une valeur vide signifie que toutes les lignes sont affichées.
+| scroll                | `-PLUS(50)-`            | Indicateur de scroll, avec le nombre de lignes sous la dernière ligne affichée.
+| lag                   | `[Lag: 2.5]`            | Indicateur de "lag" (ralentissements réseau), en secondes (caché si le lag est faible).
+| hotlist               | `[Act: 3:#abc(2,5), 5]` | Liste des tampons où il y a de l'activité (messages non lus) (dans cet exemple, 2 highlights et 5 messages non lus sur _#abc_, un message non lu sur le tampon numéro 5).
+| completion            | `abc(2) def(5)`         | Liste des mots pour la complétion, avec le nombre de complétions possibles pour chaque mot.
 |===
 
 La barre _input_ contient les objets (items) suivants par défaut :
@@ -646,8 +690,16 @@ La barre _input_ contient les objets (items) suivants par défaut :
 | input_prompt | `[@Flashy(i)]`                                  | Prompt, pour irc : pseudo et modes (le mode "+i" signifie invisible sur freenode).
 | away         | `(absent)`                                      | Indicateur d'absence.
 | input_search | `[Recherche (~ str,msg)]`                       | Indicateur de recherche de texte ("`~`" : insensible à la casse, "`==`" : sensible à la casse, "`str`" : recherche de chaîne, "`regex`" : recherche d'expression régulière, "`msg`" : recherche dans les messages, "`pre`" : recherche dans les préfixes, "`pre\|msg`" : recherche dans les préfixes et messages).
-| input_paste  | `[Coller 7 lignes ? [ctrl-Y] Oui [ctrl-N] Non]` | Question à l'utilisateur pour coller des lignes.
-| input_text   | `salut peter !`                                 | Texte entré.
+| input_paste  | `[Coller 7 lignes ? [ctrl-Y] Oui [ctrl-N] Non]` | Question à l'utilisateur pour coller des lignes.
+| input_text   | `salut peter !`                                 | Texte entré.
+|===
+
+La barre _nicklist_ contient les objets (items) suivants par défaut :
+
+[width="100%",cols="^3,^4,10",options="header"]
+|===
+| Objet (item)    | Exemple   | Description
+| buffer_nicklist | `@Flashy` | Liste des pseudos sur le tampon courant.
 |===
 
 Autres objets (non utilisés dans des barres par défaut) :
@@ -730,11 +782,11 @@ Pour voir toutes les couleurs disponibles dans votre terminal, vous pouvez
 taper `/color` puis kbd:[Alt+c] dans WeeChat ou lancez cette commande dans le
 terminal : `weechat --colors`.
 
-Exemple : affichage de "bonjour tout le monde !" avec "bonjour" en bleu clair
+Exemple : affichage de "bonjour tout le monde !" avec "bonjour" en bleu clair
 gras, et "tout le monde" en rouge clair souligné :
 
 ----
-^Cc12^Cbbonjour ^Cb^Cc04^C_tout le monde^C_^Cc !
+^Cc12^Cbbonjour ^Cb^Cc04^C_tout le monde^C_^Cc !
 ----
 
 [NOTE]
@@ -796,7 +848,7 @@ vous pouvez la changer avec ces deux commandes :
 
 Les couleurs de base dans WeeChat sont :
 
-[width="50%",cols="^3m,8",options="header"]
+[width="50%",cols="1m,4",options="header"]
 |===
 | Nom          | Couleur
 | default      | Couleur par défaut du terminal (transparent pour le fond)
@@ -915,93 +967,96 @@ aucune fenêtre) ou affiché par une ou plusieurs fenêtres.
 Exemple de découpage horizontal (`/window splith`) :
 
 ....
-                          ▼ fenêtre n°2 (tampon n°4)
-┌───────────────────────────────────────────────────────────────────────────┐
-│Bienvenue sur #abc                                                         │
-│12:55:12     Max | bonjour                                         │@Flashy│
-│12:55:20 @Flashy | salut Max !                                     │Max    │
-│12:55:32     Max | ça va bien ?                                    │       │
-│                                                                   │       │
-│                                                                   │       │
-│                                                                   │       │
-│                                                                   │       │
-│                                                                   │       │
-│[12:55] [6] [irc/freenode] 4:#abc(+n){2}                                   │
-│[@Flashy]                                                                  │
-│───────────────────────────────────────────────────────────────────────────│
-│Bienvenue sur #test                                                        │
-│12:54:15 peter | ohé !                                             │@Flashy│
-│12:55:01  @joe | salut                                             │@joe   │
-│                                                                   │+weebot│
-│                                                                   │peter  │
-│                                                                   │       │
-│                                                                   │       │
-│                                                                   │       │
-│                                                                   │       │
-│[12:55] [6] [irc/freenode] 3:#test(+n){4}                                  │
-│[@Flashy] hi peter!█                                                       │
-└───────────────────────────────────────────────────────────────────────────┘
-                          ▲ fenêtre n°1 (tampon n°3)
+                               ▼ fenêtre n°2 (tampon n°4)
+┌──────────────────────────────────────────────────────────────────────────────────────┐
+│1.freenode│Bienvenue sur #def                                                         │
+│  weechat │12:55:12     Max | bonjour                                         │@Flashy│
+│2.  #test │12:55:20 @Flashy | salut Max !                                     │Max    │
+│3.  #abc  │                                                                   │       │
+│4.  #def  │                                                                   │       │
+│5.  #ghi  │                                                                   │       │
+│          │                                                                   │       │
+│          │                                                                   │       │
+│          │                                                                   │       │
+│          │[12:55] [5] [irc/freenode] 4:#def(+n){2}                                   │
+│          │[@Flashy]                                                                  │
+│          │───────────────────────────────────────────────────────────────────────────│
+│          │Bienvenue sur #abc                                                         │
+│          │12:54:15 peter | ohé !                                             │@Flashy│
+│          │12:55:01  @joe | salut                                             │@joe   │
+│          │                                                                   │+weebot│
+│          │                                                                   │peter  │
+│          │                                                                   │       │
+│          │                                                                   │       │
+│          │                                                                   │       │
+│          │                                                                   │       │
+│          │[12:55] [5] [irc/freenode] 3:#abc(+n){4}                                   │
+│          │[@Flashy] salut peter !█                                                   │
+└──────────────────────────────────────────────────────────────────────────────────────┘
+                               ▲ fenêtre n°1 (tampon n°3)
 ....
 
 Exemple de découpage vertical (`/window splitv`) :
 
 ....
-┌───────────────────────────────────────────────────────────────────────────┐
-│Bienvenue sur #test                  │Bienvenue sur #abc                   │
-│12:54:15 peter | ohé !       │@Flashy│12:55:12     Max | bonjour   │@Flashy│
-│12:55:01  @joe | salut       │@joe   │12:55:20 @Flashy | plop Max  │Max    │
-│                             │+weebot│                             │       │
-│                             │peter  │                             │       │
-│                             │       │                             │       │
-│                             │       │                             │       │
-│                             │       │                             │       │
-│                             │       │                             │       │
-│                             │       │                             │       │
-│                             │       │                             │       │
-│                             │       │                             │       │
-│                             │       │                             │       │
-│                             │       │                             │       │
-│                             │       │                             │       │
-│                             │       │                             │       │
-│                             │       │                             │       │
-│                             │       │                             │       │
-│[12:55] [irc/oftc] 3:#test(+n){4}    │[12:55] [irc/oftc] 4:#abc(+n){2}     │
-│[@Flashy] hi peter!█                 │[@Flashy]                            │
-└───────────────────────────────────────────────────────────────────────────┘
-      ▲ fenêtre n°1 (tampon n°3)            ▲ fenêtre n°2 (tampon n°4)
+┌──────────────────────────────────────────────────────────────────────────────────────┐
+│1.freenode│Bienvenue sur #abc                   │Bienvenue sur #def                   │
+│  weechat │12:54:15 peter | ohé !       │@Flashy│12:55:12     Max | bonjour   │@Flashy│
+│2.  #test │12:55:01  @joe | salut       │@joe   │12:55:20 @Flashy | salut Max │Max    │
+│3.  #abc  │                             │+weebot│                             │       │
+│4.  #def  │                             │peter  │                             │       │
+│5.  #ghi  │                             │       │                             │       │
+│          │                             │       │                             │       │
+│          │                             │       │                             │       │
+│          │                             │       │                             │       │
+│          │                             │       │                             │       │
+│          │                             │       │                             │       │
+│          │                             │       │                             │       │
+│          │                             │       │                             │       │
+│          │                             │       │                             │       │
+│          │                             │       │                             │       │
+│          │                             │       │                             │       │
+│          │                             │       │                             │       │
+│          │                             │       │                             │       │
+│          │                             │       │                             │       │
+│          │                             │       │                             │       │
+│          │                             │       │                             │       │
+│          │[12:55] [5] [irc/freenode] 3:#abc(+n)│[12:55] [5] [irc/freenode] 4:#def(+n)│
+│          │[@Flashy] salut peter !█             │[@Flashy]                            │
+└──────────────────────────────────────────────────────────────────────────────────────┘
+                 ▲ fenêtre n°1 (tampon n°3)            ▲ fenêtre n°2 (tampon n°4)
 ....
 
 Exemple de découpage vertical + horizontal :
 
 ....
-                                            ▼ fenêtre n°3 (tampon n°5)
-┌───────────────────────────────────────────────────────────────────────────┐
-│Bienvenue sur #test                  │Bienvenue sur #def                   │
-│12:54:15 peter | ohé !       │@Flashy│12:55:42 @Flashy | salut     │@Flashy│
-│12:55:01  @joe | salut       │@joe   │12:55:56    alex | salut     │alex   │
-│                             │+weebot│                             │       │
-│                             │peter  │                             │       │
-│                             │       │                             │       │
-│                             │       │                             │       │
-│                             │       │                             │       │
-│                             │       │                             │       │
-│                             │       │[12:55] [irc/oftc] 5:#def(+n){2}     │
-│                             │       │[@Flashy]                            │
-│                             │       │─────────────────────────────────────│
-│                             │       │Bienvenue sur #abc                   │
-│                             │       │12:55:12     Max | bonjour   │@Flashy│
-│                             │       │12:55:20 @Flashy | salut Max │Max    │
-│                             │       │                             │       │
-│                             │       │                             │       │
-│                             │       │                             │       │
-│                             │       │                             │       │
-│                             │       │                             │       │
-│                             │       │                             │       │
-│[12:55] [irc/oftc] 3:#test(+n){4}    │[12:55] [irc/oftc] 4:#abc(+n){2}     │
-│[@Flashy] salut peter !█             │[@Flashy]                            │
-└───────────────────────────────────────────────────────────────────────────┘
-      ▲ fenêtre n°1 (tampon n°3)            ▲ fenêtre n°2 (tampon n°4)
+                                                       ▼ fenêtre n°3 (tampon n°5)
+┌──────────────────────────────────────────────────────────────────────────────────────┐
+│1.freenode│Bienvenue sur #abc                   │Bienvenue sur #ghi                   │
+│  weechat │12:54:15 peter | ohé !       │@Flashy│12:55:42 @Flashy | salut     │@Flashy│
+│2.  #test │12:55:01  @joe | salut       │@joe   │12:55:56    alex | salut     │alex   │
+│3.  #abc  │                             │+weebot│                             │       │
+│4.  #def  │                             │peter  │                             │       │
+│5.  #ghi  │                             │       │                             │       │
+│          │                             │       │                             │       │
+│          │                             │       │                             │       │
+│          │                             │       │                             │       │
+│          │                             │       │[12:55] [5] [irc/freenode] 5:#ghi(+n)│
+│          │                             │       │[@Flashy]                            │
+│          │                             │       │─────────────────────────────────────│
+│          │                             │       │Bienvenue sur #def                   │
+│          │                             │       │12:55:12     Max | bonjour   │@Flashy│
+│          │                             │       │12:55:20 @Flashy | salut Max │Max    │
+│          │                             │       │                             │       │
+│          │                             │       │                             │       │
+│          │                             │       │                             │       │
+│          │                             │       │                             │       │
+│          │                             │       │                             │       │
+│          │                             │       │                             │       │
+│          │[12:55] [5] [irc/freenode] 3:#abc(+n)│[12:55] [5] [irc/freenode] 4:#def(+n)│
+│          │[@Flashy] salut peter !█             │[@Flashy]                            │
+└──────────────────────────────────────────────────────────────────────────────────────┘
+                 ▲ fenêtre n°1 (tampon n°3)            ▲ fenêtre n°2 (tampon n°4)
 ....
 
 [[buffers_lines]]
@@ -1030,11 +1085,11 @@ présentation (_pass:[weechat.look.*]_) et de couleur (_pass:[weechat.color.chat
 [[lines_tags]]
 ==== Étiquettes des lignes
 
-WeeChat utilise des étiquettes (« tags ») dans les lignes pour différentes raisons :
+WeeChat utilise des étiquettes (« tags ») dans les lignes pour différentes raisons :
 
 * highlight
 * niveau de notification
-* enregistrement (« log »)
+* enregistrement (« log »)
 * utilisation de la commande <<command_weechat_filter,/filter>>
 
 Les étiquettes peuvent être affichées avec la commande `/debug tags`
@@ -1084,13 +1139,12 @@ Liste des options de barre :
 
 | type | `root`, `window` |
   Une barre avec le type `root` est affichée exactement une fois à l'écran, en
-  dehors de toutes les fenêtres. Il n'y a pas de barre root par défaut, mais un
-  exemple est la barre _buffers_ créée par le script _buffers.pl_ (barre
-  latérale avec la liste des tampons). +
+  dehors de toutes les fenêtres. La barre par défaut _buflist_ est de type
+  `root`. +
   Une barre avec le type `window` est affichée dans chaque fenêtre, par exemple
   si vous découpez l'écran (avec `/window splith` ou `/window splitv`), vous
-  aurez une barre dans chaque fenêtre. Les quatre barres par défaut (_title_,
-  _status_, _input_, _nicklist_) sont de type `window`.
+  aurez une barre dans chaque fenêtre. Les barres par défaut _title_, _status_,
+  _input_ et _nicklist_ sont de type `window`.
 
 | position | `top`, `bottom`, `left`, `right` |
   Position de la barre : au dessus/en dessous de la discussion, sur la
@@ -1337,55 +1391,61 @@ commande <<command_weechat_window,/window>>.
 Si WeeChat ressemble à ceci :
 
 ....
-┌───────────────────────────────────────────────────────────────────────────┐
-│Bienvenue sur #test, canal de test                                         │
-│12:52:27   --> | Flashy (flashcode@weechat.org) a rejoint #test    │@Flashy│
-│12:52:27    -- | Pseudos #test: [@Flashy @joe +weebot peter]       │@joe   │
-│12:52:27    -- | Canal #test: 4 pseudos (2 ops, 1 voice, 1 normal) │+weebot│
-│12:52:27    -- | Canal créé le Tue Jan 27 06:30:17 2009            │peter  │
-│12:54:15 peter | bonjour !                                         │       │
-│12:55:01  @joe | peter: hook_process: https://weechat.org/files/do │       │
-│               | c/devel/weechat_plugin_api.en.html#_weechat_hook_ │       │
-│               | process                                           │       │
-│                                                                   │       │
-│                                                                   │       │
-│                                                                   │       │
-│                                                                   │       │
-│                                                                   │       │
-│                                                                   │       │
-│                                                                   │       │
-│                                                                   │       │
-│                                                                   │       │
-│[12:55] [6] [irc/freenode] 3:#test(+n){4}* [H: 4:#abc(2,5), 6]             │
-│[@Flashy(i)] salut peter!█                                                 │
-└───────────────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────────────────┐
+│1.freenode│Bienvenue sur #abc                                                         │
+│  weechat │12:52:27   --> | Flashy (flashcode@weechat.org) a rejoint #abc     │@Flashy│
+│2.  #test │12:52:27    -- | Pseudos #abc: [@Flashy @joe +weebot peter]        │@joe   │
+│3.  #abc  │12:52:27    -- | Canal #abc: 4 pseudos (2 ops, 1 voice, 1 normal)  │+weebot│
+│4.  #def  │12:52:27    -- | Canal créé le Tue Jan 27 06:30:17 2009            │peter  │
+│5.  #ghi  │12:54:15 peter | bonjour !                                         │       │
+│          │12:55:01  @joe | peter: hook_process: https://weechat.org/files/do │       │
+│          │               | c/devel/weechat_plugin_api.en.html#_weechat_hook_ │       │
+│          │               | process                                           │       │
+│          │                                                                   │       │
+│          │                                                                   │       │
+│          │                                                                   │       │
+│          │                                                                   │       │
+│          │                                                                   │       │
+│          │                                                                   │       │
+│          │                                                                   │       │
+│          │                                                                   │       │
+│          │                                                                   │       │
+│          │                                                                   │       │
+│          │                                                                   │       │
+│          │                                                                   │       │
+│          │[12:55] [5] [irc/freenode] 3:#abc(+n){4}                                   │
+│          │[@Flashy(i)] salut peter !█                                                │
+└──────────────────────────────────────────────────────────────────────────────────────┘
 ....
 
 L'écran ressemblera à ça en mode dépouillé :
 
 ....
-┌───────────────────────────────────────────────────────────────────────────┐
-│                                                                           │
-│                                                                           │
-│                                                                           │
-│                                                                           │
-│                                                                           │
-│                                                                           │
-│                                                                           │
-│                                                                           │
-│                                                                           │
-│                                                                           │
-│                                                                           │
-│                                                                           │
-│                                                                           │
-│12:52 --> Flashy (flashcode@weechat.org) a rejoin #test                    │
-│12:52 -- Pseudos #test: [@Flashy @joe +weebot peter]                       │
-│12:52 -- Canal #test: 4 pseudos (2 ops, 1 voice, 1 normal)                 │
-│12:52 -- Canal créé le Tue Jan 27 06:30:17 2009                            │
-│12:54 <peter> bonjour !                                                    │
-│12:55 <@joe> peter: hook_process: https://weechat.org/files/doc/devel/weech│
-│at_plugin_api.en.html#_weechat_hook_process                                │
-└───────────────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────────────────┐
+│                                                                                      │
+│                                                                                      │
+│                                                                                      │
+│                                                                                      │
+│                                                                                      │
+│                                                                                      │
+│                                                                                      │
+│                                                                                      │
+│                                                                                      │
+│                                                                                      │
+│                                                                                      │
+│                                                                                      │
+│                                                                                      │
+│                                                                                      │
+│                                                                                      │
+│                                                                                      │
+│12:52 --> Flashy (flashcode@weechat.org) a rejoin #abc                                │
+│12:52 -- Pseudos #abc: [@Flashy @joe +weebot peter]                                   │
+│12:52 -- Canal #abc: 4 pseudos (2 ops, 1 voice, 1 normal)                             │
+│12:52 -- Canal créé le Tue Jan 27 06:30:17 2009                                       │
+│12:54 <peter> bonjour !                                                               │
+│12:55 <@joe> peter: hook_process: https://weechat.org/files/doc/devel/weechat_plugin_a│
+│pi.en.html#_weechat_hook_process                                                      │
+└──────────────────────────────────────────────────────────────────────────────────────┘
 ....
 
 Donc vous pouvez cliquer l'URL de _joe_ sans problème dans votre terminal (bien
@@ -1458,7 +1518,7 @@ les niveaux possibles sont :
 * 3 : highlight (en réalité inutile, car il s'agit déjà du niveau maximal par
   défaut pour tous les messages)
 
-Par exemple pour désactiver les « highlights » de "joe" et "mike" sur le tampon
+Par exemple pour désactiver les « highlights » de "joe" et "mike" sur le tampon
 courant :
 
 ----
@@ -1476,7 +1536,7 @@ avec `/help autosetbuffer`.
 === Highlights
 
 [[highlights_words]]
-==== Ajouter des mots pour le « highlight »
+==== Ajouter des mots pour le « highlight »
 
 Par défaut, WeeChat met en valeur les messages des autres utilisateurs qui
 contiennent votre pseudo, par conséquent le highlight dépend du tampon
@@ -1503,9 +1563,9 @@ Les délimiteurs autour des mots à mettre en valeur peuvent être paramétrés 
 l'option <<option_weechat.look.word_chars_highlight,weechat.look.word_chars_highlight>>.
 
 [[highlights_tags]]
-==== Ajouter des étiquettes pour le « highlight »
+==== Ajouter des étiquettes pour le « highlight »
 
-Les lignes affichées contiennent des étiquettes (« tags »), qui donnent des
+Les lignes affichées contiennent des étiquettes (« tags »), qui donnent des
 informations sur l'origine du message ou le message lui-même. +
 Vous pouvez afficher les étiquettes avec la commande `/debug tags` (même commande
 pour les cacher).
@@ -1812,7 +1872,8 @@ terminal, comme si la souris était désactivée (sous certains terminaux comme
 iTerm, vous devez utiliser kbd:[Alt] au lieu de kbd:[Shift]).
 
 [NOTE]
-Pour tout problème avec la souris, merci de consulter la _FAQ WeeChat_.
+Pour tout problème avec la souris, merci de consulter la
+link:weechat_faq.fr.html#mouse[FAQ WeeChat / Souris].
 
 [[mouse_bind_events]]
 ==== Associer des évènements souris à des commandes
@@ -1989,13 +2050,18 @@ Pour utiliser le mot de passe _freenode_, par exemple avec
 /set irc.server.freenode.sasl_password "${sec.data.freenode}"
 ----
 
-[[options_and_commands]]
-=== Options et commandes
+[[commands_and_options]]
+=== Commandes et options
+
+[[weechat_commands]]
+==== Commandes WeeChat
+
+include::autogen/user/weechat_commands.adoc[]
 
 [[sec_options]]
-==== Options des données sécurisées (sec.conf)
+==== Options des données sécurisées
 
-Sections :
+Sections dans le fichier _sec.conf_ :
 
 [width="100%",cols="3m,6m,16",options="header"]
 |===
@@ -2009,9 +2075,9 @@ Options :
 include::autogen/user/sec_options.adoc[]
 
 [[weechat_options]]
-==== Options WeeChat (weechat.conf)
+==== Options WeeChat
 
-Sections :
+Sections dans le fichier _weechat.conf_ :
 
 [width="100%",cols="3m,6m,16",options="header"]
 |===
@@ -2042,11 +2108,6 @@ Sections :
 Options :
 
 include::autogen/user/weechat_options.adoc[]
-
-[[weechat_commands]]
-==== Commandes WeeChat
-
-include::autogen/user/weechat_commands.adoc[]
 
 [[plugins]]
 == Extensions
@@ -2079,7 +2140,7 @@ Exemples pour charger, décharger et afficher les extensions :
 
 Les extensions par défaut sont :
 
-[width="100%",cols="^1,5",options="header"]
+[width="100%",cols="1,8",options="header"]
 |===
 | Extension  | Description
 | alias      | Définition d'alias pour les commandes.
@@ -2099,56 +2160,82 @@ Les extensions par défaut sont :
 | lua        | Interface (API) pour scripts Lua.
 | tcl        | Interface (API) pour scripts Tcl.
 | guile      | Interface (API) pour scripts Guile (scheme).
-| javascript | Interface (API) pour scripts Javascript.
+| javascript | Interface (API) pour scripts JavaScript.
+| php        | Interface (API) pour scripts PHP.
 | trigger    | Remplacement de texte et exécution de commande sur des évènements de WeeChat ou des extensions.
 | xfer       | Transfert de fichier et discussion directe.
 |===
 
 Pour en apprendre plus sur le développement d'extension ou de script (via
-l'API), merci de consulter la _Référence API Extension WeeChat_ ou le
-_Guide pour Scripts WeeChat_.
+l'API), merci de consulter la
+link:weechat_plugin_api.fr.html[Référence API extension WeeChat] ou le
+link:weechat_scripting.fr.html[Guide pour scripts WeeChat].
 
 [[alias_plugin]]
-=== Extension Alias
+=== Alias
 
 L'extension Alias permet de définir des alias pour des commandes (WeeChat ou
 d'autres extensions).
+
+Des alias sont créés par défaut, avec le nom en lettres majuscules (pour les
+différencier des commandes standard); les commandes ne sont pas sensibles à la
+casse dans WeeChat, donc par exemple `/close` lance l'alias `/CLOSE`.
+
+Liste des alias par défaut :
+
+include::autogen/user/alias_default_aliases.adoc[]
 
 [[alias_commands]]
 ==== Commandes
 
 include::autogen/user/alias_commands.adoc[]
 
+[[alias_options]]
+==== Options
+
+Sections dans le fichier _alias.conf_ :
+
+[width="100%",cols="3m,6m,16",options="header"]
+|===
+| Section    | Commande de contrôle           | Description
+| cmd        | <<command_alias_alias,/alias>> +
+               /set alias.cmd.*               | Commandes pour les alias.
+| completion | <<command_alias_alias,/alias>> +
+               /set alias.completion.*        | Complétions pour les alias.
+|===
+
 [[aspell_plugin]]
-=== Extension Aspell
+=== Aspell
 
 L'extension Aspell permet de vérifier l'orthographe de la ligne de commande.
 Il est possible d'utiliser plusieurs langages par tampon.
 
-[[aspell_options]]
-==== Options (aspell.conf)
+La vérification de l'orthographe est désactivée par défaut et peut être
+activée/désactivée avec la touche kbd:[Alt+s].
 
-Sections :
+[[aspell_dictionaries]]
+==== Dictionnaires
 
-[width="100%",cols="3m,6m,16",options="header"]
-|===
-| Section    | Commande de contrôle                      | Description
-| color      | /set aspell.color.*                       | Couleurs.
-| check      | /set aspell.check.*                       | Options pour contrôler la vérification orthographique.
-| dict       | <<command_aspell_aspell,/aspell setdict>> +
-               /set aspell.dict.*                        | Dictionnaires utilisés par tampon (les options peuvent être ajoutées/supprimées dans la section).
-| look       | /set aspell.look.*                        | Aspect/présentation.
-| option     | /set aspell.option.*                      | <<aspell_speller_options,Options du vérificateur d'orthographe>> (les options peuvent être ajoutées/supprimées dans la section).
-|===
+Avant d'utiliser la vérification de l'orthographe, les dictionnaires doivent
+être définis soit globalement, soit spécifiquement sur un tampon.
 
-Options :
+Plusieurs dictionnaires peuvent être utilisés en même temps : WeeChat vérifiera
+les mots dans tous les dictionnaires.
 
-include::autogen/user/aspell_options.adoc[]
+Par exemple pour utiliser l'anglais et le français :
 
-[[aspell_commands]]
-==== Commandes
+----
+/set aspell.check.default_dict "en,fr"
+----
 
-include::autogen/user/aspell_commands.adoc[]
+Il est possible d'utiliser un dictionnaire différent sur un tampon spécifique,
+par exemple sur un canal allemand :
+
+----
+/aspell setdict de
+----
+
+Pour plus d'informations, voir la commande <<command_aspell_aspell,/aspell>>.
 
 [[aspell_speller_options]]
 ==== Options du vérificateur d'orthographe
@@ -2195,17 +2282,48 @@ Exemple de suggestions avec des dictionnaires anglais et français (`en,fr`) :
 └─────────────────────────────────────────────────────────────────────────────────┘
 ....
 
+[[aspell_commands]]
+==== Commandes
+
+include::autogen/user/aspell_commands.adoc[]
+
+[[aspell_options]]
+==== Options
+
+Sections dans le fichier _aspell.conf_ :
+
+[width="100%",cols="3m,6m,16",options="header"]
+|===
+| Section    | Commande de contrôle                      | Description
+| color      | /set aspell.color.*                       | Couleurs.
+| check      | /set aspell.check.*                       | Options pour contrôler la vérification orthographique.
+| dict       | <<command_aspell_aspell,/aspell setdict>> +
+               /set aspell.dict.*                        | Dictionnaires utilisés par tampon (les options peuvent être ajoutées/supprimées dans la section).
+| look       | /set aspell.look.*                        | Aspect/présentation.
+| option     | /set aspell.option.*                      | <<aspell_speller_options,Options du vérificateur d'orthographe>> (les options peuvent être ajoutées/supprimées dans la section).
+|===
+
+Options :
+
+include::autogen/user/aspell_options.adoc[]
+
 [[buflist_plugin]]
-=== Extension Buflist
+=== Buflist
 
 L'extension Buflist affiche une liste des tampons dans un objet de barre appelé
-"buflist". +
+"buflist" (deux autres objets de barre "buflist2" et "buflist3" sont également
+disponibles). +
 Une barre par défaut "buflist" est créée au démarrage avec cet objet de barre.
 
-[[buflist_options]]
-==== Options (buflist.conf)
+[[buflist_commands]]
+==== Commandes
 
-Sections :
+include::autogen/user/buflist_commands.adoc[]
+
+[[buflist_options]]
+==== Options
+
+Sections dans le fichier _buflist.conf_ :
 
 [width="100%",cols="3m,6m,16",options="header"]
 |===
@@ -2218,13 +2336,8 @@ Options :
 
 include::autogen/user/buflist_options.adoc[]
 
-[[buflist_commands]]
-==== Commandes
-
-include::autogen/user/buflist_commands.adoc[]
-
 [[charset_plugin]]
-=== Extension Charset
+=== Charset
 
 L'extension Charset vous permet de décoder et encoder les données en utilisant
 un jeu de caractères.
@@ -2261,30 +2374,6 @@ Par exemple :
 ....
 charset : terminal : ISO-8859-15, interne : UTF-8
 ....
-
-[[charset_options]]
-==== Options (charset.conf)
-
-Sections :
-
-[width="100%",cols="3m,6m,16",options="header"]
-|===
-| Section | Commande de contrôle                        | Description
-| default | /set charset.default.*                      | Jeu de caractère d'encodage/décodage par défaut.
-| decode  | <<command_charset_charset,/charset decode>> +
-            /set charset.decode.*                       | Jeu de caractère d'encodage par tampon (les options peuvent être ajoutées/supprimées dans la section).
-| encode  | <<command_charset_charset,/charset encode>> +
-            /set charset.encode.*                       | Jeu de caractère de décodage par tampon (les options peuvent être ajoutées/supprimées dans la section).
-|===
-
-Options :
-
-include::autogen/user/charset_options.adoc[]
-
-[[charset_commands]]
-==== Commandes
-
-include::autogen/user/charset_commands.adoc[]
 
 [[charset_set]]
 ==== Définir le jeu de caractère
@@ -2345,18 +2434,47 @@ Pour voir tous les jeux de caractères utilisés, utilisez la commande suivante�
 ==== En cas de problème
 
 Pour tout problème avec les jeux de caractères, merci de consulter la
-_FAQ WeeChat_.
+link:weechat_faq.fr.html#charset[FAQ WeeChat / Accents].
+
+[[charset_commands]]
+==== Commandes
+
+include::autogen/user/charset_commands.adoc[]
+
+[[charset_options]]
+==== Options
+
+Sections dans le fichier _charset.conf_ :
+
+[width="100%",cols="3m,6m,16",options="header"]
+|===
+| Section | Commande de contrôle                        | Description
+| default | /set charset.default.*                      | Jeu de caractère d'encodage/décodage par défaut.
+| decode  | <<command_charset_charset,/charset decode>> +
+            /set charset.decode.*                       | Jeu de caractère d'encodage par tampon (les options peuvent être ajoutées/supprimées dans la section).
+| encode  | <<command_charset_charset,/charset encode>> +
+            /set charset.encode.*                       | Jeu de caractère de décodage par tampon (les options peuvent être ajoutées/supprimées dans la section).
+|===
+
+Options :
+
+include::autogen/user/charset_options.adoc[]
 
 [[exec_plugin]]
-=== Extension Exec
+=== Exec
 
 La commande `/exec` vous permet de lancer des commandes externes dans WeeChat et
 d'afficher la sortie localement, ou de l'envoyer à un tampon.
 
-[[exec_options]]
-==== Options (exec.conf)
+[[exec_commands]]
+==== Commandes
 
-Sections :
+include::autogen/user/exec_commands.adoc[]
+
+[[exec_options]]
+==== Options
+
+Sections dans le fichier _exec.conf_ :
 
 [width="100%",cols="3m,6m,16",options="header"]
 |===
@@ -2369,13 +2487,8 @@ Options :
 
 include::autogen/user/exec_options.adoc[]
 
-[[exec_commands]]
-==== Commandes
-
-include::autogen/user/exec_commands.adoc[]
-
 [[fifo_plugin]]
-=== Extension Fifo
+=== Fifo
 
 Vous pouvez contrôler WeeChat à distance, en envoyant des commandes ou du
 texte dans un tube FIFO (si l'option _fifo.file.enabled_ est activée,
@@ -2403,13 +2516,13 @@ $ echo 'irc.server.freenode */nick autrepseudo' >~/.weechat/weechat_fifo
 * Envoyer un message sur le canal IRC #weechat :
 
 ----
-$ echo 'irc.freenode.#weechat *bonjour !' >~/.weechat/weechat_fifo
+$ echo 'irc.freenode.#weechat *bonjour !' >~/.weechat/weechat_fifo
 ----
 
 * Envoyer un message sur le tampon courant :
 
 ----
-$ echo '*bonjour !' >~/.weechat/weechat_fifo
+$ echo '*bonjour !' >~/.weechat/weechat_fifo
 ----
 
 * Envoyer deux commandes pour décharger/recharger les scripts Python (vous devez
@@ -2419,10 +2532,15 @@ $ echo '*bonjour !' >~/.weechat/weechat_fifo
 $ printf '%b' '*/python unload\n*/python autoload\n' >~/.weechat/weechat_fifo
 ----
 
-[[fifo_options]]
-==== Options (fifo.conf)
+[[fifo_commands]]
+==== Commandes
 
-Sections :
+include::autogen/user/fifo_commands.adoc[]
+
+[[fifo_options]]
+==== Options
+
+Sections dans le fichier _fifo.conf_ :
 
 [width="100%",cols="3m,6m,16",options="header"]
 |===
@@ -2434,21 +2552,21 @@ Options :
 
 include::autogen/user/fifo_options.adoc[]
 
-[[fifo_commands]]
-==== Commandes
-
-include::autogen/user/fifo_commands.adoc[]
-
 [[fset_plugin]]
-=== Extension Fset
+=== Fset
 
 L'extension Fset affiche une liste des options dans un tampon et aide à définir
 les options de WeeChat et des extensions.
 
-[[fset_options]]
-==== Options (fset.conf)
+[[fset_commands]]
+==== Commandes
 
-Sections :
+include::autogen/user/fset_commands.adoc[]
+
+[[fset_options]]
+==== Options
+
+Sections dans le fichier _fset.conf_ :
 
 [width="100%",cols="3m,6m,16",options="header"]
 |===
@@ -2462,13 +2580,8 @@ Options :
 
 include::autogen/user/fset_options.adoc[]
 
-[[fset_commands]]
-==== Commandes
-
-include::autogen/user/fset_commands.adoc[]
-
 [[irc_plugin]]
-=== Extension IRC
+=== IRC
 
 L'extension IRC permet de dialoguer avec d'autres personnes via le
 protocole IRC.
@@ -2492,34 +2605,6 @@ port par défaut (6667), avec le pseudo _nono_ :
 ----
 $ weechat irc://nono@chat.freenode.net/#weechat,#toto
 ----
-
-[[irc_options]]
-==== Options (irc.conf)
-
-Sections :
-
-[width="100%",cols="3m,6m,16",options="header"]
-|===
-| Section        | Commande de contrôle           | Description
-| look           | /set irc.look.*                | Aspect/présentation.
-| color          | /set irc.color.*               | Couleurs.
-| network        | /set irc.network.*             | Options réseau.
-| msgbuffer      | /set irc.msgbuffer.*           | <<irc_target_buffer,Tampon cible pour les messages IRC>> (les options peuvent être ajoutées/supprimées dans la section).
-| ctcp           | /set irc.ctcp.*                | <<irc_ctcp_replies,Réponses CTCP>> (les options peuvent être ajoutées/supprimées dans la section).
-| ignore         | <<command_irc_ignore,/ignore>> | Personnes ignorées.
-| server_default | /set irc.server_default.*      | Valeurs par défaut pour serveurs (les options peuvent être ajoutées/supprimées dans la section).
-| server         | <<command_irc_server,/server>> +
-                   /set irc.server.*              | Serveurs.
-|===
-
-Options :
-
-include::autogen/user/irc_options.adoc[]
-
-[[irc_commands]]
-==== Commandes
-
-include::autogen/user/irc_commands.adoc[]
 
 [[irc_ssl_certificates]]
 ==== Certificats SSL
@@ -2757,7 +2842,7 @@ Par exemple, pour personnaliser la réponse au CTCP "VERSION", utilisez la
 commande suivante :
 
 ----
-/set irc.ctcp.version "Je suis sous WeeChat $version, ça déchire !"
+/set irc.ctcp.version "Je suis sous WeeChat $version, ça déchire !"
 ----
 
 Si vous voulez bloquer le CTCP "VERSION" (ne pas répondre à une demande), alors
@@ -2790,7 +2875,7 @@ Si vous voulez restaurer la réponse CTCP standard, alors supprimez l'option :
 Les codes suivants peuvent être utilisés dans les chaînes et sont
 automatiquement remplacées par WeeChat lors de la réponse au CTCP :
 
-[width="100%",cols="^2l,4,8",options="header"]
+[width="100%",cols="2l,4,8",options="header"]
 |===
 | Code         | Description                            | Valeur / exemple
 | $clientinfo  | Liste des CTCP supportés               | `ACTION DCC CLIENTINFO FINGER PING SOURCE TIME USERINFO VERSION`
@@ -2813,7 +2898,7 @@ installé.
 
 Si les options CTCP ne sont pas définies (par défaut), les réponses CTCP sont :
 
-[width="100%",cols="^2,4,8",options="header"]
+[width="100%",cols="2,4,8",options="header"]
 |===
 | CTCP       | Format de réponse                    | Exemple
 | CLIENTINFO | `$clientinfo`                        | `ACTION DCC CLIENTINFO FINGER PING SOURCE TIME USERINFO VERSION`
@@ -2958,35 +3043,39 @@ seulement :
 /set irc.msgbuffer.303 weechat
 ----
 
-[[logger_plugin]]
-=== Extension Logger
+[[irc_commands]]
+==== Commandes
 
-L'extension Logger permet de sauvegarder le contenu des tampons dans des
-fichiers, avec des options sur comment et quoi sauvegarder.
+include::autogen/user/irc_commands.adoc[]
 
-[[logger_options]]
-==== Options (logger.conf)
+[[irc_options]]
+==== Options
 
-Sections :
+Sections dans le fichier _irc.conf_ :
 
 [width="100%",cols="3m,6m,16",options="header"]
 |===
-| Section | Commande de contrôle | Description
-| look    | /set logger.look.*   | Aspect/présentation.
-| color   | /set logger.color.*  | Couleurs.
-| file    | /set logger.file.*   | Options pour les fichiers de log.
-| level   | /set logger.level.*  | Niveau de log par tampon (les options peuvent être ajoutées/supprimées dans la section).
-| mask    | /set logger.mask.*   | Masque de nom de fichier par tampon (les options peuvent être ajoutées/supprimées dans la section).
+| Section        | Commande de contrôle           | Description
+| look           | /set irc.look.*                | Aspect/présentation.
+| color          | /set irc.color.*               | Couleurs.
+| network        | /set irc.network.*             | Options réseau.
+| msgbuffer      | /set irc.msgbuffer.*           | <<irc_target_buffer,Tampon cible pour les messages IRC>> (les options peuvent être ajoutées/supprimées dans la section).
+| ctcp           | /set irc.ctcp.*                | <<irc_ctcp_replies,Réponses CTCP>> (les options peuvent être ajoutées/supprimées dans la section).
+| ignore         | <<command_irc_ignore,/ignore>> | Personnes ignorées.
+| server_default | /set irc.server_default.*      | Valeurs par défaut pour serveurs (les options peuvent être ajoutées/supprimées dans la section).
+| server         | <<command_irc_server,/server>> +
+                   /set irc.server.*              | Serveurs.
 |===
 
 Options :
 
-include::autogen/user/logger_options.adoc[]
+include::autogen/user/irc_options.adoc[]
 
-[[logger_commands]]
-==== Commandes
+[[logger_plugin]]
+=== Logger
 
-include::autogen/user/logger_commands.adoc[]
+L'extension Logger permet de sauvegarder le contenu des tampons dans des
+fichiers, avec des options sur comment et quoi sauvegarder.
 
 [[logger_log_levels]]
 ==== Niveaux d'enregistrement
@@ -3110,8 +3199,32 @@ Vous obtiendrez les fichiers suivants :
             |       #chan2.weechatlog
 ....
 
+[[logger_commands]]
+==== Commandes
+
+include::autogen/user/logger_commands.adoc[]
+
+[[logger_options]]
+==== Options
+
+Sections dans le fichier _logger.conf_ :
+
+[width="100%",cols="3m,6m,16",options="header"]
+|===
+| Section | Commande de contrôle | Description
+| look    | /set logger.look.*   | Aspect/présentation.
+| color   | /set logger.color.*  | Couleurs.
+| file    | /set logger.file.*   | Options pour les fichiers de log.
+| level   | /set logger.level.*  | Niveau de log par tampon (les options peuvent être ajoutées/supprimées dans la section).
+| mask    | /set logger.mask.*   | Masque de nom de fichier par tampon (les options peuvent être ajoutées/supprimées dans la section).
+|===
+
+Options :
+
+include::autogen/user/logger_options.adoc[]
+
 [[relay_plugin]]
-=== Extension Relay
+=== Relay
 
 L'extension Relay est utilisée pour relayer des données via le réseau, en
 utilisant divers protocoles :
@@ -3123,32 +3236,7 @@ utilisant divers protocoles :
 ** QWeeChat (Qt) : https://weechat.org/download
 ** WeeChat-Android (Android) : https://github.com/ubergeek42/weechat-android
 ** weechat.el (Emacs) : https://github.com/the-kenny/weechat.el
-** WeeCloud (Javascript) : https://github.com/eirikb/weecloud
-
-[[relay_options]]
-==== Options (relay.conf)
-
-Sections :
-
-[width="100%",cols="3m,6m,16",options="header"]
-|===
-| Section | Commande de contrôle               | Description
-| look    | /set relay.look.*                  | Aspect/présentation.
-| color   | /set relay.color.*                 | Couleurs.
-| network | /set relay.network.*               | Options réseau.
-| irc     | /set relay.irc.*                   | Options spécifiques au protocole irc (proxy irc).
-| port    | <<command_relay_relay,/relay add>> +
-            /set relay.port.*                  | Ports utilisés pour le relai (protocoles irc et weechat) (les options peuvent être ajoutées/supprimées dans la section).
-|===
-
-Options :
-
-include::autogen/user/relay_options.adoc[]
-
-[[relay_commands]]
-==== Commandes
-
-include::autogen/user/relay_commands.adoc[]
+** WeeCloud (JavaScript) : https://github.com/eirikb/weecloud
 
 [[relay_password]]
 ==== Mot de passe
@@ -3264,11 +3352,36 @@ Le port (9000 dans l'exemple) est le port défini dans l'extension Relay.
 L'URI doit toujours se terminer par "/weechat" (pour les protocoles _irc_ et
 _weechat_).
 
-[[scripts_plugins]]
-=== Extensions Scripts
+[[relay_commands]]
+==== Commandes
 
-WeeChat fournit 7 extensions pour scripts : Python, Perl, Ruby, Lua, Tcl,
-Guile (scheme) et Javascript.
+include::autogen/user/relay_commands.adoc[]
+
+[[relay_options]]
+==== Options
+
+Sections dans le fichier _relay.conf_ :
+
+[width="100%",cols="3m,6m,16",options="header"]
+|===
+| Section | Commande de contrôle               | Description
+| look    | /set relay.look.*                  | Aspect/présentation.
+| color   | /set relay.color.*                 | Couleurs.
+| network | /set relay.network.*               | Options réseau.
+| irc     | /set relay.irc.*                   | Options spécifiques au protocole irc (proxy irc).
+| port    | <<command_relay_relay,/relay add>> +
+            /set relay.port.*                  | Ports utilisés pour le relai (protocoles irc et weechat) (les options peuvent être ajoutées/supprimées dans la section).
+|===
+
+Options :
+
+include::autogen/user/relay_options.adoc[]
+
+[[scripts_plugins]]
+=== Scripts
+
+WeeChat fournit 8 extensions pour scripts : Python, Perl, Ruby, Lua, Tcl,
+Guile (scheme), JavaScript et PHP.
 Ces extensions peuvent charger, exécuter et décharger des scripts pour ces
 langages.
 
@@ -3278,24 +3391,8 @@ installer/supprimer des scripts du dépôt WeeChat, qui sont visibles à cette
 URL : https://weechat.org/scripts
 
 Pour plus d'informations sur comment écrire des scripts, ou sur l'API
-WeeChat pour les scripts, merci de lire le _Le Guide pour Scripts WeeChat_.
-
-[[script_options]]
-==== Options Script (script.conf)
-
-Sections :
-
-[width="100%",cols="3m,6m,16",options="header"]
-|===
-| Section | Commande de contrôle  | Description
-| look    | /set script.look.*    | Aspect/présentation.
-| color   | /set script.color.*   | Couleurs.
-| scripts | /set script.scripts.* | Options pour le téléchargement des scripts.
-|===
-
-Options :
-
-include::autogen/user/script_options.adoc[]
+WeeChat pour les scripts, merci de lire le
+link:weechat_scripting.fr.html[Guide pour scripts WeeChat].
 
 [[script_commands]]
 ==== Commandes Script
@@ -3333,12 +3430,34 @@ include::autogen/user/tcl_commands.adoc[]
 include::autogen/user/guile_commands.adoc[]
 
 [[javascript_commands]]
-==== Commandes Javascript
+==== Commandes JavaScript
 
 include::autogen/user/javascript_commands.adoc[]
 
+[[php_commands]]
+==== Commandes PHP
+
+include::autogen/user/php_commands.adoc[]
+
+[[script_options]]
+==== Options Script
+
+Sections dans le fichier _script.conf_ :
+
+[width="100%",cols="3m,6m,16",options="header"]
+|===
+| Section | Commande de contrôle  | Description
+| look    | /set script.look.*    | Aspect/présentation.
+| color   | /set script.color.*   | Couleurs.
+| scripts | /set script.scripts.* | Options pour le téléchargement des scripts.
+|===
+
+Options :
+
+include::autogen/user/script_options.adoc[]
+
 [[trigger_plugin]]
-=== Extension Trigger
+=== Trigger
 
 Trigger est le couteau suisse de WeeChat : il peut accrocher différentes choses
 (signal, modificateur, print, ...), changer le contenu des données, et exécuter
@@ -3346,32 +3465,8 @@ une ou plusieurs commandes. Une condition peut être utilisée pour empêcher le
 trigger de s'exécuter dans certaines circonstances.
 
 Utiliser les triggers nécessite de connaître le fonctionnement des signaux,
-modificateurs, etc... Il peut être utile de lire le chapitre sur les _Hooks_
-dans la _Référence API Extension WeeChat_.
-
-[[trigger_options]]
-==== Options (trigger.conf)
-
-Sections :
-
-[width="100%",cols="3m,6m,16",options="header"]
-|===
-| Section | Commande de contrôle                     | Description
-| look    | /set trigger.look.*                      | Aspect/présentation.
-| color   | /set trigger.color.*                     | Couleurs.
-| trigger | <<command_trigger_trigger,/trigger add>> +
-            <<command_trigger_trigger,/trigger set>> +
-            /set trigger.trigger.*                   | Options des triggers.
-|===
-
-Options :
-
-include::autogen/user/trigger_options.adoc[]
-
-[[trigger_commands]]
-==== Commandes
-
-include::autogen/user/trigger_commands.adoc[]
+modificateurs, etc... Il peut être utile de lire la
+link:weechat_plugin_api.fr.html#hooks[Référence API extension WeeChat / Hooks].
 
 [[trigger_anatomy]]
 ==== Anatomie d'un trigger
@@ -3389,8 +3484,8 @@ Un trigger a les options suivantes (les noms sont
 
 | hook | `signal`, `hsignal`, `modifier`, `print`, `command`, `command_run`,
   `timer`, `config`, `focus` |
-  Le "hook" utilisé dans le trigger. Pour plus d'information, voir le chapitre
-  _Hooks_ dans la _Référence API Extension WeeChat_.
+  Le "hook" utilisé dans le trigger. Pour plus d'information, voir la
+  link:weechat_plugin_api.fr.html#hooks[Référence API extension WeeChat / Hooks].
 
 | arguments | chaîne |
   Les paramètres pour le "hook", ils dépendent du type de hook utilisé.
@@ -3452,9 +3547,9 @@ le trigger lui-même est activé :
 Les paramètres dépendent du type de "hook" utilisé. Ils sont séparés par des
 points-virgules.
 
-[width="100%",cols="2,6,7",options="header"]
+[width="100%",cols="2,6,7,2",options="header"]
 |===
-| Hook | Paramètres | Exemples
+| Hook | Paramètres | Exemples | Documentation (API)
 
 | signal |
   1. nom de signal (priorité autorisée) (obligatoire) +
@@ -3462,20 +3557,23 @@ points-virgules.
   3. ... |
   `+*,irc_in_privmsg+` +
   `+*,irc_in_privmsg;*,irc_in_notice+` +
-  `+signal_sigwinch+`
+  `+signal_sigwinch+` |
+  link:weechat_plugin_api.fr.html#_hook_signal[hook_signal]
 
 | hsignal |
   1. nom de signal (priorité autorisée) (obligatoire) +
   2. nom de signal (priorité autorisée) +
   3. ... |
-  `+nicklist_nick_added+`
+  `+nicklist_nick_added+` |
+  link:weechat_plugin_api.fr.html#_hook_hsignal[hook_hsignal]
 
 | modifier |
   1. nom de modificateur (priorité autorisée) (obligatoire) +
   2. nom de modificateur (priorité autorisée) +
   3. ... |
   `+weechat_print+` +
-  `+5000\|input_text_display;5000\|history_add+`
+  `+5000\|input_text_display;5000\|history_add+` |
+  link:weechat_plugin_api.fr.html#_hook_modifier[hook_modifier]
 
 | print |
   1. nom de tampon +
@@ -3485,7 +3583,8 @@ points-virgules.
   `+irc.freenode.*+` +
   `+irc.freenode.#weechat+` +
   `+irc.freenode.#weechat;irc_notice+` +
-  `+*;;;1+`
+  `+*;;;1+` |
+  link:weechat_plugin_api.fr.html#_hook_print[hook_print]
 
 | command |
   1. nom de commande (priorité autorisée) (obligatoire) +
@@ -3494,32 +3593,37 @@ points-virgules.
   4. description des paramètres +
   5. complétion |
   `+test+` +
-  `+5000\|test+`
+  `+5000\|test+` |
+  link:weechat_plugin_api.fr.html#_hook_command[hook_command]
 
 | command_run |
   1. commande (priorité autorisée) (obligatoire) +
   2. commande (priorité autorisée) +
   3. ... |
-  `+/cmd paramètres+`
+  `+/cmd paramètres+` |
+  link:weechat_plugin_api.fr.html#_hook_command_run[hook_command_run]
 
 | timer |
   1. intervalle, en millisecondes (obligatoire) +
   2. alignement sur la seconde (par défaut : 0) +
   3. nombre maximum d'appels (par défaut : 0, qui signifie "sans fin") |
   `+3600000+` +
-  `+60000;0;5+`
+  `+60000;0;5+` |
+  link:weechat_plugin_api.fr.html#_hook_timer[hook_timer]
 
 | config |
   1. nom d'option (priorité autorisée) (obligatoire) +
   2. nom d'option (priorité autorisée) +
   3. ... |
-  `+weechat.look.*+`
+  `+weechat.look.*+` |
+  link:weechat_plugin_api.fr.html#_hook_config[hook_config]
 
 | focus |
   1. nom d'aire (priorité autorisée) (obligatoire) +
   2. nom d'aire (priorité autorisée) +
   3. ... |
-  `+buffer_nicklist+`
+  `+buffer_nicklist+` |
+  link:weechat_plugin_api.fr.html#_hook_focus[hook_focus]
 |===
 
 [[trigger_conditions]]
@@ -3575,7 +3679,7 @@ Les groupes de correspondance peuvent être utilisés dans le "remplacement" :
 
 * `+${re:0}+` à `+${re:99}+` : `+${re:0}+` est la correspondance complète, `+${re:1}+`
   à `+${re:99}+` sont les groupes capturés
-* `+${re:+}+` : la dernière correspondance (avec le numéro le plus élevé)
+* `+${re:+++}+` : la dernière correspondance (avec le numéro le plus élevé)
 * `+${hide:c,${re:N}}+` : la correspondance "N" avec tous les caractères
   remplacés par "c" (exemple : `+${hide:*,${re:2}}+` est le groupe n°2 avec tous
   les caractères remplacés par `+*+`).
@@ -3901,8 +4005,32 @@ Les paramètres pour le minuteur sont :
 La commande `/mute /save` sauvegarde silencieusement les fichiers de
 configuration (rien n'est affiché sur le tampon "core").
 
+[[trigger_commands]]
+==== Commandes
+
+include::autogen/user/trigger_commands.adoc[]
+
+[[trigger_options]]
+==== Options
+
+Sections dans le fichier _trigger.conf_ :
+
+[width="100%",cols="3m,6m,16",options="header"]
+|===
+| Section | Commande de contrôle                     | Description
+| look    | /set trigger.look.*                      | Aspect/présentation.
+| color   | /set trigger.color.*                     | Couleurs.
+| trigger | <<command_trigger_trigger,/trigger add>> +
+            <<command_trigger_trigger,/trigger set>> +
+            /set trigger.trigger.*                   | Options des triggers.
+|===
+
+Options :
+
+include::autogen/user/trigger_options.adoc[]
+
 [[xfer_plugin]]
-=== Extension Xfer
+=== Xfer
 
 L'extension Xfer permet :
 
@@ -3910,10 +4038,15 @@ L'extension Xfer permet :
   "DCC Chat" via l'extension IRC
 * le transfert de fichiers, par exemple le "DCC" via l'extension IRC
 
-[[xfer_options]]
-==== Options (xfer.conf)
+[[xfer_commands]]
+==== Commandes
 
-Sections :
+include::autogen/user/xfer_commands.adoc[]
+
+[[xfer_options]]
+==== Options
+
+Sections dans le fichier _xfer.conf_ :
 
 [width="100%",cols="3m,6m,16",options="header"]
 |===
@@ -3927,11 +4060,6 @@ Sections :
 Options :
 
 include::autogen/user/xfer_options.adoc[]
-
-[[xfer_commands]]
-==== Commandes
-
-include::autogen/user/xfer_commands.adoc[]
 
 [[support]]
 == Support

@@ -2,9 +2,11 @@
 :author: Sébastien Helleu
 :email: flashcode@flashtux.org
 :lang: pl
-:toc: macro
+:toc: left
 :toc-title: Spis treści
+:toclevels: 2
 :sectnums:
+:sectnumlevels: 2
 :docinfo1:
 
 
@@ -80,8 +82,8 @@ brew install weechat --with-aspell --with-curl --with-python --with-perl --with-
 Dla pomocy wpisz `/help`. Aby uzyskać pomoc dla komendy wpisz `/help komenda`.
 Klawisze i komendy są wypisane w dokumentacji.
 
-Nowym użytkownikom zaleca się przeczytanie quickstart (szybki start):
-https://weechat.org/doc
+Nowym użytkowniką zaleca się przeczytanie dokumentu
+link:weechat_quickstart.pl.html[Szybki start].
 
 [[display]]
 == Wyświetlanie
@@ -97,8 +99,9 @@ Jest to częsty problem, przeczytaj i sprawdź *WSZYSTKIE* poniższe rozwiązani
   (jeśli nie jest, to najprawdopodobniej potrzebujesz pakietu "weechat-plugins")
 * sprawdź wyjście komendy `/charset` (w głównym buforze). Powinieneś zobaczyć
   _ISO-XXXXXX_ lub _UTF-8_ dla kodowania terminala. Jeśli widzisz _ANSI_X3.4-1968_
-  lub inne wartości, twoje ustawienie dla locale najprawdopodobniej jest złe
-  (napraw swoje $LANG).
+  lub inne wartości, twoje ustawienie dla locale najprawdopodobniej jest złe. +
+  Aby to naprawić, sprawdź zainstalowane w systemie kodowania za pomocą `locale -a`
+  i ustaw odpowiednią wartość zmiennej $LANG, na przykład: `export LANG=en_US.UTF-8`.
 * ustaw globalną wartość dekodowania, na przykład:
   `/set charset.default.decode "ISO-8859-2"`
 * jeśli korzystasz z UTF-8:
@@ -178,29 +181,36 @@ okno) lub wyświetlany w jednym lub więcej oknach.
 [[buffers_list]]
 === Jak wyświetlić listę z buforami po lewej stronie?
 
-Użyj skryptu _buffers.pl_:
+W wersji WeeChat ≥ 1.8, wtyczka "buflist" jest domyślnie włączona i załadowana.
+
+W starszych wersjach możesz zainstalować skrypt _buffers.pl_:
 
 ----
 /script install buffers.pl
 ----
 
-W celu ograniczenia rozmiaru paska:
+Ograniczenie rozmiaru bufora z listą kanałów (zamień "buflist" na "buffers" jeśli
+używasz skryptu _buffers.pl_):
 
 ----
-/set weechat.bar.buffers.size_max 15
+/set weechat.bar.buflist.size_max 15
 ----
 
-Żeby przenieść pasek na dół:
+Aby przesunąć pasek na spód:
 
 ----
-/set weechat.bar.buffers.position bottom
+/set weechat.bar.buflist.position bottom
 ----
 
-Aby przewinąć pasek: jeśli mysz jest włączona (key: kbd:[Alt+m]), możesz przewinąć pasek
-za pomocą rolki myszy.
+Przewijanie paska: jeśli obsługa myszy jest włączona (skrót: kbd:[Alt+m]), możesz
+przewijać pasek za pomocą rolki myszy.
 
-Możesz też zdefiniować skróty klawiszowe, podobne do tych od przewijania listy nicków.
-Na przykład użyć kbd:[F1], kbd:[F2], kbd:[Alt+F1] i kbd:[Alt+F2]:
+Domyślne skróty do przewijania paska _buflist_ to kbd:[F1], kbd:[F2], kbd:[Alt+F1]
+oraz kbd:[Alt+F2].
+
+Dla skryptu _buffers.pl_, możesz zdefiniować skróty w podobny sposób do istniejących
+skrótów do przewijania listy nicków. +
+Na przykład kbd:[F1], kbd:[F2], kbd:[Alt+F1] oraz kbd:[Alt+F2]:
 
 ----
 /key bind meta-OP /bar scroll buffers * -100%
@@ -253,7 +263,8 @@ Kolory można zmienić za pomocą opcji __weechat.color.status_data_*__
 (bufory) i __weechat.color.status_count_*__ (liczniki). +
 Pozostałe opcje hotlist można zmienić za pomocą opcji __weechat.look.hotlist_*__.
 
-Więcej informacji na temat hotlisty można znaleźć w poradniku użytkownika (sekcja układ ekranu).
+Więcej informacji na temat hotlity można znaleźć w
+link:weechat_user.pl.html#screen_layout[Poradniku użytkownika / Układ ekranu].
 
 [[input_bar_size]]
 === Jak używać linii poleceń z więcej niż jednym wierszem?
@@ -314,25 +325,21 @@ Innym rozwiązaniem jest przesunięcie listy nicków na górę lub dół, na prz
 
 W WeeChat od wersji ≥ 1.0, możesz użyć trybu niesformatowanego wyświetlania (domyślnie: kbd:[Alt+l]).
 
-// TRANSLATION MISSING
-To make opening URLs easier, you can:
+Żeby operowanie na URLach było latwiejsze możesz:
 
-// TRANSLATION MISSING
-* move nicklist to top:
+* przenieść listę nicków na górę:
 
 ----
 /set weechat.bar.nicklist.position top
 ----
 
-// TRANSLATION MISSING
-* disable alignment for multiline words (WeeChat ≥ 1.7):
+* wyłączyć wyrównanie dla wieloliniowych słów (WeeChat ≥ 1.7):
 
 ----
 /set weechat.look.align_multiline_words off
 ----
 
-// TRANSLATION MISSING
-* or for all wrapped lines:
+* albo dla wszystkich zawiniętych lini:
 
 ----
 /set weechat.look.align_end_of_lines time
@@ -409,7 +416,8 @@ Dla wersji 0.3.4, musisz użyć komendy `/color` w celu dodania nowych kolorów.
 Dla wersji ≥ 0.3.5, można używać dowolnego numeru koloru w opcjach (opcjonalnie:
 można stworzyć alias dla koloru za pomocą komendy `/color`).
 
-Więcej informacji na temat zarządzania kolorami można uzyskać w poradniku użytkownika.
+Więcej informacji o zarządzaniu kolorami można znaleźć w
+link:weechat_user.pl.html#colors[Poradniku użytkownika / Kolory].
 
 [[search_text]]
 === Jak mogę wyszukać tekst w buforze (jak za pomocą /lastlog w irssi)?
@@ -418,7 +426,8 @@ Domyślny skrót klawiszowy to kbd:[Ctrl+r] (komenda: `/input search_text_here`)
 
 Poruszanie się między podświetleniami: kbd:[Alt+p] / kbd:[Alt+n].
 
-Po więcej informacji zajrzyj do poradnika użytkownika (domyślne skróty klawiszowe).
+Więcej informacji o skrótach klawiszowych można znaleźć w
+link:weechat_user.pl.html#key_bindings[Poradniku użytkownika / Domyślne skróty klawiszowe].
 
 [[terminal_focus]]
 === Jak mogę wykonywać komendy, kiedy terminal stanie się/przestanie być aktywny?
@@ -496,7 +505,8 @@ Można również samemu stworzyć skrót, na przykład:
 /key bind meta-q /buffer *11
 ----
 
-Lista domyślnych skrótów znajduje się w poradniku użytkownika.
+Listę domyślnych skrótów klawiszowych można znależć w
+link:weechat_user.pl.html#key_bindings[Poradniku uzytkownika / Domyślne skróty klawiszowe].
 
 [[global_history]]
 === Jak używać globalnej historii (zamiast historii buforu) za pomocą strzałek góra/dół?
@@ -826,6 +836,41 @@ Możesz użyć komendy `/script` do instalowania i zarządzania skryptami
 
 Skrypty nie są kompatybilne z innymi klientami IRC.
 
+[[scripts_update]]
+=== Komenda "/script update" nie może odczytać skryptów, jak to naprawić?
+
+Najpierw zapoznaj się z zagadnieniami dotyczącymi połączeń SSL znajdującymi się
+w tym dokumencie (zwłaszcza opcji _weechat.network.gnutls_ca_file_).
+
+Jeśli to nie pomoże spróuj ręcznie usunąć plik z listą skryptów (z poziomu powłoki):
+
+----
+$ rm ~/.weechat/script/plugins.xml.gz
+----
+
+Następnie ponownie zaktualizuj listę sktyptów w WeeChat:
+
+----
+/script update
+----
+
+Jeśli w dalszym ciągu otrzymujesz błąd, wtedy musisz wyłączyć automatyczną aktualizacje
+pliku z listą skryptów przez WeeChat i ręcznie pobrać ten plik (oznacza to, że musisz
+ręcznie aktualizować plik do najnowszej wersji):
+
+* w WeeChat:
+
+----
+/set script.scripts.cache_expire -1
+----
+
+* w powłoce, z zainstalowanym programem curl:
+
+----
+$ cd ~/.weechat/script
+$ curl -O https://weechat.org/files/plugins.xml.gz
+----
+
 [[settings]]
 == Ustawienia
 
@@ -836,7 +881,8 @@ Możesz, ale *NIE* jest to zalecane.
 
 Zaleca się użycie komendy `/set`:
 
-* możesz użwać dopełnienia za pomocą klawisza Tab
+* Możesz dopałnić nazwę i wartość opcji za pomocą klawisza kbd:[Tab]
+  (lub kbd:[Shift+Tab] dla częściowego dopełnieina, przydatne dla nazw).
 * wartość jest sprawdzana, w razie błędu wyświetlana jest wiadomość
 * wartości zmieniane są od razu, nie trzeba retartować WeeChat ani nic takiego
 
@@ -856,7 +902,7 @@ W celu zmniejszenia używanej pamięci możesz zastosować się do poniższych r
 * używać najnowsze stabilnej wersji (powinna mieć mniej wycieków pamięci
   niż starsze wersje)
 * nie ładuj nieużywanych pluginów, np: aspell, buflist, fifo, logger, perl,
-  python, ruby, lua, tcl, guile, javascript, xfer (używana do DCC)
+  python, ruby, lua, tcl, guile, javascript, php, xfer (używana do DCC)
 * ładować tylko naprawdę używane skrypty
 * nie ładuj certyfikatów jeśli SSL *NIE* jest używany: ustaw pusty ciąg w opcji
   _weechat.network.gnutls_ca_file_

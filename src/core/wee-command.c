@@ -1089,11 +1089,22 @@ COMMAND_CALLBACK(buffer)
     /* set a property on buffer */
     if (string_strcasecmp (argv[1], "set") == 0)
     {
-        COMMAND_MIN_ARGS(4, "set");
-        value = string_remove_quotes (argv_eol[3], "'\"");
-        gui_buffer_set (buffer, argv[2], (value) ? value : argv_eol[3]);
-        if (value)
-            free (value);
+        COMMAND_MIN_ARGS(3, "set");
+        if (argc == 3)
+        {
+            /*
+             * default to empty value for valueless buffer "properties",
+             * e.g. localvar_del_xxx
+             */
+            gui_buffer_set (buffer, argv[2], "");
+        }
+        else
+        {
+            value = string_remove_quotes (argv_eol[3], "'\"");
+            gui_buffer_set (buffer, argv[2], (value) ? value : argv_eol[3]);
+            if (value)
+                free (value);
+        }
         return WEECHAT_RC_OK;
     }
 
@@ -2110,6 +2121,9 @@ COMMAND_CALLBACK(filter)
                 {
                     buffer->filter = 1;
                     gui_filter_buffer (buffer, NULL);
+                    (void) hook_signal_send (
+                        "buffer_filters_enabled",
+                        WEECHAT_HOOK_SIGNAL_POINTER, buffer);
                 }
             }
             else
@@ -2165,6 +2179,9 @@ COMMAND_CALLBACK(filter)
                 {
                     buffer->filter = 0;
                     gui_filter_buffer (buffer, NULL);
+                    (void) hook_signal_send (
+                        "buffer_filters_disabled",
+                        WEECHAT_HOOK_SIGNAL_POINTER, buffer);
                 }
             }
             else
@@ -2218,6 +2235,10 @@ COMMAND_CALLBACK(filter)
                 /* toggle filters in buffer */
                 buffer->filter ^= 1;
                 gui_filter_buffer (buffer, NULL);
+                (void) hook_signal_send (
+                    (buffer->filter) ?
+                    "buffer_filters_enabled" : "buffer_filters_disabled",
+                    WEECHAT_HOOK_SIGNAL_POINTER, buffer);
             }
             else
             {
@@ -6979,7 +7000,7 @@ command_init ()
            " || close [<n1>[-<n2>]|<name>]"
            " || notify <level>"
            " || localvar"
-           " || set <property> <value>"
+           " || set <property> [<value>]"
            " || get <property>"
            " || <number>|-|+|<name>"),
         N_("    list: list buffers (without argument, this list is displayed)\n"
@@ -7241,10 +7262,13 @@ command_init ()
            "\n"
            "An expression is considered as \"true\" if it is not NULL, not "
            "empty, and different from \"0\".\n"
-           "The comparison is made using integers if the two expressions are "
-           "valid integers.\n"
-           "To force a string comparison, add double quotes around each "
-           "expression, for example:\n"
+           "The comparison is made using floating point numbers if the two "
+           "expressions are valid numbers, with one of the following formats:\n"
+           "  - integer (examples: 5, -7)\n"
+           "  - floating point number (examples: 5.2, -7.5, 2.83e-2)\n"
+           "  - hexadecimal number (examples: 0xA3, -0xA3)\n"
+           "To force a string comparison, you can add double quotes around "
+           "each expression, for example:\n"
            "  50 > 100      ==> 0\n"
            "  \"50\" > \"100\"  ==> 1\n"
            "\n"
@@ -7549,7 +7573,7 @@ command_init ()
            "format: \"@area:key\" or \"@area1>area2:key\" where area can be:\n"
            "          *: any area on screen\n"
            "       chat: chat area (any buffer)\n"
-           "  chat(xxx): char area for buffer with name \"xxx\" (full name "
+           "  chat(xxx): chat area for buffer with name \"xxx\" (full name "
            "including plugin)\n"
            "     bar(*): any bar\n"
            "   bar(xxx): bar \"xxx\"\n"
@@ -7892,7 +7916,8 @@ command_init ()
         N_("[<option> [<value>]]"
            " || diff [<option> [<option>...]]"
            " || env [<variable> [<value>]]"),
-        N_("option: name of an option (wildcard \"*\" is allowed)\n"
+        N_("option: name of an option (wildcard \"*\" is allowed to list "
+           "options, if no value is specified)\n"
            " value: new value for option, according to type:\n"
            "          boolean: on, off or toggle\n"
            "          integer: number, ++number or --number\n"

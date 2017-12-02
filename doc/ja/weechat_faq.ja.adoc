@@ -2,9 +2,11 @@
 :author: Sébastien Helleu
 :email: flashcode@flashtux.org
 :lang: ja
-:toc: macro
+:toc: left
 :toc-title: 目次
+:toclevels: 2
 :sectnums:
+:sectnumlevels: 2
 :docinfo1:
 
 
@@ -43,7 +45,7 @@ WeeChat は非常に軽く、革新的な機能を備えているからです。
 [[gui]]
 === WeeChat には多くの GUI があると聞きました。コンパイル/利用方法を教えてください。
 
-いくつかのリモート GUI が利用可能です、機能のページに載っているリンクをご覧ください:
+いくつかのリモート GUI が利用可能です、機能のページに載っているリンクを参照してください:
 https://weechat.org/about/features
 
 [[compile_git]]
@@ -80,8 +82,7 @@ brew install weechat --with-aspell --with-curl --with-python --with-perl --with-
 ヘルプを見るには、`/help` と入力してください。コマンドに関するヘルプを見るには、`/help command`
 と入力してください。キーとコマンドはドキュメント内にリストアップされています。
 
-新しいユーザはクイックスタートガイドを読むことをお勧めします:
-https://weechat.org/doc
+新しいユーザはlink:weechat_quickstart.ja.html[クイックスタートガイド]を読むことをお勧めします
 
 [[display]]
 == 表示
@@ -96,8 +97,9 @@ https://weechat.org/doc
 * `/plugin` コマンドで "charset" プラグインがロード済みであることの確認
   (ロードされていない場合、"weechat-plugins" パッケージが必要かもしれません)。
 * `/charset` コマンドの出力を確認 (core バッファ上で)。端末の文字セットとして _ISO-XXXXXX_
-  または _UTF-8_ があるはずです。その他の値がある場合は、ロケールが間違っている可能性があります
-  ($LANG を修正してください)。
+  または _UTF-8_ があるはずです。その他の値がある場合は、ロケールが間違っている可能性があります。 +
+  ロケールを修正するには、`locale -a` を使ってインストール済みのロケールを確認し、$LANG
+  に適切な値を設定してください。これを行うには `export LANG=en_US.UTF-8` のようにします。
 * グローバルデコードを設定、例えば:
   `/set charset.default.decode "ISO-8859-15"`
 * UTF-8 ロケールを使っている場合は:
@@ -122,7 +124,7 @@ WeeChat は UTF-8 ロケールを推奨します。ISO
 次の回避方法を使えば、修正済みの _wcwidth_ 関数を使う事が可能です:
 https://blog.nytsoi.net/2015/05/04/emoji-support-for-weechat
 
-より詳しい情報を得るにはバグ報告をご覧ください:
+より詳しい情報を得るにはバグ報告を参照してください:
 https://github.com/weechat/weechat/issues/79
 
 [[bars_background]]
@@ -177,29 +179,36 @@ _ウィンドウ_
 [[buffers_list]]
 === どうすれば左側にバッファリストを表示できますか。
 
-_buffers.pl_ スクリプトを使ってください:
+WeeChat バージョン 1.8 以上の場合、"buflist" プラグインがロードされ、デフォルトで有効化されます。
+
+バージョン 1.8 よりも古い WeeChat をお使いなら、以下の方法で _buffers.pl_ スクリプトをインストールしてください:
 
 ----
 /script install buffers.pl
 ----
 
-バーのサイズを制限するには:
+バッファリストバーのサイズを制限するには以下の方法を使ってください
+(_buffers.pl_ スクリプトを使っているなら、"buflist" を "buffers" に置き換えてください):
 
 ----
-/set weechat.bar.buffers.size_max 15
+/set weechat.bar.buflist.size_max 15
 ----
 
-バーの位置を下に移動するには:
+バッファリストバーの位置を下に移動するには以下の方法を使ってください:
 
 ----
-/set weechat.bar.buffers.position bottom
+/set weechat.bar.buflist.position bottom
 ----
 
-バーをスクロールするには: マウスが有効化されているならば
-(キー: kbd:[Alt+m])、マウスホイールでバーをスクロールできます。
+_buflist_ バーをスクロールする方法: マウスを有効化しているならば
+(キー: kbd:[Alt+m])、マウスホイールでバッファリストバーをスクロールできます。
 
-スクロール機能を果たすキーが割り当てられているならば、それらを使ってスクロールすることも可能です。以下ではニックネームリストをスクロールする既存のキーに合わせて
-kbd:[F1]、kbd:[F2]、kbd:[Alt+F1]、kbd:[Alt+F2] を定義しています:
+_buflist_ バーをスクロールするデフォルトキーは
+kbd:[F1]、kbd:[F2]、kbd:[Alt+F1]、kbd:[Alt+F2] です。
+
+_buffers.pl_
+スクリプトをお使いの場合、ニックネームリストをスクロールするキーと似たキーを割り当てることも可能です。 +
+例えば、kbd:[F1]、kbd:[F2]、kbd:[Alt+F1]、kbd:[Alt+F2] を割り当てるには以下の方法を使います:
 
 ----
 /key bind meta-OP /bar scroll buffers * -100%
@@ -251,7 +260,7 @@ kbd:[Alt+k] の後にキーを押してください。
 および __weechat.color.status_count_*__ オプション (カウンタ) を設定します。 +
 その他のホットリスト関連オプションは __weechat.look.hotlist_*__ オプションを使って変更します。
 
-ホットリストに関する詳しい情報はユーザーズガイド (画面レイアウト) をご覧ください。
+ホットリストに関する詳しい情報はlink:weechat_user.ja.html#screen_layout[ユーザーズガイド / 画面レイアウト]を参照してください
 
 [[input_bar_size]]
 === コマンドラインの行数を増やすにはどうすればいいですか。
@@ -403,7 +412,7 @@ WeeChat バージョン 0.3.4 の場合、新しい色を追加するには `/co
 WeeChat バージョン 0.3.5 以上の場合、任意の色番号を利用できます (オプション:
 色の別名を追加するには `/color` コマンドを使ってください)。
 
-色管理に関するより詳しい情報はユーザーズガイドを読んでください。
+色管理に関するより詳しい情報はlink:weechat_user.ja.html#colors[ユーザーズガイド / 色]を参照してください
 
 [[search_text]]
 === どうすればバッファ内の文字列を検索できますか (irssi の /lastlog の様に)。
@@ -411,7 +420,7 @@ WeeChat バージョン 0.3.5 以上の場合、任意の色番号を利用で�
 デフォルトのキーは kbd:[Ctrl+r] です (コマンドは: `/input search_text_here`)。
 ハイライト部分へのジャンプは: kbd:[Alt+p] / kbd:[Alt+n]
 
-この機能に関するより詳しい情報はユーザーズガイドを参照してください (デフォルトのキー割り当て)。
+この機能に関するより詳しい情報はlink:weechat_user.ja.html#key_bindings[ユーザーズガイド / デフォルトのキー割り当て]を参照してください
 
 [[terminal_focus]]
 === どうすれば端末にフォーカスが合った時や外れた時にコマンドを実行できますか。
@@ -488,7 +497,7 @@ UXTerm*metaSendsEscape: true
 /key bind meta-q /buffer *11
 ----
 
-デフォルトキー割り当てのリストはユーザーズガイドを参照してください。
+デフォルトキー割り当てのリストはlink:weechat_user.ja.html#key_bindings[ユーザーズガイド / デフォルトのキー割り当て]を参照してください
 
 [[global_history]]
 === どうすればグローバルヒストリを (バッファヒストリの代わりに) 上下矢印キーで使えますか。
@@ -815,6 +824,42 @@ OpenBSD では、プラグインファイル名の末尾が ".so.0.0" です (Li
 
 スクリプトは他の IRC クライアントのものと互換性がありません。
 
+// TRANSLATION MISSING
+[[scripts_update]]
+=== The command "/script update" can not read scripts, how to fix that?
+
+First check questions about SSL connection in this FAQ
+(especially the option _weechat.network.gnutls_ca_file_).
+
+If still not working, try to manually delete the scripts file (in your shell):
+
+----
+$ rm ~/.weechat/script/plugins.xml.gz
+----
+
+And update scripts again in WeeChat:
+
+----
+/script update
+----
+
+If you still have an error, then you must remove the automatic update of file
+in WeeChat and download the file manually outside WeeChat (that means you'll
+have to update manually the file yourself to get updates):
+
+* in WeeChat:
+
+----
+/set script.scripts.cache_expire -1
+----
+
+* in your shell, with curl installed:
+
+----
+$ cd ~/.weechat/script
+$ curl -O https://weechat.org/files/plugins.xml.gz
+----
+
 [[settings]]
 == 設定
 
@@ -825,7 +870,8 @@ OpenBSD では、プラグインファイル名の末尾が ".so.0.0" です (Li
 
 その代わり WeeChat 内でコマンド `/set` を使うことを推奨します。その理由は:
 
-* Tab キーで値を補完できるからです
+* kbd:[Tab] キー を使ってオプションの名前と値を補完できるからです (さらに
+  kbd:[Shift+Tab] キーを使えばオプション名の補完に役立つ部分補完もできるからです)
 * 設定しようとした値は検証され、値に問題があった場合にはメッセージが表示されるからです
 * 設定した値はすぐに反映され、再起動の必要もないからです
 
@@ -844,7 +890,7 @@ OpenBSD では、プラグインファイル名の末尾が ".so.0.0" です (Li
 * 最新の安定版を使う
   (古いバージョンよりもメモリリークの可能性が減ると思われます)
 * 使わないプラグインのロードを禁止する、例えば:
-  aspell、buflist、fifo、logger、perl、python、ruby、lua、tcl、guile、javascript、xfer (DCC で使用)
+  aspell、buflist、fifo、logger、perl、python、ruby、lua、tcl、guile、javascript、php、xfer (DCC で使用)
 * 本当に必要なスクリプトだけをロード
 * SSL を *使わない* なら、証明書を読み込まないでください: オプション
   _weechat.network.gnutls_ca_file_ に空文字列を設定してください。

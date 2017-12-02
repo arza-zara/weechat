@@ -29,13 +29,14 @@ schlanker Chat-Client der für verschiedene Betriebssysteme entwickelt wird.
 Dieses Handbuch beschreibt wie man Skripten für WeeChat schreiben kann. Dabei
 werden folgende Programmiersprachen unterstützt:
 
-* python
-* perl
-* ruby
-* lua
-* tcl
-* guile (scheme)
-* javascript
+* Python
+* Perl
+* Ruby
+* Lua
+* Tcl
+* Guile (Scheme)
+* JavaScript
+* PHP
 
 [NOTE]
 Fast alle Beispiele in dieser Dokumentation sind für Python erstellt.
@@ -80,7 +81,7 @@ Weechat.config_new_option(config, section, "name", "string", "description of opt
 
 * Funktionen werden im Format `weechat::xxx arg1 arg2 ...` ausgeführt
 
-==== Guile (scheme)
+==== Guile (Scheme)
 
 * Funktionen werden im Format `(weechat:xxx arg1 arg2 ...)` ausgeführt
 * folgende Funktionen nutzen eine Liste von Argumente (anstelle von vielen
@@ -90,9 +91,13 @@ Weechat.config_new_option(config, section, "name", "string", "description of opt
 ** config_new_option
 ** bar_new
 
-==== Javascript
+==== JavaScript
 
 * Funktionen werden im Format `weechat.xxx(arg1, arg2, ...);` ausgeführt
+
+==== PHP
+
+* Funktionen werden im Format `weechat_xxx(arg1, arg2, ...);` ausgeführt
 
 [[register_function]]
 === Die "Register" Funktion
@@ -166,7 +171,7 @@ weechat::register "test_tcl" "FlashCode" "1.0" "GPL3" "Test Skript" "" ""
 weechat::print "" "Hallo, von einem tcl Skript!"
 ----
 
-* Guile (scheme):
+* Guile (Scheme):
 
 [source,lisp]
 ----
@@ -174,12 +179,20 @@ weechat::print "" "Hallo, von einem tcl Skript!"
 (weechat:print "" "Hallo, von einem scheme Skript!")
 ----
 
-* Javascript:
+* JavaScript:
 
 [source,javascript]
 ----
 weechat.register("test_js", "FlashCode", "1.0", "GPL3", "Test Skript", "", "");
 weechat.print("", "Hallo, von einem javascript Skript!");
+----
+
+* PHP:
+
+[source,php]
+----
+weechat_register('test_php', 'FlashCode', '1.0', 'GPL3', 'Test Skript', '', '');
+weechat_print('', 'Hallo, von einem PHP Skript!');
 ----
 
 [[load_script]]
@@ -196,6 +209,7 @@ nutzen, zum Beispiel:
 /script load script.tcl
 /script load script.scm
 /script load script.js
+/script load script.php
 ----
 
 Es besteht natürlich weiterhin die Möglichkeit, individuell für jede
@@ -209,6 +223,7 @@ Skriptsprache, den entsprechenden Befehl zu nutzen:
 /tcl load script.tcl
 /guile load script.scm
 /javascript load script.js
+/php load script.php
 ----
 
 Um Skripten automatisch beim Start von WeeChat zu laden sollte man einen Link
@@ -231,7 +246,7 @@ ein Link in das entsprechende _autoload_ Verzeichnis erzeugt.
 Die Skripten API ist nahezu identisch mit der API der C Erweiterung.
 Um einen Überblick über alle API Funktionen (Prototyp, Argumente,
 Rückgabe werte, Beispiele) zu erhalten werfen Sie einen Blick in
-die _WeeChat Plugin API Reference_.
+die link:weechat_plugin_api.en.html[WeeChat Plugin API Reference] (Englisch).
 Es ist wichtig das man zwischen einer _Erweiterung_ und einem _Skript_
 unterscheidet: Eine _Erweiterung_ ist eine Binärdatei die kompiliert wurde
 und mittels `/plugin` geladen wird. Ein _Skript_ ist eine Textdatei welche
@@ -360,7 +375,7 @@ proc timer_cb { data remaining_calls } {
 weechat::hook_timer 1000 0 1 timer_cb test
 ----
 
-* Guile (scheme):
+* Guile (Scheme):
 
 [source,lisp]
 ----
@@ -372,7 +387,7 @@ weechat::hook_timer 1000 0 1 timer_cb test
 (weechat:hook_timer 1000 0 1 "timer_cb" "test")
 ----
 
-* Javascript:
+* JavaScript:
 
 [source,javascript]
 ----
@@ -384,11 +399,23 @@ function timer_cb(data, remaining_calls) {
 weechat.hook_timer(1000, 0, 1, "timer_cb", "test");
 ----
 
+* PHP:
+
+[source,php]
+----
+$timer_cb = function ($data, $remaining_calls) {
+    weechat_print('', 'timer! data=' . $data);
+    return WEECHAT_RC_OK;
+};
+
+weechat_hook_timer(1000, 0, 1, $timer_cb, 'test');
+----
+
 [[script_api]]
 == Skript API
 
 Um weiterführende Informationen zu den API Funktionen zu erhalten
-lesen Sie bitte _WeeChat Plugin API Reference_.
+lesen Sie bitte link:weechat_plugin_api.en.html[WeeChat Plugin API Reference] (Englisch).
 
 [[script_api_functions]]
 === Funktionen
@@ -697,7 +724,8 @@ Liste der Konstanten in Skript API:
 
 Dieses Kapitel beinhaltet einige Aufgaben mit Lösungsbeispielen.
 Die Skript API wird dabei nur sehr oberflächlich besprochen.Um eine vollständige
-Übersicht aller Befehle zu erhalten nutzen Sie bitte die _WeeChat Plugin API Reference_.
+Übersicht aller Befehle zu erhalten nutzen Sie bitte die
+link:weechat_plugin_api.en.html[WeeChat Plugin API Reference] (Englisch).
 
 [[buffers]]
 === Buffer
@@ -742,8 +770,7 @@ weechat.prnt(buffer, "Nachricht im #weechat Channel")
 ----
 
 [NOTE]
-Die print Funktion heißt in Perl/Ruby/Lua/Tcl/Guile/Javascript `print`.
-In Python lautet die Funktion `prnt`.
+Die Print-Funktion lautet unter Python `prnt` und `print` in den anderen Sprachen.
 
 [[buffers_send_text]]
 ==== Text in einen Buffer senden
@@ -965,8 +992,9 @@ weechat.hook_process_hashtable("url:https://weechat.org/files/src/weechat-devel.
                                30 * 1000, "my_process_cb", "")
 ----
 
-Für weiterführende Informationen zum URL Transfer und für die verfügbaren Optionen,
-siehe `hook_process` und `hook_process_hashtable` in der API Erweiterung Anleitung.
+Für weitere Informationen zum URL Transfer und verfügbare Optionen, siehe Funktionen
+`hook_process` und `hook_process_hashtable` in
+link:weechat_plugin_api.en.html#_hook_process[WeeChat plugin API reference] (Englisch).
 
 [[config_options]]
 === Konfiguration / Optionen

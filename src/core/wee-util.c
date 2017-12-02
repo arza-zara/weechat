@@ -24,6 +24,7 @@
 #endif
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <stdint.h>
 #include <errno.h>
 #include <string.h>
@@ -316,8 +317,9 @@ util_get_time_string (const time_t *date)
     local_time = localtime (date);
     if (local_time)
     {
-        strftime (text_time, sizeof (text_time),
-                  CONFIG_STRING(config_look_time_format), local_time);
+        if (strftime (text_time, sizeof (text_time),
+                      CONFIG_STRING(config_look_time_format), local_time) == 0)
+            text_time[0] = '\0';
     }
 
     return text_time;

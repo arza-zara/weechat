@@ -47,6 +47,16 @@ GNU/Linux では ".so"、Windows
 (WeeChat ソースコードに含まれています)。このファイルでは WeeChat
 と通信する際に使う構造体や型が定義されています。
 
+// TRANSLATION MISSING
+In order to call WeeChat functions in the format displayed in <<plugin_api>>,
+the following global pointer must be declared and initialized in the function
+<<_weechat_plugin_init,weechat_plugin_init>>:
+
+[source,C]
+----
+struct t_weechat_plugin *weechat_plugin;
+----
+
 [[macros]]
 === マクロ
 
@@ -89,7 +99,9 @@ int weechat_plugin_init (struct t_weechat_plugin *plugin,
 
 引数:
 
-* _plugin_: WeeChat プラグイン構造体へのポインタ
+// TRANSLATION MISSING
+* _plugin_: WeeChat プラグイン構造体へのポインタ, used to initialize the
+  convenience global pointer `weechat_plugin`
 * _argc_: プラグインに対する引数の数 (ユーザがコマンドラインで指定)
 * _argv_: プラグインに対する引数
 
@@ -424,7 +436,7 @@ const char *weechat_gettext (const char *string);
 
 戻り値:
 
-* 翻訳済み文字列
+* 翻訳済み文字列または _string_ (未翻訳の場合)
 
 C 言語での使用例:
 
@@ -466,7 +478,8 @@ const char *weechat_ngettext (const char *string, const char *plural,
 
 戻り値:
 
-* 翻訳済みの文字列
+* 翻訳済み文字列または _string_ / _plural_
+  (未翻訳の場合)
 
 C 言語での使用例:
 
@@ -988,8 +1001,8 @@ path = weechat.string_eval_path_home("%h/test", {}, {}, {})
 
 ==== string_remove_quotes
 
-文字列の最初と最後から引用符号を削除
-(最初の引用符号の前と最後の引用符号の後にある空白文字は無視)。
+文字列の最初と最後から引用符を削除
+(最初の引用符の前と最後の引用符の後にある空白文字は無視)。
 
 プロトタイプ:
 
@@ -1001,11 +1014,11 @@ char *weechat_string_remove_quotes (const char *string, const char *quotes);
 引数:
 
 * _string_: 文字列
-* _quotes_: 引用符号のリストを含む文字列
+* _quotes_: 引用符のリストを含む文字列
 
 戻り値:
 
-* 最初と最後から引用符号を削除した文字列
+* 最初と最後から引用符を削除した文字列
   (使用後には必ず "free" を呼び出して領域を開放してください)
 
 C 言語での使用例:
@@ -1961,7 +1974,7 @@ str3 = weechat.string_input_for_buffer("//test")  # "/test"
 
 ==== string_eval_expression
 
-_WeeChat バージョン 0.4.0 以上で利用可、バージョン 0.4.2、0.4.3、1.0、1.1、1.2、1.3、1.6、1.8 で更新。_
+_WeeChat バージョン 0.4.0 以上で利用可、バージョン 0.4.2、0.4.3、1.0、1.1、1.2、1.3、1.6、1.8、2.0 で更新。_
 
 式を評価して文字列として返す。`+${variable}+`
 という書式で書かれた特殊変数は展開されます (以下の表を参照)。
@@ -1982,7 +1995,8 @@ char *weechat_string_eval_expression (const char *expr,
 
 引数:
 
-* _expr_: 評価する式 (以下の表を参照)
+* _expr_: 評価する式
+  (<<eval_conditions,条件>>および<<eval_variables,変数>>を参照してください)
 * _pointers_: ポインタを含むハッシュテーブル (キーは文字列、値はポインタ);
   (現在のウィンドウやバッファへのポインタを持つ) ハッシュテーブルが "window" と
   "buffer" ポインタを持たない場合はこれらは自動的に追加される (NULL でも可):
@@ -2013,6 +2027,74 @@ char *weechat_string_eval_expression (const char *expr,
 
 * 評価された式 (使用後には必ず "free" を呼び出して領域を開放してください)、失敗した場合は
   NULL (式が不正な場合やメモリが不足している場合)
+
+C 言語での使用例:
+
+[source,C]
+----
+/* 条件式の評価 */
+struct t_hashtable *options1 = weechat_hashtable_new (8,
+                                                      WEECHAT_HASHTABLE_STRING,
+                                                      WEECHAT_HASHTABLE_STRING,
+                                                      NULL,
+                                                      NULL);
+weechat_hashtable_set (options1, "type", "condition");
+char *str1 = weechat_string_eval_expression ("${window.win_width} > 100", NULL, NULL, options1);  /* "1" */
+char *str2 = weechat_string_eval_expression ("abc =~ def", NULL, NULL, options1);                 /* "0" */
+
+/* 単純な展開 */
+char *str3 = weechat_string_eval_expression ("${buffer.full_name}", NULL, NULL, NULL);  /* "core.weechat" */
+
+/* 正規表現を用いた置換 */
+struct t_hashtable *options2 = weechat_hashtable_new (8,
+                                                      WEECHAT_HASHTABLE_STRING,
+                                                      WEECHAT_HASHTABLE_STRING,
+                                                      NULL,
+                                                      NULL);
+/* URL に関するブラックリストを追加 */
+weechat_hashtable_set (options2, "regex", "\\w+://\\S+");
+weechat_hashtable_set (options2, "regex_replace", "[ ${re:0} ]");
+char *str4 = weechat_string_eval_expression ("test: https://weechat.org", NULL, NULL, NULL);  /* "test: [ https://weechat.org ]" */
+
+/* パスワードを隠す */
+weechat_hashtable_set (options2, "regex", "(password=)(\\S+)");
+weechat_hashtable_set (options2, "regex_replace", "${re:1}${hide:*,${re:2}}");
+char *str5 = weechat_string_eval_expression ("password=abc password=def", NULL, NULL, NULL);  /* "password=*** password=***" */
+----
+
+スクリプト (Python) での使用例:
+
+[source,python]
+----
+# プロトタイプ
+str = weechat.string_eval_expression(expr, pointers, extra_vars, options)
+
+# 例
+
+# 条件式の評価
+str1 = weechat.string_eval_expression("${window.win_width} > 100", {}, {}, {"type": "condition"})  # "1"
+str2 = weechat.string_eval_expression("abc =~ def", {}, {}, {"type": "condition"})                 # "0"
+
+# 単純な展開
+str3 = weechat.string_eval_expression("${buffer.full_name}", {}, {}, {}) # "core.weechat"
+
+# 正規表現を用いた置換: URL に関するブラックリストを追加
+options = {
+    "regex": "\\w+://\\S+",
+    "regex_replace": "[ ${re:0} ]",
+}
+str4 = weechat.string_eval_expression("test: https://weechat.org", {}, {}, options)  # "test: [ https://weechat.org ]"
+
+# 正規表現を用いた置換: パスワードを隠す
+options = {
+    "regex": "(password=)(\\S+)",
+    "regex_replace": "${re:1}${hide:*,${re:2}}",
+}
+str5 = weechat.string_eval_expression("password=abc password=def", {}, {}, options)  # "password=*** password=***"
+----
+
+[[eval_conditions]]
+===== 条件
 
 条件に使える論理演算子のリスト
 (上から優先順位の高い順):
@@ -2132,6 +2214,20 @@ char *weechat_string_eval_expression (const char *expr,
   `+1+`
 |===
 
+浮動小数点数として比較される数値表現の書式は以下です:
+
+* 整数 (例: 5、-7)
+* 浮動小数点数 (例: 5.2、-7.5、2.83e-2) (_WeeChat バージョン 2.0 以上で利用可_)
+* 16 進数 (例: 0xA3、-0xA3) (_WeeChat バージョン 2.0 以上で利用可_)
+
+数値表現を二重引用符で括ることで、文字列として比較されます。例:
+
+* `50 > 100` は 0 を返します (数値として比較)
+* `"50" > "100"` は 1 を返します (文字列として比較)
+
+[[eval_variables]]
+===== 変数
+
 式中で展開される変数のリスト
 (優先度の高い順、展開順の早いものを上に遅いものを下に):
 
@@ -2221,7 +2317,7 @@ char *weechat_string_eval_expression (const char *expr,
   WeeChat またはプラグインのインフォ、<<_info_get,info_get>>
   を参照 |
   `+${info:version}+` +
-  `+${info:irc_nick_color_name,foo}+` |
+  `+${info:nick_color_name,foo}+` |
   `+1.0+` +
   `+lightblue+`
 
@@ -2276,71 +2372,6 @@ char *weechat_string_eval_expression (const char *expr,
   `+1+`
 |===
 
-C 言語での使用例:
-
-[source,C]
-----
-/* 条件式の評価 */
-struct t_hashtable *options1 = weechat_hashtable_new (8,
-                                                      WEECHAT_HASHTABLE_STRING,
-                                                      WEECHAT_HASHTABLE_STRING,
-                                                      NULL,
-                                                      NULL);
-weechat_hashtable_set (options1, "type", "condition");
-char *str1 = weechat_string_eval_expression ("${window.win_width} > 100", NULL, NULL, options1);  /* "1" */
-char *str2 = weechat_string_eval_expression ("abc =~ def", NULL, NULL, options1);                 /* "0" */
-
-/* 単純な展開 */
-char *str3 = weechat_string_eval_expression ("${buffer.full_name}", NULL, NULL, NULL);  /* "core.weechat" */
-
-/* 正規表現を用いた置換 */
-struct t_hashtable *options2 = weechat_hashtable_new (8,
-                                                      WEECHAT_HASHTABLE_STRING,
-                                                      WEECHAT_HASHTABLE_STRING,
-                                                      NULL,
-                                                      NULL);
-/* URL に関するブラックリストを追加 */
-weechat_hashtable_set (options2, "regex", "\\w+://\\S+");
-weechat_hashtable_set (options2, "regex_replace", "[ ${re:0} ]");
-char *str4 = weechat_string_eval_expression ("test: https://weechat.org", NULL, NULL, NULL);  /* "test: [ https://weechat.org ]" */
-
-/* パスワードを隠す */
-weechat_hashtable_set (options2, "regex", "(password=)(\\S+)");
-weechat_hashtable_set (options2, "regex_replace", "${re:1}${hide:*,${re:2}}");
-char *str5 = weechat_string_eval_expression ("password=abc password=def", NULL, NULL, NULL);  /* "password=*** password=***" */
-----
-
-スクリプト (Python) での使用例:
-
-[source,python]
-----
-# プロトタイプ
-str = weechat.string_eval_expression(expr, pointers, extra_vars, options)
-
-# 例
-
-# 条件式の評価
-str1 = weechat.string_eval_expression("${window.win_width} > 100", {}, {}, {"type": "condition"})  # "1"
-str2 = weechat.string_eval_expression("abc =~ def", {}, {}, {"type": "condition"})                 # "0"
-
-# 単純な展開
-str3 = weechat.string_eval_expression("${buffer.full_name}", {}, {}, {}) # "core.weechat"
-
-# 正規表現を用いた置換: URL に関するブラックリストを追加
-options = {
-    "regex": "\\w+://\\S+",
-    "regex_replace": "[ ${re:0} ]",
-}
-str4 = weechat.string_eval_expression("test: https://weechat.org", {}, {}, options)  # "test: [ https://weechat.org ]"
-
-# 正規表現を用いた置換: パスワードを隠す
-options = {
-    "regex": "(password=)(\\S+)",
-    "regex_replace": "${re:1}${hide:*,${re:2}}",
-}
-str5 = weechat.string_eval_expression("password=abc password=def", {}, {}, options)  # "password=*** password=***"
-----
-
 ==== string_dyn_alloc
 
 _WeeChat バージョン 1.8 以上で利用可_
@@ -2355,7 +2386,7 @@ _WeeChat バージョン 1.8 以上で利用可_
 
 [source,C]
 ----
-char **weechat_dyn_alloc (int size_alloc);
+char **weechat_string_dyn_alloc (int size_alloc);
 ----
 
 引数:
@@ -2370,7 +2401,7 @@ C 言語での使用例:
 
 [source,C]
 ----
-char **string = weechat_dyn_alloc (256);
+char **string = weechat_string_dyn_alloc (256);
 ----
 
 [NOTE]
@@ -2389,7 +2420,7 @@ _WeeChat バージョン 1.8 以上で利用可_
 
 [source,C]
 ----
-int weechat_dyn_copy (char **string, const char *new_string);
+int weechat_string_dyn_copy (char **string, const char *new_string);
 ----
 
 引数:
@@ -2405,8 +2436,8 @@ C 言語での使用例:
 
 [source,C]
 ----
-char **string = weechat_dyn_alloc (256);
-if (weechat_dyn_copy (string, "test"))
+char **string = weechat_string_dyn_alloc (256);
+if (weechat_string_dyn_copy (string, "test"))
 {
     /* 成功 */
 }
@@ -2432,7 +2463,7 @@ _WeeChat バージョン 1.8 以上で利用可_
 
 [source,C]
 ----
-int weechat_dyn_concat (char **string, const char *add);
+int weechat_string_dyn_concat (char **string, const char *add);
 ----
 
 引数:
@@ -2448,10 +2479,10 @@ C 言語での使用例:
 
 [source,C]
 ----
-char **string = weechat_dyn_alloc (256);
-if (weechat_dyn_copy (string, "test"))
+char **string = weechat_string_dyn_alloc (256);
+if (weechat_string_dyn_copy (string, "test"))
 {
-    if (weechat_dyn_concat (string, "abc"))
+    if (weechat_string_dyn_concat (string, "abc"))
     {
         /* ... */
     }
@@ -2471,7 +2502,7 @@ _WeeChat バージョン 1.8 以上で利用可_
 
 [source,C]
 ----
-char *weechat_dyn_free (char **string, int free_string);
+char *weechat_string_dyn_free (char **string, int free_string);
 ----
 
 引数:
@@ -2488,8 +2519,8 @@ C 言語での使用例:
 
 [source,C]
 ----
-char **string = weechat_dyn_alloc (256);
-if (weechat_dyn_concat (string, "test"))
+char **string = weechat_string_dyn_alloc (256);
+if (weechat_string_dyn_concat (string, "test"))
 {
     /* 成功 */
 }
@@ -2498,7 +2529,7 @@ else
     /* 失敗 */
 }
 /* ... */
-weechat_dyn_free (string, 1);
+weechat_string_dyn_free (string, 1);
 ----
 
 [NOTE]
@@ -5579,9 +5610,11 @@ option5 = weechat.config_new_option(config_file, section, "option5", "color",
 ----
 
 [NOTE]
-Ruby では、3 組のコールバックとデータ (合わせて 6 つの文字列) を渡すために必ず 6 つの文字列をからなる配列を
-1 つ渡してください (これは Ruby が 関数に 15 個以上の引数を渡せないことが原因です)、より詳しい内容は
-_WeeChat スクリプト作成ガイド_ を参照してください _(WeeChat バージョン 0.4.1 で修正済み)_。
+Ruby では、3 組のコールバックとデータ (6 つの文字列変数) を渡す際に必ず 6 つの文字列変数の配列を
+1 つ渡してください (これは Ruby が関数に 15 個以上の引数を渡せないことが原因です)、より詳しい内容は
+link:++weechat_scripting.ja.html#_ruby++[WeeChat スクリプト作成ガイド]を参照してください
+_(WeeChat バージョン 0.4.1 で修正済み)_。
+
 
 ==== config_search_option
 
@@ -7369,7 +7402,7 @@ weechat.key_bind("mouse", keys)
 
 ==== key_unbind
 
-_WeeChat バージョン 0.3.6 以上で利用可。_
+_WeeChat バージョン 0.3.6 以上で利用可、バージョン 2.0 で更新。_
 
 キー割り当てを削除。
 
@@ -7387,7 +7420,9 @@ int weechat_key_unbind (const char *context, const char *key);
 
 * _context_: キーのコンテキスト (<<_key_bind,key_bind>> を参照)
 * _key_: 削除するキーまたは特殊値 "area:XXX" で1 番目または 2
-  番目の領域から _XXX_ をもつすべてのキーを削除する
+  番目の領域から _XXX_ をもつすべてのキーを削除しますが、
+  キーの先頭に "quiet:" を付けた場合には、削除されたキーを _core_
+  バッファに表示しません (_WeeChat バージョン 2.0 以上で利用可_)。
 
 戻り値:
 
@@ -7647,8 +7682,8 @@ void weechat_printf_date_tags (struct t_gui_buffer *buffer, time_t date,
 * _tags_: タグのコンマ区切りリスト (タグを指定しない場合は NULL)
 * _message_: 表示するメッセージ
 
-WeeChat で共通に使われるタグのリストは _WeeChat ユーザーズガイド_
-の行のタグに関する章をご覧ください
+WeeChat で共通に使われるタグのリストは
+link:weechat_user.ja.html#lines_tags[WeeChat ユーザーズガイド / 行のタグ]を参照してください
 
 C 言語での使用例:
 
@@ -7813,7 +7848,7 @@ struct t_hook *weechat_hook_command (const char *command,
 * _description_: コマンドの説明 (`/help command` で表示されます)
 * _args_: コマンドの引数 (`/help command` で表示されます)
 * _args_description_: 引数の説明 (`/help command` で表示されます)
-* _completion_: コマンドに対する補完候補テンプレート (書式は以下をご覧ください)
+* _completion_: コマンドに対する補完候補テンプレート (書式は以下を参照してください)
 * _callback_: コマンドが使用された際に呼び出すコールバック関数、引数と戻り値:
 ** _const void *pointer_: ポインタ
 ** _void *data_: ポインタ
@@ -8279,7 +8314,7 @@ hook = weechat.hook_timer(20 * 1000, 0, 0, "my_timer_cb", "")
 
 ==== hook_fd
 
-_WeeChat バージョン 1.3 と 1.5 で更新。_
+_WeeChat バージョン 1.3、1.5、2.0 で更新。_
 
 ファイルディスクリプタ (ファイルやソケット) をフック。
 
@@ -8321,6 +8356,12 @@ struct t_hook *weechat_hook_fd (int fd,
 戻り値:
 
 * 新しいフックへのポインタ、エラーが起きた場合は NULL
+
+[IMPORTANT]
+スクリプトにおけるコールバック引数 _fd_  は
+WeeChat バージョン 2.0 以上では整数、バージョン 1.9 以下では文字列です。 +
+すべてのバージョンで互換性を保つには、使用前にコールバック引数 _fd_
+を整数へ変換することを推奨します (Python の場合 `int(fd)` のように変換してください)。
 
 C 言語での使用例:
 
@@ -8365,7 +8406,7 @@ _WeeChat バージョン 1.5 で更新。_
 WeeChat バージョン 0.3.9.2
 以上の場合、コマンドを実行するためにシェルを使わないようになりました。WeeChat
 が自動的にコマンドと引数を分割します (シェルがやっているように)。 +
-分割 (クォートに基づくコマンド分割)
+分割 (引用符に基づくコマンド分割)
 に失敗する場合、またはシェルを使いたい場合は、ハッシュテーブル _options_
 に引数を入れて <<_hook_process_hashtable,hook_process_hashtable>>
 関数を使ってください _(WeeChat バージョン 0.4.0 以上で利用可)_。
@@ -8614,13 +8655,14 @@ struct t_hook *weechat_hook_process_hashtable (const char *command,
 一般的なコマンド (最初に "url:" が付かないコマンド)
 では、以下のオプションを使うことができます:
 
-[width="100%",cols="^1,1,3",options="header"]
+[width="100%",cols="^1,1,1,4",options="header"]
 |===
-| オプション | 値 | 説明
+| オプション | 値 | デフォルト | 説明
 
 | argN (N は 1 以上) +
   _(WeeChat バージョン 0.4.0 以上で利用可)_ |
   任意の文字列 |
+  引数なし |
   コマンドの引数;
   このオプションを使って引数を渡さない場合、シェルと同じように引数を自動的に分割します
   (_command_ 引数からコマンド引数をロードします)
@@ -8628,18 +8670,22 @@ struct t_hook *weechat_hook_process_hashtable (const char *command,
 | stdin +
   _(WeeChat バージョン 0.4.3 以上で利用可)_ |
   (非使用) |
+  標準出力を使用しない |
   データを書き込むためのパイプを子プロセスの標準入力 (stdin)
   に作成します (関数 <<_hook_set,hook_set>> を参照)
 
 | buffer_flush +
   _(WeeChat バージョン 1.0 以上で利用可)_ |
   バイト数 |
-  標準出力および標準エラー出力をフラッシュ (出力をコールバックに送信) するバイト数の最小値、
-  1 から 65536 (デフォルト) まで; 1 = すべての出力をすぐにコールバックに送信
+  65536 |
+  標準出力および標準エラー出力をフラッシュ (出力をコールバックヘ送信)
+  するバイト数の最小値。取りうる値の範囲は 1 から 65536 までです。1
+  の場合、出力をすぐにコールバックへ送信します。
 
 | detached +
   _(WeeChat バージョン 1.0 以上で利用可)_ |
   (非使用) |
+  detached モードで実行しない |
   detached モードでプロセスを実行: 標準出力と標準エラー出力を
   _/dev/null_ にリダイレクトする
 |===
@@ -8790,7 +8836,7 @@ hook3 = weechat.hook_process_hashtable("sh",
 
 ==== hook_connect
 
-_WeeChat バージョン 1.5 で更新。_
+_WeeChat バージョン 1.5 と 2.0 で更新。_
 
 接続をフックする (リモートホストへのバックグラウンド接続)。
 
@@ -8872,6 +8918,12 @@ struct t_hook *weechat_hook_connect (const char *proxy,
 戻り値:
 
 * 新しいフックへのポインタ、エラーが起きた場合は NULL
+
+[IMPORTANT]
+スクリプトにおけるコールバック引数 _status_、_gnutls_rc_、_sock_  は
+WeeChat バージョン 2.0 以上では整数、バージョン 1.9 以下では文字列です。 +
+すべてのバージョンで互換性を保つには、使用前にコールバック引数 _status_、_gnutls_rc_、_sock_
+を整数へ変換することを推奨します (Python の場合 `int(sock)` のように変換してください)。
 
 C 言語での使用例:
 
@@ -9032,10 +9084,10 @@ struct t_hook *weechat_hook_print (struct t_gui_buffer *buffer,
 * 新しいフックへのポインタ、エラーが起きた場合は NULL
 
 [IMPORTANT]
-WeeChat バージョン 1.0 以上では、スクリプトのコールバック引数 _displayed_
-と _highlight_ は整数です (WeeChat バージョン 0.4.3 以下では文字列でした)。 +
-すべてのバージョンで互換性を持たせるためには、引数を使う前に整数に変換することをお勧めします、Python
-を使った例: `if int(highlight):`。
+スクリプトにおけるコールバック引数 _displayed_、_highlight_ は
+WeeChat バージョン 1.0 以上では整数、バージョン 0.4.3 以下では文字列です。 +
+すべてのバージョンで互換性を保つには、使用前にコールバック引数 _displayed_、_highlight_
+を整数へ変換することを推奨します (Python の場合 `if int(highlight):` のように変換してください)。
 
 C 言語での使用例:
 
@@ -9267,22 +9319,22 @@ WeeChat とプラグインが送信するシグナルのリスト:
 | javascript | javascript_script_loaded +
   _(WeeChat バージョン 1.2 以上で利用可)_ |
   String: スクリプトへのパス |
-  Javascript スクリプトをロード
+  JavaScript スクリプトをロード
 
 | javascript | javascript_script_unloaded +
   _(WeeChat バージョン 1.2 以上で利用可)_ |
   String: スクリプトへのパス |
-  Javascript スクリプトをリロード
+  JavaScript スクリプトをリロード
 
 | javascript | javascript_script_installed +
   _(WeeChat バージョン 1.2 以上で利用可)_ |
   String: インストールされたスクリプトへのパスのコンマ区切りリスト |
-  Javascript スクリプトをインストール
+  JavaScript スクリプトをインストール
 
 | javascript | javascript_script_removed +
   _(WeeChat バージョン 1.2 以上で利用可)_ |
   String: 削除されたスクリプトへのパスのコンマ区切りリスト |
-  Javascript スクリプトを削除
+  JavaScript スクリプトを削除
 
 | logger | logger_start |
   Pointer: バッファ |
@@ -9335,6 +9387,26 @@ WeeChat とプラグインが送信するシグナルのリスト:
   _(WeeChat バージョン 0.3.9 以上で利用可)_ |
   String: 削除されたスクリプトへのパスのコンマ区切りリスト |
   Perl スクリプトを削除
+
+| php | php_script_loaded +
+  _(WeeChat バージョン 2.0 以上で利用可)_ |
+  String: スクリプトへのパス |
+  PHP スクリプトをロード
+
+| php | php_script_unloaded +
+  _(WeeChat バージョン 2.0 以上で利用可)_ |
+  String: スクリプトへのパス |
+  PHP スクリプトをリロード
+
+| php | php_script_installed +
+  _(WeeChat バージョン 2.0 以上で利用可)_ |
+  String: インストールされたスクリプトへのパスのコンマ区切りリスト |
+  PHP スクリプトをインストール
+
+| php | php_script_removed +
+  _(WeeChat バージョン 2.0 以上で利用可)_ |
+  String: 削除されたスクリプトへのパスのコンマ区切りリスト |
+  PHP スクリプトを削除
 
 | python | python_script_loaded +
   _(WeeChat バージョン 0.3.9 以上で利用可)_ |
@@ -9441,6 +9513,16 @@ WeeChat とプラグインが送信するシグナルのリスト:
 | weechat | buffer_cleared |
   Pointer: バッファ |
   バッファをクリア
+
+| weechat | buffer_filters_enabled +
+  _(WeeChat バージョン 2.0 以上で利用可)_ |
+  Pointer: バッファ |
+  バッファでフィルタが有効化されています。
+
+| weechat | buffer_filters_disabled +
+  _(WeeChat バージョン 2.0 以上で利用可)_ |
+  Pointer: バッファ |
+  バッファでフィルタが無効化されています。
 
 | weechat | buffer_hidden |
   Pointer: バッファ |
@@ -9881,6 +9963,7 @@ weechat.hook_signal_send("logger_backlog", weechat.WEECHAT_HOOK_SIGNAL_POINTER, 
 * _tcl_script_install_
 * _guile_script_install_
 * _javascript_script_install_
+* _php_script_install_
 
 シグナルを受け取ったらコールバックは以下のように働きます:
 
@@ -9923,6 +10006,7 @@ weechat.hook_signal_send("python_script_install", WEECHAT_HOOK_SIGNAL_STRING,
 * _tcl_script_remove_
 * _guile_script_remove_
 * _javascript_script_remove_
+* _php_script_remove_
 
 リスト文字列に含まれるそれぞれのスクリプトについて、コールバックはスクリプトをリロードして削除します。
 
@@ -11778,6 +11862,7 @@ int weechat_buffer_get_integer (struct t_gui_buffer *buffer,
 ** _input_: 入力可能な場合は 1、そうでない場合は 0
 ** _input_get_unknown_commands_: 未定義のコマンドを入力コールバックに送信する場合は
    1、そうでない場合は 0
+** _input_get_empty_: 入力コールバックに何も送信されなかった場合は 1、そうでない場合は 0
 ** _input_size_: 入力サイズ (バイト単位)
 ** _input_length_: 入力長 (文字数)
 ** _input_pos_: バッファ入力におけるカーソル位置
@@ -12073,6 +12158,9 @@ void weechat_buffer_set (struct t_gui_buffer *buffer, const char *property,
   指定したバッファに対する未定義のコマンドを無効にする場合は "0"
   (デフォルト)、未定義のコマンドを受け入れる場合は "1"、例えばユーザが "/unknowncmd"
   を入力した場合、バッファはこれを受け入れる (未定義のコマンドに対するエラーを出さない)
+
+| input_get_empty | "0" または "1" |
+  バッファに対する空入力を受け取らない場合は "0" (デフォルト)、空入力を受け取る場合は "1"
 
 | localvar_set_xxx | 任意の文字列 |
   ローカル変数 _xxx_ の新しい値を設定
@@ -13609,7 +13697,8 @@ struct t_gui_bar *weechat_bar_new (const char *name,
 ** _active_: アクティブウィンドウのみに表示されているバー
 ** _inactive_: 非アクティブウィンドウのみに表示されているバー
 ** _nicklist_: ニックネームリストを持つウィンドウに表示されているバー
-** 評価された式: _WeeChat ユーザーズガイド_ のバーに関する章を参照
+** 評価された式:
+   link:weechat_user.ja.html#bar_conditions[WeeChat ユーザーズガイド / バー状態]を参照してください
 * _position_: _top_、_bottom_、_left_、_right_
 * _filling_top_bottom_:
 ** _horizontal_: 要素は水平方向に詰め込まれている (各要素の後に間隔)
@@ -14054,8 +14143,9 @@ if (hashtable_in)
 ----
 
 [NOTE]
-"irc_message_parse" の出力に関するより詳しい内容を得るには
-_WeeChat スクリプト作成ガイド_ をご覧ください。
+"irc_message_parse" の出力に関するより詳しい情報は
+link:weechat_scripting.ja.html#irc_message_parse[WeeChat スクリプト作成ガイド / メッセージの構文解析]を参照してください。
+
 
 スクリプト (Python) での使用例:
 
@@ -15658,8 +15748,8 @@ void *weechat_hdata_search (struct t_hdata *hdata, void *pointer, const char *se
 * _hdata_: hdata へのポインタ
 * _pointer_: WeeChat および plugin オブジェクトへのポインタ
 * _search_: 評価する式、式中のデフォルトポインタは hdata の名前
-  (デフォルトポインタはリストに含まれる各要素で置換される); 式に関する詳細は
-  _WeeChat ユーザーズガイド_ のコマンド `/eval` を参照
+  (デフォルトポインタはリストに含まれる各要素で置換されます); 式に関する詳細は
+  link:weechat_user.ja.html#command_weechat_eval[WeeChat ユーザーズガイド / WeeChat コマンド / eval] を参照してください
 * _move_: 検索に失敗した後に移動を実行する回数
   (負および正の整数、ゼロは禁止)
 

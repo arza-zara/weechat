@@ -18,7 +18,7 @@
  */
 
 #ifndef WEECHAT_GUI_BUFFER_H
-#define WEECHAT_GUI_BUFFER_H 1
+#define WEECHAT_GUI_BUFFER_H
 
 #include <limits.h>
 #include <regex.h>
@@ -155,6 +155,8 @@ struct t_gui_buffer
     void *input_callback_data;         /* data for callback                 */
                                        /* to this buffer                    */
     int input_get_unknown_commands;    /* 1 if unknown commands are sent to */
+                                       /* input_callback                    */
+    int input_get_empty;               /* 1 if empty input is sent to       */
                                        /* input_callback                    */
     char *input_buffer;                /* input buffer                      */
     int input_buffer_alloc;            /* input buffer: allocated size      */

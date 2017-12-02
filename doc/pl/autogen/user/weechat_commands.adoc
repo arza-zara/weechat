@@ -81,7 +81,7 @@ Przykłady:
          close [<n1>[-<n2>]|<nazwa>]
          notify <poziom>
          localvar
-         set <opcja> <wartość>
+         set <opcja> [<wartość>]
          get <opcja>
          <numer>|-|+|<nazwa>
 
@@ -278,7 +278,10 @@ wyrażenie: wyrażenie do przetworzenia, zmienne o formacie ${zmienna} są zast�
                 !*  NIE pasuje do maski (dzika karta "*" dozwolona)
 
 Wyrażenie jest uznawane za "prawdziwe" jeśli nie jest NULL, nie jest puste, oraz różni się od "0".
-Porównania dokonuje się z użyciem liczb całkowitych jeśli oba wyrażenia są liczbami całkowitymi.
+Porównania dokonuje się z użyciem liczb całkowitych jeśli oba wyrażenia są liczbami całkowitymi, w jednym z następujących formatów:
+  - liczby załkowite (przykłady: 5, -7)
+  - liczby zmiennoprzecinkowe (przykłady: 5.2, -7.5, 2.83e-2)
+  - liczby szestnastkowe (przykłady: 0xA3, -0xA3)
 W celu wymuszenia porównywania ciągów, należy umieścić każde wyrażenie w cudzysłowie, na przykład:
   50 > 100      ==> 0
   "50" > "100"  ==> 1
@@ -814,7 +817,7 @@ Przykłady:
       diff [<opcja> [<opcja>...]]
       env [<zmienna> [<wartość>]]
 
-opcja: nazwa opcji (może zawierać wildcard"*")
+opcja: nazwa opcji (może zawierać wildcard "*" jeśli nie podano żadnej wartości)
  wartość: nowa wartość opcji, zgodnie z typem:
           boolean: on, off lub toggle
           integer: numer, ++numer lub --numer

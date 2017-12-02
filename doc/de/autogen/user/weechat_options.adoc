@@ -951,7 +951,7 @@
 ** Standardwert: `+10+`
 
 * [[option_weechat.look.paste_max_lines]] *weechat.look.paste_max_lines*
-** Beschreibung: pass:none[maximale Anzahl an Zeilen die eingefügt werden dürfen, ohne dass der Anwender gefragt wird (-1 = schaltet diese Funktion ab)]
+** Beschreibung: pass:none[maximale Anzahl an Zeilen die, ohne Rückfrage, eingefügt werden sollen (-1 = deaktiviert die Funktion); diese Option wird nur genutzt wenn das Bar-Item "input_paste" in mindestens einer Bar genutzt wird (Standardmäßig wird es in der "input" Bar verwendet)]
 ** Typ: integer
 ** Werte: -1 .. 2147483647
 ** Standardwert: `+1+`
@@ -1093,6 +1093,12 @@
 ** Typ: boolesch
 ** Werte: on, off
 ** Standardwert: `+on+`
+
+* [[option_weechat.look.save_config_with_fsync]] *weechat.look.save_config_with_fsync*
+** Beschreibung: pass:none[es wird fsync verwendet um die Konfigurationsdateien mit dem Datenträger zu synchronisieren (siehe man fsync); dies verlangsamt das Sichern der Daten, soll aber zum Beispiel bei einem Stromausfall dafür sorgen, dass keine Daten verloren gehen]
+** Typ: boolesch
+** Werte: on, off
+** Standardwert: `+off+`
 
 * [[option_weechat.look.save_layout_on_exit]] *weechat.look.save_layout_on_exit*
 ** Beschreibung: pass:none[beim Beenden wird das aktuelle Layout gesichert (Buffer, Fenster oder beides)]

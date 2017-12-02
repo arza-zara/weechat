@@ -452,9 +452,10 @@ irc_ctcp_replace_variables (struct t_irc_server *server, const char *format)
     now = time (NULL);
     local_time = localtime (&now);
     setlocale (LC_ALL, "C");
-    strftime (buf, sizeof (buf),
-              weechat_config_string (irc_config_look_ctcp_time_format),
-              local_time);
+    if (strftime (buf, sizeof (buf),
+                  weechat_config_string (irc_config_look_ctcp_time_format),
+                  local_time) == 0)
+        buf[0] = '\0';
     setlocale (LC_ALL, "");
     temp = weechat_string_replace (res, "$time", buf);
     free (res);
@@ -1081,8 +1082,21 @@ irc_ctcp_recv (struct t_irc_server *server, time_t date, const char *command,
                                       address, arguments + 1, pos_args, reply);
             if (!reply || reply[0])
             {
-                irc_ctcp_reply_to_nick (server, command, channel, nick,
-                                        arguments + 1, pos_args);
+                if (reply)
+                {
+                    decoded_reply = irc_ctcp_replace_variables (server, reply);
+                    if (decoded_reply)
+                    {
+                        irc_ctcp_reply_to_nick (server, command, channel, nick,
+                                                arguments + 1, decoded_reply);
+                        free (decoded_reply);
+                    }
+                }
+                else
+                {
+                    irc_ctcp_reply_to_nick (server, command, channel, nick,
+                                            arguments + 1, pos_args);
+                }
             }
         }
         /* CTCP DCC */

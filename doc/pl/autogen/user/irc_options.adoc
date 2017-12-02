@@ -309,7 +309,7 @@
 ** domyślna wartość: `+auto+`
 
 * [[option_irc.look.notice_welcome_redirect]] *irc.look.notice_welcome_redirect*
-** opis: pass:none[automatyczne przekierowanie powiadomień powitalnych do bufora kanału; takie powiadomienia mają nick jako cel i nazwę kanału na początku wiadomości, na przykład powiadomienia wysyłane przez serwer freenode wyglądają następująco: "[#kanał\] Witaj na tym kanale..."]
+** opis: pass:none[automatyczne przekierowanie powiadomień powitalnych do bufora kanału; takie powiadomienia mają nick jako cel i nazwę kanału na początku wiadomości, na przykład powiadomienia ENTRYMSG wysyłane przez Atheme IRC Services wyglądają następująco: "[#kanał\] Witaj na tym kanale..."]
 ** typ: bool
 ** wartości: on, off
 ** domyślna wartość: `+on+`

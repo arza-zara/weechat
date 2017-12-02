@@ -9,31 +9,35 @@ dist: trusty
 
 env:
     - BUILDTOOL="cmake" BUILDARGS=""
-    - BUILDTOOL="cmake" BUILDARGS="-DENABLE_PYTHON3=ON"
+    # - BUILDTOOL="cmake" BUILDARGS="-DENABLE_PYTHON3=ON"
     - BUILDTOOL="cmake" BUILDARGS="-DENABLE_GNUTLS=OFF"
     - BUILDTOOL="autotools" BUILDARGS=""
-    - BUILDTOOL="autotools" BUILDARGS="--enable-python3"
+    # - BUILDTOOL="autotools" BUILDARGS="--enable-python3"
     - BUILDTOOL="autotools" BUILDARGS="--disable-gnutls"
 
 before_script:
-    # Workaround travis-ci/travis-ci#5326
+    # Workaround https://github.com/travis-ci/travis-ci/issues/5326
     - export PATH=$(echo $PATH | tr ':' "\n" | sed '/\/opt\/python/d' | tr "\n" ":" | sed "s|::|:|g")
     - echo 'APT::Install-Recommends "false";' | sudo tee -a /etc/apt/apt.conf
+    - sudo add-apt-repository -y ppa:ondrej/php
     - sudo apt-get update -qq
-    - sudo apt-get -y install devscripts equivs python-pip libenchant-dev autopoint cmake pkg-config libncursesw5-dev gem2deb libperl-dev python-dev python3-dev libaspell-dev liblua5.1-0-dev tcl8.5-dev guile-2.0-dev libv8-dev libcurl4-gnutls-dev libgcrypt11-dev libgnutls-dev zlib1g-dev curl libcpputest-dev
+    - sudo apt-get -y install devscripts equivs python-pip libenchant-dev autopoint cmake pkg-config libncursesw5-dev gem2deb libperl-dev python-dev python3-dev libaspell-dev liblua5.1-0-dev tcl8.5-dev guile-2.0-dev libv8-dev libcurl4-gnutls-dev libgcrypt11-dev libgnutls-dev zlib1g-dev curl libcpputest-dev php7.0-dev libphp7.0-embed
     - sudo gem install asciidoctor
     - sudo pip install msgcheck pylint
+    - phpenv local system
 
 script:
     - ./tools/build-test.sh
     - msgcheck po/*.po
     - pylint --version
     - pylint doc/docgen.py
+    - pylint tests/scripts/python/testapigen.py
+    - pylint tests/scripts/python/testapi.py
+    - pylint tests/scripts/python/unparse.py
 
 after_success:
     - weechat --help
     - weechat-curses --help
-    - weechat -r "/debug libs;/quit"
 
 matrix:
     fast_finish: true

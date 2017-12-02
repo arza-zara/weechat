@@ -18,6 +18,8 @@ Linie z buforami są wyświetlane za pomocą przetwarzania ciągów (zobacz /hel
   - buflist.format.buffer_current: format format dla obecnego buforu
 
 Następujące zmienne mogą być użyte w powyższych opcjach:
+  - dane elementu paska (pełną listę można znaleźć w dokumentacji API dla hdata "bar_item"), na przykład:
+    - ${bar_item.name}
   - dane buforu (zobacz hdata "buffer" w dokumentacji API dla pełnej listy zmiennych), na przykład:
     - ${buffer.number}
     - ${buffer.name}

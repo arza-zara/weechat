@@ -81,7 +81,7 @@ Examples:
          close [<n1>[-<n2>]|<name>]
          notify <level>
          localvar
-         set <property> <value>
+         set <property> [<value>]
          get <property>
          <number>|-|+|<name>
 
@@ -278,8 +278,11 @@ expression: expression to evaluate, variables with format ${variable} are replac
                 !*  is NOT matching mask (wildcard "*" is allowed)
 
 An expression is considered as "true" if it is not NULL, not empty, and different from "0".
-The comparison is made using integers if the two expressions are valid integers.
-To force a string comparison, add double quotes around each expression, for example:
+The comparison is made using floating point numbers if the two expressions are valid numbers, with one of the following formats:
+  - integer (examples: 5, -7)
+  - floating point number (examples: 5.2, -7.5, 2.83e-2)
+  - hexadecimal number (examples: 0xA3, -0xA3)
+To force a string comparison, you can add double quotes around each expression, for example:
   50 > 100      ==> 0
   "50" > "100"  ==> 1
 
@@ -518,7 +521,7 @@ When binding a command to a key, it is recommended to use key alt+k (or Esc then
 For context "mouse" (possible in context "cursor" too), key has format: "@area:key" or "@area1>area2:key" where area can be:
           *: any area on screen
        chat: chat area (any buffer)
-  chat(xxx): char area for buffer with name "xxx" (full name including plugin)
+  chat(xxx): chat area for buffer with name "xxx" (full name including plugin)
      bar(*): any bar
    bar(xxx): bar "xxx"
     item(*): any bar item
@@ -814,7 +817,7 @@ Examples:
       diff [<option> [<option>...]]
       env [<variable> [<value>]]
 
-option: name of an option (wildcard "*" is allowed)
+option: name of an option (wildcard "*" is allowed to list options, if no value is specified)
  value: new value for option, according to type:
           boolean: on, off or toggle
           integer: number, ++number or --number

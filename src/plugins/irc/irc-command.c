@@ -1526,8 +1526,8 @@ IRC_COMMAND_CALLBACK(ctcp)
     {
         /* generate argument for PING if not provided */
         gettimeofday (&tv, NULL);
-        snprintf (str_time, sizeof (str_time), "%ld %ld",
-                  (long)tv.tv_sec, (long)tv.tv_usec);
+        snprintf (str_time, sizeof (str_time), "%lld %ld",
+                  (long long)tv.tv_sec, (long)tv.tv_usec);
         ctcp_args = str_time;
     }
     else
@@ -2544,7 +2544,8 @@ irc_command_join_server (struct t_irc_server *server, const char *arguments,
                     }
                 }
                 if (manual_join
-                    && weechat_config_boolean (irc_config_look_buffer_open_before_join))
+                    && weechat_config_boolean (irc_config_look_buffer_open_before_join)
+                    && !irc_channel_search (server, pos_channel))
                 {
                     /*
                      * open the channel buffer immediately (do not wait for the

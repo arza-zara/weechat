@@ -77,10 +77,11 @@ Les répertoires principaux de WeeChat sont :
 |       fset/       | Extension Fset (Fast Set).
 |       guile/      | API script Guile (scheme).
 |       irc/        | Extension IRC (Internet Relay Chat).
-|       javascript/ | API script Javascript.
+|       javascript/ | API script JavaScript.
 |       logger/     | Extension Logger (enregistrer les messages affichés dans des fichiers).
 |       lua/        | API script Lua.
 |       perl/       | API script Perl.
+|       php/        | API script PHP.
 |       python/     | API script Python.
 |       relay/      | Extension Relay (proxy IRC + relai pour interfaces distantes).
 |       ruby/       | API script Ruby.
@@ -89,6 +90,8 @@ Les répertoires principaux de WeeChat sont :
 |       trigger/    | Extension Trigger.
 |       xfer/       | Extension Xfer (IRC DCC fichier/discussion).
 | tests/            | Tests.
+|    scripts/       | Tests de l'API script.
+|       python/     | Scripts Python pour générer et lancer les tests de l'API script.
 |    unit/          | Tests unitaires.
 |       core/       | Tests unitaires pour les fonctions du cœur.
 | doc/              | Documentation.
@@ -111,7 +114,7 @@ Le cœur de WeeChat est situé dans les répertoires suivants :
 |===
 | Chemin/fichier                | Description
 | core/                         | Fonctions du cœur : point d'entrée, structures internes.
-|    wee-arraylist.c            | Listes avec tableau (« arraylists »).
+|    wee-arraylist.c            | Listes avec tableau (« arraylists »).
 |    wee-backtrace.c            | Afficher une trace après un plantage.
 |    wee-command.c              | Commandes du cœur de WeeChat.
 |    wee-completion.c           | Complétions par défaut.
@@ -254,10 +257,10 @@ Le cœur de WeeChat est situé dans les répertoires suivants :
 |       irc-sasl.c                  | Authentification SASL avec le serveur IRC.
 |       irc-server.c                | Communication avec le serveur IRC.
 |       irc-upgrade.c               | Sauvegarde/restauration des données IRC lors de la mise à jour de WeeChat.
-|    javascript/                    | Extension Javascript.
-|       weechat-js.cpp              | Fonctions principales pour Javascript (chargement/déchargement des scripts, exécution de code Javascript).
-|       weechat-js-api.cpp          | Fonctions de l'API script Javascript.
-|       weechat-js-v8.cpp           | Fonctions Javascript v8.
+|    javascript/                    | Extension JavaScript.
+|       weechat-js.cpp              | Fonctions principales pour JavaScript (chargement/déchargement des scripts, exécution de code JavaScript).
+|       weechat-js-api.cpp          | Fonctions de l'API script JavaScript.
+|       weechat-js-v8.cpp           | Fonctions JavaScript v8.
 |    logger/                        | Extension Logger.
 |       logger.c                    | Fonctions principales pour Logger.
 |       logger-buffer.c             | Gestion des listes de tampons pour Logger.
@@ -270,6 +273,9 @@ Le cœur de WeeChat est situé dans les répertoires suivants :
 |    perl/                          | Extension Perl.
 |       weechat-perl.c              | Fonctions principales pour Perl (chargement/déchargement des scripts, exécution de code Perl).
 |       weechat-perl-api.c          | Fonctions de l'API script Perl.
+|    php/                           | Extension PHP.
+|       weechat-php.c               | Fonctions principales pour PHP (chargement/déchargement des scripts, exécution de code PHP).
+|       weechat-php-api.c           | Fonctions de l'API script PHP.
 |    python/                        | Extension Python.
 |       weechat-python.c            | Fonctions principales pour Python (chargement/déchargement des scripts, exécution de code Python).
 |       weechat-python-api.c        | Fonctions de l'API script Python.
@@ -337,10 +343,16 @@ Le cœur de WeeChat est situé dans les répertoires suivants :
 |===
 | Chemin/fichier              | Description
 | tests/                      | Racine des tests.
-|    tests.cpp                | Programme utilisé pour lancer les tests.
+|    tests.cpp                | Programme utilisé pour lancer tous les tests.
+|    scripts/                 | Racine des tests de l'API script.
+|       test-scripts.cpp      | Programme utilisé pour lancer les tests de l'API script.
+|       python/               | Scripts Python pour générer et lancer les tests de l'API script.
+|          testapigen.py      | Script Python générant des scripts dans tous les languages pour tester l'API script.
+|          testapi.py         | Script Python avec les tests API, utilisé par le script testapigen.py.
+|          unparse.py         | Conversion de code Python vers d'autres langages, utilisé par le script testapigen.py.
 |    unit/                    | Racine des tests unitaires.
 |       core/                 | Racine des tests unitaires pour le cœur.
-|          test-arraylist.cpp | Tests : listes avec tableau (« arraylists »).
+|          test-arraylist.cpp | Tests : listes avec tableau (« arraylists »).
 |          test-eval.cpp      | Tests : évaluation d'expressions.
 |          test-hashtble.cpp  | Tests : tables de hachage.
 |          test-hdata.cpp     | Tests : hdata.
@@ -366,17 +378,17 @@ Fichiers de documentation :
 |    XX/                               | Documentation pour la langue XX (langues : en, fr, de, it, ...).
 |       cmdline_options.XX.adoc        | Options de ligne de commande (fichier inclus dans la page de manuel et le guide utilisateur).
 |       weechat.1.XX.adoc              | Page de manuel (`man weechat`).
-|       weechat_dev.XX.adoc            | Guide du développeur (ce document).
-|       weechat_faq.XX.adoc            | FAQ (questions fréquemment posées).
-|       weechat_plugin_api.XX.adoc     | Référence API extension.
-|       weechat_quickstart.XX.adoc     | Guide de démarrage.
-|       weechat_relay_protocol.XX.adoc | Protocole Relay (pour les interfaces distantes).
-|       weechat_scripting.XX.adoc      | Guide pour scripts.
-|       weechat_tester.XX.adoc         | Guide du testeur.
-|       weechat_user.XX.adoc           | Guide utilisateur.
+|       weechat_dev.XX.adoc            | link:weechat_dev.fr.html[Guide du développeur] (ce document).
+|       weechat_faq.XX.adoc            | link:weechat_faq.fr.html[FAQ] (questions fréquemment posées).
+|       weechat_plugin_api.XX.adoc     | link:weechat_plugin_api.fr.html[Référence API extension].
+|       weechat_quickstart.XX.adoc     | link:weechat_quickstart.fr.html[Guide de démarrage].
+|       weechat_relay_protocol.XX.adoc | link:weechat_relay_protocol.fr.html[Protocole Relay (pour les interfaces distantes)].
+|       weechat_scripting.XX.adoc      | link:weechat_scripting.fr.html[Guide pour scripts].
+|       weechat_tester.XX.adoc         | link:weechat_tester.fr.html[Guide du testeur].
+|       weechat_user.XX.adoc           | link:weechat_user.fr.html[Guide utilisateur].
 |       autogen/                       | Fichiers automatiquement générés avec le script docgen.py.
-|          user/                       | Fichiers automatiquement générés pour le guide utilisateur (ne *JAMAIS* les mettre à jour manuellement !).
-|          plugin_api/                 | Fichiers automatiquement générés pour l'API extension (ne *JAMAIS* les mettre à jour manuellement !).
+|          user/                       | Fichiers automatiquement générés pour le guide utilisateur (ne *JAMAIS* les mettre à jour manuellement !).
+|          plugin_api/                 | Fichiers automatiquement générés pour l'API extension (ne *JAMAIS* les mettre à jour manuellement !).
 |===
 
 Les traductions pour WeeChat et les extensions sont effectuées avec gettext, les

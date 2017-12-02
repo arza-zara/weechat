@@ -324,6 +324,26 @@ _prev_script_   (pointer, hdata: "perl_script") +
 _next_script_   (pointer, hdata: "perl_script") +
 
 
+| php
+| [[hdata_php_script]]<<hdata_php_script,php_script>>
+| liste des scripts
+| _scripts_ +
+_last_script_ +
+
+| _filename_   (string) +
+_interpreter_   (pointer) +
+_name_   (string) +
+_author_   (string) +
+_version_   (string) +
+_license_   (string) +
+_description_   (string) +
+_shutdown_func_   (string) +
+_charset_   (string) +
+_unloading_   (integer) +
+_prev_script_   (pointer, hdata: "php_script") +
+_next_script_   (pointer, hdata: "php_script") +
+
+
 | python
 | [[hdata_python_script]]<<hdata_python_script,python_script>>
 | liste des scripts
@@ -478,7 +498,7 @@ _gui_objects_   (pointer) +
 _prev_bar_window_   (pointer, hdata: "bar_window") +
 _next_bar_window_   (pointer, hdata: "bar_window") +
 
-*Mise à jour autorisée :* +
+*Mise à jour autorisée :* +
     _scroll_x_ (integer) +
     _scroll_y_ (integer) +
 
@@ -534,6 +554,7 @@ _input_callback_   (pointer) +
 _input_callback_pointer_   (pointer) +
 _input_callback_data_   (pointer) +
 _input_get_unknown_commands_   (integer) +
+_input_get_empty_   (integer) +
 _input_buffer_   (string) +
 _input_buffer_alloc_   (integer) +
 _input_buffer_size_   (integer) +
@@ -720,7 +741,7 @@ _last_gui_history_ +
 _next_history_   (pointer, hdata: "history") +
 _prev_history_   (pointer, hdata: "history") +
 
-*Mise à jour autorisée :* +
+*Mise à jour autorisée :* +
     _{hdata_update_create}_ +
     _{hdata_update_delete}_ +
 
@@ -848,7 +869,7 @@ _prefix_   (shared_string) +
 _prefix_length_   (integer) +
 _message_   (string) +
 
-*Mise à jour autorisée :* +
+*Mise à jour autorisée :* +
     _date_ (time) +
     _date_printed_ (time) +
     _tags_array_ (shared_string) +

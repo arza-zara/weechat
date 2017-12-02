@@ -25,6 +25,7 @@
 #endif
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <stddef.h>
 #include <unistd.h>
 #include <string.h>
@@ -2483,16 +2484,8 @@ hook_print_exec (struct t_gui_buffer *buffer, struct t_gui_line *line)
     if (!line->data->message || !line->data->message[0])
         return;
 
-    prefix_no_color = (line->data->prefix) ?
-        gui_color_decode (line->data->prefix, NULL) : NULL;
-
-    message_no_color = gui_color_decode (line->data->message, NULL);
-    if (!message_no_color)
-    {
-        if (prefix_no_color)
-            free (prefix_no_color);
-        return;
-    }
+    prefix_no_color = NULL;
+    message_no_color = NULL;
 
     hook_exec_start ();
 
@@ -2510,12 +2503,23 @@ hook_print_exec (struct t_gui_buffer *buffer, struct t_gui_line *line)
                 || string_strcasestr (prefix_no_color, HOOK_PRINT(ptr_hook, message))
                 || string_strcasestr (message_no_color, HOOK_PRINT(ptr_hook, message))))
         {
-            /* check if tags match */
+            /* check if tags are matching */
             if (!HOOK_PRINT(ptr_hook, tags_array)
                 || gui_line_match_tags (line->data,
                                         HOOK_PRINT(ptr_hook, tags_count),
                                         HOOK_PRINT(ptr_hook, tags_array)))
             {
+                /* strip colors if needed (and if not already done) */
+                if (HOOK_PRINT(ptr_hook, strip_colors) && !message_no_color)
+                {
+                    message_no_color = gui_color_decode (line->data->message,
+                                                         NULL);
+                    if (!message_no_color)
+                        goto end;
+                    prefix_no_color = (line->data->prefix) ?
+                        gui_color_decode (line->data->prefix, NULL) : NULL;
+                }
+
                 /* run callback */
                 ptr_hook->running = 1;
                 (void) (HOOK_PRINT(ptr_hook, callback))
@@ -2533,6 +2537,7 @@ hook_print_exec (struct t_gui_buffer *buffer, struct t_gui_line *line)
         ptr_hook = next_hook;
     }
 
+end:
     if (prefix_no_color)
         free (prefix_no_color);
     if (message_no_color)
@@ -4804,11 +4809,12 @@ hook_print_log ()
                     local_time = localtime (&seconds);
                     if (local_time)
                     {
-                        strftime (text_time, sizeof (text_time),
-                                  "%d/%m/%Y %H:%M:%S", local_time);
+                        if (strftime (text_time, sizeof (text_time),
+                                      "%d/%m/%Y %H:%M:%S", local_time) == 0)
+                            text_time[0] = '\0';
                     }
-                    log_printf ("    last_exec.tv_sec. . . : %ld (%s)",
-                                HOOK_TIMER(ptr_hook, last_exec.tv_sec),
+                    log_printf ("    last_exec.tv_sec. . . : %lld (%s)",
+                                (long long)(HOOK_TIMER(ptr_hook, last_exec.tv_sec)),
                                 text_time);
                     log_printf ("    last_exec.tv_usec . . : %ld",   HOOK_TIMER(ptr_hook, last_exec.tv_usec));
                     text_time[0] = '\0';
@@ -4816,11 +4822,12 @@ hook_print_log ()
                     local_time = localtime (&seconds);
                     if (local_time)
                     {
-                        strftime (text_time, sizeof (text_time),
-                                  "%d/%m/%Y %H:%M:%S", local_time);
+                        if (strftime (text_time, sizeof (text_time),
+                                      "%d/%m/%Y %H:%M:%S", local_time) == 0)
+                            text_time[0] = '\0';
                     }
-                    log_printf ("    next_exec.tv_sec. . . : %ld (%s)",
-                                HOOK_TIMER(ptr_hook, next_exec.tv_sec),
+                    log_printf ("    next_exec.tv_sec. . . : %lld (%s)",
+                                (long long)(HOOK_TIMER(ptr_hook, next_exec.tv_sec)),
                                 text_time);
                     log_printf ("    next_exec.tv_usec . . : %ld",   HOOK_TIMER(ptr_hook, next_exec.tv_usec));
                     break;

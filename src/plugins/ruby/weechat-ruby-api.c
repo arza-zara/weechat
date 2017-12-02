@@ -2735,7 +2735,7 @@ weechat_ruby_api_hook_fd_cb (const void *pointer, void *data, int fd)
 {
     struct t_plugin_script *script;
     void *func_argv[2];
-    char str_fd[32], empty_arg[1] = { '\0' };
+    char empty_arg[1] = { '\0' };
     const char *ptr_function, *ptr_data;
     int *rc, ret;
 
@@ -2744,15 +2744,13 @@ weechat_ruby_api_hook_fd_cb (const void *pointer, void *data, int fd)
 
     if (ptr_function && ptr_function[0])
     {
-        snprintf (str_fd, sizeof (str_fd), "%d", fd);
-
         func_argv[0] = (ptr_data) ? (char *)ptr_data : empty_arg;
-        func_argv[1] = str_fd;
+        func_argv[1] = &fd;
 
         rc = (int *) weechat_ruby_exec (script,
                                         WEECHAT_SCRIPT_EXEC_INT,
                                         ptr_function,
-                                        "ss", func_argv);
+                                        "si", func_argv);
 
         if (!rc)
             ret = WEECHAT_RC_ERROR;
@@ -2954,7 +2952,6 @@ weechat_ruby_api_hook_connect_cb (const void *pointer, void *data,
 {
     struct t_plugin_script *script;
     void *func_argv[6];
-    char str_status[32], str_gnutls_rc[32], str_sock[32];
     char empty_arg[1] = { '\0' };
     const char *ptr_function, *ptr_data;
     int *rc, ret;
@@ -2964,21 +2961,17 @@ weechat_ruby_api_hook_connect_cb (const void *pointer, void *data,
 
     if (ptr_function && ptr_function[0])
     {
-        snprintf (str_status, sizeof (str_status), "%d", status);
-        snprintf (str_gnutls_rc, sizeof (str_gnutls_rc), "%d", gnutls_rc);
-        snprintf (str_sock, sizeof (str_sock), "%d", sock);
-
         func_argv[0] = (ptr_data) ? (char *)ptr_data : empty_arg;
-        func_argv[1] = str_status;
-        func_argv[2] = str_gnutls_rc;
-        func_argv[3] = str_sock;
+        func_argv[1] = &status;
+        func_argv[2] = &gnutls_rc;
+        func_argv[3] = &sock;
         func_argv[4] = (ip_address) ? (char *)ip_address : empty_arg;
         func_argv[5] = (error) ? (char *)error : empty_arg;
 
         rc = (int *) weechat_ruby_exec (script,
                                         WEECHAT_SCRIPT_EXEC_INT,
                                         ptr_function,
-                                        "ssssss", func_argv);
+                                        "siiiss", func_argv);
 
         if (!rc)
             ret = WEECHAT_RC_ERROR;
@@ -3070,7 +3063,7 @@ weechat_ruby_api_hook_print_cb (const void *pointer, void *data,
 
     if (ptr_function && ptr_function[0])
     {
-        snprintf (timebuffer, sizeof (timebuffer), "%ld", (long int)date);
+        snprintf (timebuffer, sizeof (timebuffer), "%lld", (long long)date);
 
         func_argv[0] = (ptr_data) ? (char *)ptr_data : empty_arg;
         func_argv[1] = API_PTR2STR(buffer);
@@ -5469,7 +5462,10 @@ weechat_ruby_api_infolist_time (VALUE class, VALUE infolist, VALUE variable)
     time = weechat_infolist_time (API_STR2PTR(c_infolist), c_variable);
     date_tmp = localtime (&time);
     if (date_tmp)
-        strftime (timebuffer, sizeof (timebuffer), "%F %T", date_tmp);
+    {
+        if (strftime (timebuffer, sizeof (timebuffer), "%F %T", date_tmp) == 0)
+            timebuffer[0] = '\0';
+    }
     result = strdup (timebuffer);
 
     API_RETURN_STRING_FREE(result);

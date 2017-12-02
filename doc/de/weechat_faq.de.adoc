@@ -2,9 +2,11 @@
 :author: Sébastien Helleu
 :email: flashcode@flashtux.org
 :lang: de
-:toc: macro
+:toc: left
 :toc-title: Inhaltsverzeichnis
+:toclevels: 2
 :sectnums:
+:sectnumlevels: 2
 :docinfo1:
 
 
@@ -88,14 +90,13 @@ Befehle sowie die Belegung der jeweiligen Tasten sind in der Dokumentation
 beschrieben. (Tipp: Mit den Tasten <Bild-hoch>/<Bild-runter> kann man seitenweise
 in den Buffern blättern)
 
-Neue Benutzer sollten unbedingt die quickstart-Anleitung lesen:
-https://weechat.org/doc
+Neuen Anwendern wird empfohlen die link:weechat_quickstart.de.html[Quickstart Anleitung] zu lesen.
 
 [[display]]
 == Anzeige
 
 [[charset]]
-=== Bei einigen Zeichen fehlen die Akzente. Wie kann ich das korrigieren?
+=== Bei einigen Zeichen fehlen die Akzente. Wie kann ich das beheben?
 
 Dies ist ein bekanntes Problem. Aus diesem Grund sollten die folgenden Punkte
 sorgfältig durchgelesen und *alle* aufgezeigten Lösungsmöglichkeiten überprüft
@@ -108,7 +109,9 @@ werden:
 * überprüfe die Ausgabe des `/charset` Befehls (im Server-Buffer). Du solltest
   für den Terminal _ISO-XXXXXX_ oder _UTF-8_ als Antwort erhalten. Sollte hingegen
   _ANSI_X3.4-1968_ oder ein anderer Wert angezeigt werden, ist Deine lokale
-  Einstellung möglicherweise falsch.
+  Einstellung möglicherweise falsch. +
+  um die Lokalisation zu reparieren überprüfe selbige mittels `locale -a`
+  und füge einen entsprechenden Wert in $LANG ein, zum Beispiel `export LANG=de_DE.UTF-8`
 * Einstellen des globalen decode Wertes, z.B.:
   `/set charset.default.decode "ISO-8859-15"`
 * Falls Du UTF-8 lokal nutzt:
@@ -190,29 +193,36 @@ angezeigt.
 [[buffers_list]]
 === Wie kann ich eine Liste mit den Buffern z.B. auf der linken Seite anzeigen lassen?
 
-Nutze dazu das Skript _buffers.pl_:
+Ab WeeChat ≥ 1.8 wird standardmäßig die "buflist" Erweiterung automatisch geladen und verwendet.
+
+bei älteren Versionen kann das Skript _buffers.pl_ installiert werden:
 
 ----
 /script install buffers.pl
 ----
 
-Um die Größe der Bar zu limitieren:
+Um die Größe der Bar zu reduzieren (ersetze "buflist" durch "buffers", wenn das
+Skript _buffers.pl_ genutzt wird):
 
 ----
-/set weechat.bar.buffers.size_max 15
+/set weechat.bar.buflist.size_max 15
 ----
 
-Um die Bar nach oben zu verschieben:
+Um die Bar an den unteren Rand zu bewegen:
 
 ----
-/set weechat.bar.buffers.position bottom
+/set weechat.bar.buflist.position bottom
 ----
 
-um den Inhalt der Bar zu scollen: sollte die Mausunterstützung aktiviert sein (Taste: kbd:[Alt+m]),
-kann man den Inhalt der Bar ganz einfach mit dem Mausrad vor- und zurück scrollen.
+Um in der Bar zu scollen; wenn die Maus aktiviert ist (Taste: kbd:[Alt+m]), kann
+mit dem Mausrad gescrollt werden.
 
-man kann aber auch Tastenbefehle nutzen, ähnlich den schon existierenden Tastenbefehlen mit welchen
-man die Nickliste vor- und zurück scrollen kann: kbd:[F1], kbd:[F2], kbd:[Alt+F1] und kbd:[Alt+F2]:
+Standardtastenbelegung zum scrollen der _buflist_ Bar: kbd:[F1], kbd:[F2], kbd:[Alt+F1]
+und kbd:[Alt+F2].
+
+Beim Skript _buffers.pl_ können entsprechende Tasten definiert werden die vergleichbar
+mit den vorhanden Tasten für die Nicklist sind +
+Um zum Beispiel folgende Tasten zu nutzen kbd:[F1], kbd:[F2], kbd:[Alt+F1] und kbd:[Alt+F2]:
 
 ----
 /key bind meta-OP /bar scroll buffers * -100%
@@ -269,7 +279,8 @@ Diese Farben können mit den Optionen __weechat.color.status_data_*__
 Weitere hotlist Eigenschaften können den Optionen  __weechat.look.hotlist_*__
 verändert werden.
 
-siehe Benutzeranleitung für weitere Informationen bezüglich der Hotlist (screen layout).
+Siehe link:weechat_user.de.html#screen_layout[Benutzeranleitung / Screen layout] für
+weitere Informationen über die Hotlist.
 
 [[input_bar_size]]
 === Wie kann man eine mehrzeilige Eingabezeile einstellen?
@@ -428,7 +439,8 @@ Ab Version ≥ 0.3.5 kann in den Optionen für eine zu nutzende Farbe die entspr
 Zahl der Farbe eingetragen werden (optional: mit dem Befehl `/color` kann man einen Alias für
 eine Farbe definieren).
 
-Weiterführende Informationen zum Farbmanagement erhält man in der Benutzeranleitung.
+Bitte lese link:weechat_user.de.html#colors[Benutzeranleitung / Farben] für weitere
+Informationen die das Farbmanagement betreffen.
 
 [[search_text]]
 === Wie kann ich in einem Buffer nach einem Text suchen (vergleichbar /lastlog in irssi)?
@@ -436,7 +448,8 @@ Weiterführende Informationen zum Farbmanagement erhält man in der Benutzeranle
 Die Standardtastenbelegung lautet kbd:[Ctrl+r] (der dazugehörige Befehl: `/input search_text_here`).
 und um zu Highlight-Nachrichten zu springen: kbd:[Alt+p] / kbd:[Alt+n].
 
-Siehe Benutzeranleitung für weitere Informationen zu dieser Funktion (Standardtastenbelegung).
+siehe link:weechat_user.de.html#key_bindings[Benutzeranleitung / Tastenbelegungen] für weitere
+Informationen zu dieser Funktion.
 
 [[terminal_focus]]
 === Wie kann ich Befehle ausführen, wenn der Terminal (keinen) Fokus hat?
@@ -518,7 +531,8 @@ Es kann auch eine neue Taste eingebunden werden um zu einem Buffer zu wechseln:
 /key bind meta-q /buffer *11
 ----
 
-Eine Auflistung der Standardtastenbelegung findet man in der Benutzeranleitung.
+Eine Auflistung der Standardtastenbelegung findet man in
+link:weechat_user.de.html#key_bindings[Benutzeranleitung / Tastenbelegungen].
 
 [[global_history]]
 === Wie kann ich den globalen Verlaufsspeicher (anstelle des Buffer eigenen) mit den Up-/Down-Tasten nutzen?
@@ -862,6 +876,42 @@ Zum installieren und verwalten von Skripten kann der Befehl `/script` genutzt we
 
 Die Skripten für WeeChat sind mit anderer IRC-Clients nicht kompatibel und vice versa.
 
+[[scripts_update]]
+=== Der Befehl "/script update" liest die Skriptliste nicht ein, wie kann ich das beheben?
+
+Als erstes sollte das Kapitel über SSL Verbindungen in dieser FAQ gelesen werden
+(besonders über die Option _weechat.network.gnutls_ca_file_).
+
+Sollte das nicht helfen, sollte man manuell die Skriptliste löschen (in der shell):
+If still not working, try to manually delete the scripts file (in your shell):
+
+----
+$ rm ~/.weechat/script/plugins.xml.gz
+----
+
+danach sollte man noch mal versuchen die Datei herunter zu laden:
+
+----
+/script update
+----
+
+Tritt weiterhin der Fehler auf dann muss in WeeChat das automatische Update
+der Datei deaktiviert werden und die Datei muss manuell aus einer Shell
+herunter geladen werden (das bedeutet das man manuell für Updates zuständig ist):
+
+* in WeeChat:
+
+----
+/set script.scripts.cache_expire -1
+----
+
+* in der Shell, mit installiertem curl:
+
+----
+$ cd ~/.weechat/script
+$ curl -O https://weechat.org/files/plugins.xml.gz
+----
+
 [[settings]]
 == Einstellungen
 
@@ -872,27 +922,29 @@ Das ist möglich, wird aber *NICHT* empfohlen.
 
 Der interne WeeChat Befehl `/set` sollte genutzt werden:
 
-* da die TAB Vervollständigung unterstützt wird
-* der neue Wert wird auf Legalität geprüft und bei einem Fehler eine entsprechende Meldung ausgegeben
-* der neue Wert wird umgehend genutzt. Es ist nicht notwendig WeeChat neu zu starten oder irgendwelche Daten neu zu laden
+* Mittels der kbd:[Tab] Taste kann man sehr einfach Namen und Werte von Optionen
+  vervollständigen (oder mittels kbd:[Shift+Tab] kann eine teilweise Vervollständigung
+  durchgeführt werden, was beim Namen nützlich ist).
+* der neue Wert wird auf Plausibilität geprüft und bei einem Fehler eine entsprechende Meldung ausgegeben
+* der neue Wert wird umgehend genutzt. Es ist nicht notwendig WeeChat neu zu starten oder Daten neu zu laden
 
 Solltest Du die Dateien weiter händisch ändern wollen, dann solltest Du vorsichtig sein:
 
-* wird ein ungültiger Wert eingetragen, gibt WeeChat einen Fehler beim Start aus und
-  der ungültigen Wert wird verworfen (der Standardwert, für die entsprechende Option, wird
+* wird ein ungültiger Wert eingetragen gibt WeeChat einen Fehler, beim Start, aus und
+  der ungültigen Wert wird verworfen (der Standardwert für die entsprechende Option wird
   dann genutzt)
-* sollte WeeChat laufen und man nutzt den `/reload` Befehl aber Einstellungen wurden nicht
+* sollte WeeChat laufen und man nutzt den `/reload` Befehl, aber Einstellungen wurden nicht
   vorher mit `/save` gesichert, ist ein Datenverlust unvermeidbar
 
 [[memory_usage]]
-=== Wie kann ich WeeChat dazu bringen weniger Speicher zu verbrauchen?
+=== Wie kann ich erreichen, dass WeeChat weniger Speicher verbraucht?
 
 Damit WeeChat weniger Speicher benötigt, solltest Du folgende Tipps umsetzen:
 
 * nutze die aktuelle Version (man kann davon ausgehen das eine aktuelle Version
   weniger Speicherlecks besitzt, als eine vorherige Version)
 * lade keine Erweiterungen die Du nicht benötigst. Zum Beispiel: ASpell, Buflist,
-  Fifo, Logger, Perl, Python, Ruby, Lua, Tcl, Guile, Javascript, Xfer (wird für
+  Fifo, Logger, Perl, Python, Ruby, Lua, Tcl, Guile, JavaScript, PHP, Xfer (wird für
   DCC benötigst)
 * installiere ausschließlich Skripten die Du auch nutzt
 * falls man SSL *NICHT* nutzt, sollte kein Zertifikat geladen werden. In diesem
@@ -918,7 +970,7 @@ und zusätzlich diese Tipps beherzigen:
   verhindert, dass auf die Datei _/etc/localtime_ häufig zugegriffen wird.
 
 [[security]]
-=== Ich bin ein bisschen Paranoid was Sicherheit betrifft. Welche Einstellungen kann ich vornehmen um noch mehr Privatsphäre zu erlangen?
+=== Ich bin ein bisschen paranoid was Sicherheit betrifft. Welche Einstellungen kann ich vornehmen um noch mehr Privatsphäre zu erlangen?
 
 Deaktiviere IRC part und quit Nachrichten:
 

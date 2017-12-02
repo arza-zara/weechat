@@ -951,7 +951,7 @@
 ** domyślna wartość: `+10+`
 
 * [[option_weechat.look.paste_max_lines]] *weechat.look.paste_max_lines*
-** opis: pass:none[maksymalna ilość linii do wklejenia bez pytania użytkownika (-1 = wyłącza tę opcję)]
+** opis: pass:none[maksymalna ilość linii do wklejenia bez pytania użytkownika (-1 = wyłącz tą opcję); ta opcja jest używana tylko jesli element "input_paste" jest użyty w przynajmniej jednym pasku (domyślnie używany jest w pasku "input")]
 ** typ: liczba
 ** wartości: -1 .. 2147483647
 ** domyślna wartość: `+1+`
@@ -1093,6 +1093,12 @@
 ** typ: bool
 ** wartości: on, off
 ** domyślna wartość: `+on+`
+
+* [[option_weechat.look.save_config_with_fsync]] *weechat.look.save_config_with_fsync*
+** opis: pass:none[użyj fsync do synchronizacji konfiguracji na zewnętrznym nośniku (zobacz man fsync); jest to wolniejsze ale powinno zapobiec utracie danych w przypadku zaniku napięcia podczas zapisu danych konfiguracyjnych]
+** typ: bool
+** wartości: on, off
+** domyślna wartość: `+off+`
 
 * [[option_weechat.look.save_layout_on_exit]] *weechat.look.save_layout_on_exit*
 ** opis: pass:none[zapisz układ przy wyjściu (bufory, okna lub oba)]

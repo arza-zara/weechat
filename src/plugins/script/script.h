@@ -17,13 +17,13 @@
  * along with WeeChat.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WEECHAT_SCRIPT_H
-#define WEECHAT_SCRIPT_H 1
+#ifndef WEECHAT_PLUGIN_SCRIPT_H
+#define WEECHAT_PLUGIN_SCRIPT_H
 
 #define weechat_plugin weechat_script_plugin
 #define SCRIPT_PLUGIN_NAME "script"
 
-#define SCRIPT_NUM_LANGUAGES 7
+#define SCRIPT_NUM_LANGUAGES 8
 
 extern struct t_weechat_plugin *weechat_script_plugin;
 
@@ -38,4 +38,4 @@ extern char *script_build_download_url (const char *url);
 extern void script_get_loaded_plugins ();
 extern void script_get_scripts ();
 
-#endif /* WEECHAT_SCRIPT_H */
+#endif /* WEECHAT_PLUGIN_SCRIPT_H */

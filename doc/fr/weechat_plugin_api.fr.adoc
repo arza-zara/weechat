@@ -44,6 +44,15 @@ source WeeChat).
 Ce fichier définit les structures et types utilisés pour communiquer avec
 WeeChat.
 
+Pour appeler les fonctions de WeeChat dans le format affiché dans <<plugin_api>>,
+le pointeur global suivant doit être déclaré et initialisé dans la fonction
+<<_weechat_plugin_init,weechat_plugin_init>> :
+
+[source,C]
+----
+struct t_weechat_plugin *weechat_plugin;
+----
+
 [[macros]]
 === Macros
 
@@ -86,7 +95,8 @@ int weechat_plugin_init (struct t_weechat_plugin *plugin,
 
 Paramètres :
 
-* _plugin_ : pointeur vers la structure d'extension WeeChat
+* _plugin_ : pointeur vers la structure d'extension WeeChat, utilisé pour
+  initialiser le pointeur global `weechat_plugin`
 * _argc_ : nombre de paramètres pour l'extension (donnés sur la ligne de
   commande par l'utilisateur)
 * _argv_ : paramètres pour l'extension
@@ -162,7 +172,7 @@ Sous WeeChat :
 
 Exemple complet d'extension, qui ajoute une commande `/double` : affiche deux
 fois les paramètres sur le tampon courant, ou exécute deux fois une commande
-(ok ce n'est pas très utile, mais c'est juste un exemple !) :
+(ok ce n'est pas très utile, mais c'est juste un exemple !) :
 
 [source,C]
 ----
@@ -427,7 +437,7 @@ Paramètres :
 
 Valeur de retour :
 
-* chaîne traduite
+* chaîne traduite ou _string_ s'il n'y a pas de traduction disponible dans la langue locale
 
 Exemple en C :
 
@@ -469,7 +479,8 @@ Paramètres :
 
 Valeur de retour :
 
-* chaîne traduite
+* chaîne traduite ou _string_ / _plural_ s'il n'y a pas de traduction disponible
+  dans la langue locale
 
 Exemple en C :
 
@@ -1991,7 +2002,7 @@ str3 = weechat.string_input_for_buffer("//test")  # "/test"
 
 ==== string_eval_expression
 
-_WeeChat ≥ 0.4.0, mis à jour dans la 0.4.2, 0.4.3, 1.0, 1.1, 1.2, 1.3, 1.6 et 1.8._
+_WeeChat ≥ 0.4.0, mis à jour dans la 0.4.2, 0.4.3, 1.0, 1.1, 1.2, 1.3, 1.6, 1.8 et 2.0._
 
 Évaluer l'expression et retourner le résultat sous forme de chaîne.
 Les variables spéciales avec le format `+${variable}+` sont étendues (voir le
@@ -2013,7 +2024,8 @@ char *weechat_string_eval_expression (const char *expr,
 
 Paramètres :
 
-* _expr_ : l'expression à évaluer (voir le tableau ci-dessous)
+* _expr_ : l'expression à évaluer (voir les <<eval_conditions,conditions>> et
+  <<eval_variables,variables>>)
 * _pointers_ : table de hachage avec les pointeurs (les clés doivent être des
   chaînes, les valeurs doivent être des pointeurs); les pointeurs "window" et
   "buffer" sont automatiquement ajoutés s'ils ne sont pas dans la table de
@@ -2049,6 +2061,74 @@ Valeur de retour :
 * expression évaluée (doit être supprimée après un appel à "free" après
   utilisation), ou NULL si problème (expression invalide ou pas assez de
   mémoire)
+
+Exemples en C :
+
+[source,C]
+----
+/* conditions */
+struct t_hashtable *options1 = weechat_hashtable_new (8,
+                                                      WEECHAT_HASHTABLE_STRING,
+                                                      WEECHAT_HASHTABLE_STRING,
+                                                      NULL,
+                                                      NULL);
+weechat_hashtable_set (options1, "type", "condition");
+char *str1 = weechat_string_eval_expression ("${window.win_width} > 100", NULL, NULL, options1);  /* "1" */
+char *str2 = weechat_string_eval_expression ("abc =~ def", NULL, NULL, options1);                 /* "0" */
+
+/* expression simple */
+char *str3 = weechat_string_eval_expression ("${buffer.full_name}", NULL, NULL, NULL);  /* "core.weechat" */
+
+/* remplacement avec regex */
+struct t_hashtable *options2 = weechat_hashtable_new (8,
+                                                      WEECHAT_HASHTABLE_STRING,
+                                                      WEECHAT_HASHTABLE_STRING,
+                                                      NULL,
+                                                      NULL);
+/* ajout de crochets autour des URLs */
+weechat_hashtable_set (options2, "regex", "\\w+://\\S+");
+weechat_hashtable_set (options2, "regex_replace", "[ ${re:0} ]");
+char *str4 = weechat_string_eval_expression ("test : https://weechat.org", NULL, NULL, NULL);  /* "test : [ https://weechat.org ]" */
+
+/* masquage des mots de passe */
+weechat_hashtable_set (options2, "regex", "(password=)(\\S+)");
+weechat_hashtable_set (options2, "regex_replace", "${re:1}${hide:*,${re:2}}");
+char *str5 = weechat_string_eval_expression ("password=abc password=def", NULL, NULL, NULL);  /* "password=*** password=***" */
+----
+
+Script (Python) :
+
+[source,python]
+----
+# prototype
+str = weechat.string_eval_expression(expr, pointers, extra_vars, options)
+
+# exemples
+
+# conditions
+str1 = weechat.string_eval_expression("${window.win_width} > 100", {}, {}, {"type": "condition"})  # "1"
+str2 = weechat.string_eval_expression("abc =~ def", {}, {}, {"type": "condition"})                 # "0"
+
+# expression simple
+str3 = weechat.string_eval_expression("${buffer.full_name}", {}, {}, {}) # "core.weechat"
+
+# remplacement avec regex : ajout de crochets autour des URLs
+options = {
+    "regex": "\\w+://\\S+",
+    "regex_replace": "[ ${re:0} ]",
+}
+str4 = weechat.string_eval_expression("test : https://weechat.org", {}, {}, options)  # "test : [ https://weechat.org ]"
+
+# replace with regex : masquage des mots de passe
+options = {
+    "regex": "(password=)(\\S+)",
+    "regex_replace": "${re:1}${hide:*,${re:2}}",
+}
+str5 = weechat.string_eval_expression("password=abc password=def", {}, {}, options)  # "password=*** password=***"
+----
+
+[[eval_conditions]]
+===== Conditions
 
 Liste des opérateurs logiques qui peuvent être utilisés dans les conditions
 (par ordre de priorité, du premier utilisé au dernier) :
@@ -2168,6 +2248,22 @@ Liste des opérateurs de comparaison qui peuvent être utilisés dans les condit
   `+1+`
 |===
 
+La comparaison est faite en utilisant des nombres à virgule si les deux expressions
+sont des nombres valides, avec l'un de ces formats :
+
+* entier (exemples : 5, -7)
+* nombre à virgule (exemples : 5.2, -7.5, 2.83e-2) (_WeeChat ≥ 2.0_)
+* nombre hexadécimal (exemples : 0xA3, -0xA3) (_WeeChat ≥ 2.0_)
+
+Pour forcer une comparaison de chaînes, vous pouvez ajouter des guillemets autour
+de chaque expression, par exemple :
+
+* `50 > 100` retourne 0 (comparaison de nombres)
+* `"50" > "100"` retourne 1 (comparaison de chaînes)
+
+[[eval_variables]]
+===== Variables
+
 Liste des variables étendues dans l'expression (par ordre de priorité, de la
 première étendue à la dernière) :
 
@@ -2257,7 +2353,7 @@ première étendue à la dernière) :
   (_WeeChat ≥ 0.4.3_) |
   Info de WeeChat ou d'une extension, voir la fonction <<_info_get,info_get>>. |
   `+${info:version}+` +
-  `+${info:irc_nick_color_name,foo}+` |
+  `+${info:nick_color_name,foo}+` |
   `+1.0+` +
   `+lightblue+`
 
@@ -2313,71 +2409,6 @@ première étendue à la dernière) :
   `+1+`
 |===
 
-Exemples en C :
-
-[source,C]
-----
-/* conditions */
-struct t_hashtable *options1 = weechat_hashtable_new (8,
-                                                      WEECHAT_HASHTABLE_STRING,
-                                                      WEECHAT_HASHTABLE_STRING,
-                                                      NULL,
-                                                      NULL);
-weechat_hashtable_set (options1, "type", "condition");
-char *str1 = weechat_string_eval_expression ("${window.win_width} > 100", NULL, NULL, options1);  /* "1" */
-char *str2 = weechat_string_eval_expression ("abc =~ def", NULL, NULL, options1);                 /* "0" */
-
-/* expression simple */
-char *str3 = weechat_string_eval_expression ("${buffer.full_name}", NULL, NULL, NULL);  /* "core.weechat" */
-
-/* remplacement avec regex */
-struct t_hashtable *options2 = weechat_hashtable_new (8,
-                                                      WEECHAT_HASHTABLE_STRING,
-                                                      WEECHAT_HASHTABLE_STRING,
-                                                      NULL,
-                                                      NULL);
-/* ajout de crochets autour des URLs */
-weechat_hashtable_set (options2, "regex", "\\w+://\\S+");
-weechat_hashtable_set (options2, "regex_replace", "[ ${re:0} ]");
-char *str4 = weechat_string_eval_expression ("test : https://weechat.org", NULL, NULL, NULL);  /* "test : [ https://weechat.org ]" */
-
-/* masquage des mots de passe */
-weechat_hashtable_set (options2, "regex", "(password=)(\\S+)");
-weechat_hashtable_set (options2, "regex_replace", "${re:1}${hide:*,${re:2}}");
-char *str5 = weechat_string_eval_expression ("password=abc password=def", NULL, NULL, NULL);  /* "password=*** password=***" */
-----
-
-Script (Python) :
-
-[source,python]
-----
-# prototype
-str = weechat.string_eval_expression(expr, pointers, extra_vars, options)
-
-# exemples
-
-# conditions
-str1 = weechat.string_eval_expression("${window.win_width} > 100", {}, {}, {"type": "condition"})  # "1"
-str2 = weechat.string_eval_expression("abc =~ def", {}, {}, {"type": "condition"})                 # "0"
-
-# expression simple
-str3 = weechat.string_eval_expression("${buffer.full_name}", {}, {}, {}) # "core.weechat"
-
-# remplacement avec regex : ajout de crochets autour des URLs
-options = {
-    "regex": "\\w+://\\S+",
-    "regex_replace": "[ ${re:0} ]",
-}
-str4 = weechat.string_eval_expression("test : https://weechat.org", {}, {}, options)  # "test : [ https://weechat.org ]"
-
-# replace with regex : masquage des mots de passe
-options = {
-    "regex": "(password=)(\\S+)",
-    "regex_replace": "${re:1}${hide:*,${re:2}}",
-}
-str5 = weechat.string_eval_expression("password=abc password=def", {}, {}, options)  # "password=*** password=***"
-----
-
 ==== string_dyn_alloc
 
 _WeeChat ≥ 1.8._
@@ -2393,7 +2424,7 @@ Prototype :
 
 [source,C]
 ----
-char **weechat_dyn_alloc (int size_alloc);
+char **weechat_string_dyn_alloc (int size_alloc);
 ----
 
 Paramètres :
@@ -2408,7 +2439,7 @@ Exemple en C :
 
 [source,C]
 ----
-char **string = weechat_dyn_alloc (256);
+char **string = weechat_string_dyn_alloc (256);
 ----
 
 [NOTE]
@@ -2427,7 +2458,7 @@ Prototype :
 
 [source,C]
 ----
-int weechat_dyn_copy (char **string, const char *new_string);
+int weechat_string_dyn_copy (char **string, const char *new_string);
 ----
 
 Paramètres :
@@ -2443,8 +2474,8 @@ Exemple en C :
 
 [source,C]
 ----
-char **string = weechat_dyn_alloc (256);
-if (weechat_dyn_copy (string, "test"))
+char **string = weechat_string_dyn_alloc (256);
+if (weechat_string_dyn_copy (string, "test"))
 {
     /* OK */
 }
@@ -2470,7 +2501,7 @@ Prototype :
 
 [source,C]
 ----
-int weechat_dyn_concat (char **string, const char *add);
+int weechat_string_dyn_concat (char **string, const char *add);
 ----
 
 Paramètres :
@@ -2486,10 +2517,10 @@ Exemple en C :
 
 [source,C]
 ----
-char **string = weechat_dyn_alloc (256);
-if (weechat_dyn_copy (string, "test"))
+char **string = weechat_string_dyn_alloc (256);
+if (weechat_string_dyn_copy (string, "test"))
 {
-    if (weechat_dyn_concat (string, "abc"))
+    if (weechat_string_dyn_concat (string, "abc"))
     {
         /* ... */
     }
@@ -2509,7 +2540,7 @@ Prototype :
 
 [source,C]
 ----
-char *weechat_dyn_free (char **string, int free_string);
+char *weechat_string_dyn_free (char **string, int free_string);
 ----
 
 Paramètres :
@@ -2526,8 +2557,8 @@ Exemple en C :
 
 [source,C]
 ----
-char **string = weechat_dyn_alloc (256);
-if (weechat_dyn_concat (string, "test"))
+char **string = weechat_string_dyn_alloc (256);
+if (weechat_string_dyn_concat (string, "test"))
 {
     /* OK */
 }
@@ -2536,7 +2567,7 @@ else
     /* erreur */
 }
 /* ... */
-weechat_dyn_free (string, 1);
+weechat_string_dyn_free (string, 1);
 ----
 
 [NOTE]
@@ -5669,7 +5700,8 @@ option5 = weechat.config_new_option(config_file, section, "option5", "color",
 [NOTE]
 En Ruby, les 3 fonctions de rappel + "data" (6 chaînes) doivent être données
 dans un tableau de 6 chaînes de caractères (en raison d'une limitation de Ruby
-à 15 paramètres par fonction), voir le _Guide pour Scripts WeeChat_ pour plus
+à 15 paramètres par fonction), voir le
+link:++weechat_scripting.fr.html#_ruby++[Guide pour scripts WeeChat] pour plus
 d'infos _(corrigé dans la version 0.4.1)_.
 
 ==== config_search_option
@@ -7477,7 +7509,7 @@ weechat.key_bind("mouse", keys)
 
 ==== key_unbind
 
-_WeeChat ≥ 0.3.6._
+_WeeChat ≥ 0.3.6, mis à jour dans la 2.0._
 
 Supprimer une/des association(s) de touche(s).
 
@@ -7496,7 +7528,9 @@ Paramètres :
 
 * _context_ : contexte pour les touches (voir <<_key_bind,key_bind>>)
 * _key_ : touche à supprimer ou la valeur spéciale "area:XXX" pour supprimer
-  toutes les touches ayant _XXX_ comme première ou deuxième zone
+  toutes les touches ayant _XXX_ comme première ou deuxième zone; si la touche
+  commence par "quiet:", les touches supprimées ne sont pas affichées dans le
+  tampon _core_ (_WeeChat ≥ 2.0_).
 
 Valeur de retour :
 
@@ -7718,7 +7752,7 @@ Exemple en C :
 ----
 weechat_printf (NULL, "Bonjour sur le tampon WeeChat");
 weechat_printf (buffer, "Bonjour sur ce tampon");
-weechat_printf (buffer, "%sCeci est une erreur !", weechat_prefix ("error"));
+weechat_printf (buffer, "%sCeci est une erreur !", weechat_prefix ("error"));
 weechat_printf (buffer, " \tMessage sans préfixe mais avec \t quelques \t tabulations");
 weechat_printf (buffer, "\t\tMessage sans heure/alignement");
 weechat_printf (buffer, "\t\t");  /* ligne vide (sans heure) */
@@ -7734,7 +7768,7 @@ weechat.prnt(buffer, message)
 # exemple
 weechat.prnt("", "Bonjour sur le tampon WeeChat")
 weechat.prnt(buffer, "Bonjour sur ce tampon")
-weechat.prnt(buffer, "%sCeci est une erreur !" % weechat.prefix("error"))
+weechat.prnt(buffer, "%sCeci est une erreur !" % weechat.prefix("error"))
 weechat.prnt(buffer, " \tMessage sans préfixe mais avec \t quelques \t tabulations")
 weechat.prnt(buffer, "\t\tMessage sans heure/alignement")
 weechat.prnt(buffer, "\t\t")  # ligne vide (sans heure)
@@ -7765,7 +7799,7 @@ Paramètres :
   étiquette)
 * _message_ : message à afficher
 
-Voir le chapitre sur les étiquettes des lignes dans le _Guide utilisateur WeeChat_
+Voir le link:weechat_user.fr.html#lines_tags[Guide utilisateur WeeChat / Étiquettes des lignes]
 pour une liste des étiquettes couramment utilisées dans WeeChat.
 
 Exemple en C :
@@ -8148,7 +8182,7 @@ my_completion_cb (const void *pointer, void *data, const char *completion_item,
 }
 
 struct t_hook *my_completion_hook = weechat_hook_completion ("extension_item",
-                                                             "ma complétion !",
+                                                             "ma complétion !",
                                                              &my_completion_cb, NULL, NULL);
 ----
 
@@ -8165,7 +8199,7 @@ def my_completion_cb(data, completion_item, buffer, completion):
     weechat.hook_completion_list_add(completion, "test_mot2", 0, weechat.WEECHAT_LIST_POS_SORT)
     return weechat.WEECHAT_RC_OK
 
-hook = weechat.hook_completion("extension_item", "ma complétion !",
+hook = weechat.hook_completion("extension_item", "ma complétion !",
                                "my_completion_cb", "")
 ----
 
@@ -8315,7 +8349,7 @@ int
 my_command_run_cb (const void *pointer, void *data,
                    struct t_gui_buffer *buffer, const char *command)
 {
-    weechat_printf (NULL, "Je mange la complétion !");
+    weechat_printf (NULL, "Je mange la complétion !");
     return WEECHAT_RC_OK_EAT;
 }
 
@@ -8333,7 +8367,7 @@ hook = weechat.hook_command_run(command, callback, callback_data)
 
 # exemple
 def my_command_run_cb(data, buffer, command):
-    weechat.prnt("", "Je mange la complétion !")
+    weechat.prnt("", "Je mange la complétion !")
     return weechat.WEECHAT_RC_OK_EAT
 
 hook = weechat.hook_command_run("/input complete*", "my_command_run_cb", "")
@@ -8422,7 +8456,7 @@ hook = weechat.hook_timer(20 * 1000, 0, 0, "my_timer_cb", "")
 
 ==== hook_fd
 
-_Mis à jour dans la 1.3, 1.5._
+_Mis à jour dans la 1.3, 1.5, 2.0._
 
 Accrocher un descripteur de fichier (fichier ou socket).
 
@@ -8466,6 +8500,12 @@ Paramètres :
 Valeur de retour :
 
 * pointeur vers le nouveau "hook", NULL en cas d'erreur
+
+[IMPORTANT]
+Dans les scripts, avec WeeChat ≥ 2.0, le paramètre de la fonction de rappel _fd_
+est un entier (avec WeeChat ≤ 1.9, il était une chaîne). +
+Pour être compatible avec toutes les versions, il est recommandé de convertir le
+paramètre en entier avant de l'utiliser, par exemple en Python : `int(fd)`.
 
 Exemple en C :
 
@@ -8772,13 +8812,14 @@ Les paramètres sont les mêmes que ceux de la fonction
 Pour une commande standard (ne commençant pas par "url:"), les options suivantes
 sont disponibles :
 
-[width="100%",cols="^1,1,3",options="header"]
+[width="100%",cols="^1,1,1,4",options="header"]
 |===
-| Option | Valeur | Description
+| Option | Valeur | Défaut | Description
 
 | argN (N ≥ 1) +
   _(WeeChat ≥ 0.4.0)_ |
   toute chaîne |
+  pas de paramètres |
   Paramètres pour la commande ; si aucun paramètre n'est donné avec ces options,
   la commande sera automatiquement découpée comme le fait le shell (et donc les
   paramètres de la commande sont lus dans le paramètre _command_).
@@ -8786,19 +8827,22 @@ sont disponibles :
 | stdin +
   _(WeeChat ≥ 0.4.3)_ |
   (non utilisée) |
+  pas de stdin |
   Créer un tuyau pour écrire sur l'entrée standard (stdin) du processus fils
   (voir la fonction <<_hook_set,hook_set>>).
 
 | buffer_flush +
   _(WeeChat ≥ 1.0)_ |
   nombre d'octets |
+  65536 |
   Nombre minimum d'octets pour vider stdout/stderr (pour envoyer la sortie à la
-  fonction de rappel), entre 1 et 65536 (par défaut); 1 = envoyer toute sortie
+  fonction de rappel), entre 1 et 65536. Avec la valeur 1, la sortie est envoyée
   immédiatement à la fonction de rappel.
 
 | detached +
   _(WeeChat ≥ 1.0)_ |
   (non utilisée) |
+  non détaché |
   Lancer le process dans un mode détaché : stdout et stderr sont redirigés vers
   _/dev/null_.
 |===
@@ -8951,7 +8995,7 @@ hook3 = weechat.hook_process_hashtable("sh",
 
 ==== hook_connect
 
-_Mis à jour dans la 1.5._
+_Mis à jour dans la 1.5, 2.0._
 
 Accrocher une connexion (connexion à une machine distante en tâche de fond).
 
@@ -9039,6 +9083,13 @@ Paramètres :
 Valeur de retour :
 
 * pointeur vers le nouveau "hook", NULL en cas d'erreur
+
+[IMPORTANT]
+Dans les scripts, avec WeeChat ≥ 2.0, les paramètres de la fonction de rappel
+_status_, _gnutls_rc_ et _sock_ sont des entiers (avec WeeChat ≤ 1.9, ils étaient
+des chaînes). +
+Pour être compatible avec toutes les versions, il est recommandé de convertir
+le paramètre avant de l'utiliser, par exemple en Python: `int(sock)`.
 
 Exemple en C :
 
@@ -9446,22 +9497,22 @@ Liste des signaux envoyés par WeeChat et les extensions :
 | javascript | javascript_script_loaded +
   _(WeeChat ≥ 1.2)_ |
   Chaîne : chemin vers le script. |
-  Script javascript chargé.
+  Script JavaScript chargé.
 
 | javascript | javascript_script_unloaded +
   _(WeeChat ≥ 1.2)_ |
   Chaîne : chemin vers le script. |
-  Script javascript déchargé.
+  Script JavaScript déchargé.
 
 | javascript | javascript_script_installed +
   _(WeeChat ≥ 1.2)_ |
   Chaîne : liste de chemins vers scripts installés (séparés par des virgules). |
-  Script(s) javascript installé(s).
+  Script(s) JavaScript installé(s).
 
 | javascript | javascript_script_removed +
   _(WeeChat ≥ 1.2)_ |
   Chaîne : liste de scripts supprimés (séparés par des virgules). |
-  Script(s) javascript supprimé(s).
+  Script(s) JavaScript supprimé(s).
 
 | logger | logger_start |
   Pointeur : tampon. |
@@ -9514,6 +9565,26 @@ Liste des signaux envoyés par WeeChat et les extensions :
   _(WeeChat ≥ 0.3.9)_ |
   Chaîne : liste de scripts supprimés (séparés par des virgules). |
   Script(s) perl supprimé(s).
+
+| php | php_script_loaded +
+  _(WeeChat ≥ 2.0)_ |
+  Chaîne : chemin vers le script. |
+  Script PHP chargé.
+
+| php | php_script_unloaded +
+  _(WeeChat ≥ 2.0)_ |
+  Chaîne : chemin vers le script. |
+  Script PHP déchargé.
+
+| php | php_script_installed +
+  _(WeeChat ≥ 2.0)_ |
+  Chaîne : liste de chemins vers scripts installés (séparés par des virgules). |
+  Script(s) PHP installé(s).
+
+| php | php_script_removed +
+  _(WeeChat ≥ 2.0)_ |
+  Chaîne : liste de scripts supprimés (séparés par des virgules). |
+  Script(s) PHP supprimé(s).
 
 | python | python_script_loaded +
   _(WeeChat ≥ 0.3.9)_ |
@@ -9620,6 +9691,16 @@ Liste des signaux envoyés par WeeChat et les extensions :
 | weechat | buffer_cleared |
   Pointeur : tampon. |
   Tampon vidé.
+
+| weechat | buffer_filters_enabled +
+  _(WeeChat ≥ 2.0)_ |
+  Pointeur : tampon. |
+  Filtres activés dans le tampon.
+
+| weechat | buffer_filters_disabled +
+  _(WeeChat ≥ 2.0)_ |
+  Pointeur : tampon. |
+  Filtres désactivés dans le tampon.
 
 | weechat | buffer_hidden |
   Pointeur : tampon. |
@@ -10061,6 +10142,7 @@ Cinq signaux peuvent être envoyés pour installer un script, selon le langage 
 * _tcl_script_install_
 * _guile_script_install_
 * _javascript_script_install_
+* _php_script_install_
 
 La fonction de rappel effectuera les actions suivantes lorsqu'elle recevra le
 signal :
@@ -10107,6 +10189,7 @@ langage :
 * _tcl_script_remove_
 * _guile_script_remove_
 * _javascript_script_remove_
+* _php_script_remove_
 
 Pour chaque script dans la liste, la fonction de rappel déchargera et
 supprimera le script.
@@ -10164,9 +10247,9 @@ Exemples en C :
 
 [source,C]
 ----
-/* dis "Bonjour !" sur le serveur freenode, canal #weechat */
+/* dis "Bonjour !" sur le serveur freenode, canal #weechat */
 weechat_hook_signal_send ("irc_input_send", WEECHAT_HOOK_SIGNAL_STRING,
-                          "freenode;#weechat;priority_high,user_message;;Bonjour !");
+                          "freenode;#weechat;priority_high,user_message;;Bonjour !");
 
 /* envoie la commande "/whois FlashCode" sur le canal freenode, en basse priorité */
 weechat_hook_signal_send ("irc_input_send", WEECHAT_HOOK_SIGNAL_STRING,
@@ -10177,9 +10260,9 @@ Script (Python) :
 
 [source,python]
 ----
-# dis "Bonjour !" sur le serveur freenode, canal #weechat
+# dis "Bonjour !" sur le serveur freenode, canal #weechat
 weechat.hook_signal_send("irc_input_send", weechat.WEECHAT_HOOK_SIGNAL_STRING,
-                         "freenode;#weechat;priority_high,user_message;;Bonjour !")
+                         "freenode;#weechat;priority_high,user_message;;Bonjour !")
 
 # envoie la commande "/whois FlashCode" sur le canal freenode, en basse priorité
 weechat.hook_signal_send("irc_input_send", weechat.WEECHAT_HOOK_SIGNAL_STRING,
@@ -11668,7 +11751,7 @@ my_input_cb (const void *pointer, void *data,
 int
 my_close_cb (const void *pointer, void *data, struct t_gui_buffer *buffer)
 {
-    weechat_printf (NULL, "Le tampon '%s' va être fermé !",
+    weechat_printf (NULL, "Le tampon '%s' va être fermé !",
                     weechat_buffer_get_string (buffer, "name"));
     return WEECHAT_RC_OK;
 }
@@ -11692,7 +11775,7 @@ def my_input_cb(data, buffer, input_data):
     return weechat.WEECHAT_RC_OK
 
 def my_close_cb(data, buffer):
-    weechat.prnt("", "Le tampon '%s' va être fermé !" % weechat.buffer_get_string(buffer, "name"))
+    weechat.prnt("", "Le tampon '%s' va être fermé !" % weechat.buffer_get_string(buffer, "name"))
     return weechat.WEECHAT_RC_OK
 
 buffer = weechat.buffer_new("mon_buffer", "my_input_cb", "", "my_close_cb", "")
@@ -12021,6 +12104,8 @@ Paramètres :
 ** _input_ : 1 si la zone de saisie est activée, sinon 0
 ** _input_get_unknown_commands_ : 1 si les commandes inconnues sont envoyées
    à la fonction de rappel "input", sinon 0
+** _input_get_empty_ : 1 si une entrée vide est envoyée à la fonction de rappel
+   "input", sinon 0
 ** _input_size_ : taille de la zone de saisie (en octets)
 ** _input_length_ : longueur de la zone de saisie (nombre de caractères)
 ** _input_pos_ : position du curseur dans la zone de saisie
@@ -12331,6 +12416,10 @@ Propriétés :
   défaut), "1" pour recevoir les commandes inconnues, par exemple si
   l'utilisateur tape "/commandeinconnue", le tampon le recevra (pas d'erreur
   sur la commande inconnue).
+
+| input_get_empty | "0" ou "1" |
+  "0" pour désactiver l'entrée vide sur ce tampon (comportement par défaut),
+  "1" pour recevoir l'entrée vide.
 
 | localvar_set_xxx | toute chaîne |
   Change la valeur de la variable locale _xxx_ (la variable est créée si elle
@@ -13888,8 +13977,8 @@ Paramètres :
 ** _inactive_ : la barre est affichée dans les fenêtres inactives seulement
 ** _nicklist_ : la barre est affichée dans les fenêtres possédant une liste des
    pseudos
-** expression évaluée : voir le chapitre sur les barres dans le
-   _Guide utilisateur WeeChat_
+** expression évaluée : voir le
+   link:weechat_user.fr.html#bar_conditions[Guide utilisateur WeeChat / Conditions de barres]
 * _position_ : _top_ (en haut), _bottom_ (en bas), _left_ (à gauche) ou _right_
   (à droite)
 * _filling_top_bottom_ :
@@ -14346,8 +14435,8 @@ if (hashtable_in)
 ----
 
 [NOTE]
-Voir le _Guide pour Scripts WeeChat_ pour plus d'infos sur la sortie de
-"irc_message_parse".
+Voir le link:weechat_scripting.fr.html#irc_message_parse[Guide pour scripts WeeChat / Analyser un message]
+pour plus d'infos sur la sortie de "irc_message_parse".
 
 Script (Python) :
 
@@ -15979,8 +16068,8 @@ Paramètres :
 * _pointer_ : pointeur vers un objet WeeChat ou d'une extension
 * _search_ : expression à évaluer, le pointeur par défaut dans l'expression est
   le nom du hdata (et ce pointeur change pour chaque élément dans la liste);
-  pour l'aide sur l'expression, voir la commande `/eval` dans le
-  _Guide utilisateur WeeChat_
+  pour l'aide sur l'expression, voir le
+  link:weechat_user.fr.html#command_weechat_eval[Guide utilisateur WeeChat / Commande /eval]
 * _move_ : nombre de saut(s) à exécuter après une recherche infructueuse (entier
   négatif ou positif, différent de 0)
 

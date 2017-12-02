@@ -80,12 +80,11 @@ a write of the options).
 
 [IMPORTANT]
 It is *not recommended* to edit configuration files by hand because WeeChat
-may write them at any time (for example on <<command_weechat_quit,/quit>>)
-and after any change you must run the command <<command_weechat_reload,/reload>>
-(with the risk of losing other changes that were not yet saved with
-<<command_weechat_save,/save>>). +
-You can use the command <<command_weechat_set,/set>>, which checks the value
-and applies immediately the changes.
+may write them at any time (for example on `/quit`) and after any change
+you must run the command `/reload` (with the risk of losing other changes
+that were not yet saved with `/save`). +
+You can use the command `/set`, which checks the value and applies immediately
+the changes.
 
 [[core_vs_plugins]]
 == Core vs plugins
@@ -196,6 +195,11 @@ To auto-join some channels when connecting to server:
 ----
 /set irc.server.freenode.autojoin "#channel1,#channel2"
 ----
+
+[TIP]
+You can complete name and value of options with the kbd:[Tab] key
+and kbd:[Shift+Tab] for a partial completion (useful for long words like
+the name of option).
 
 To remove a value of a server option, and use the default value instead,
 for example to use default nicks (irc.server_default.nicks):
@@ -362,7 +366,7 @@ download and install scripts from the repository with the `/script` command,
 for example:
 
 ----
-/script install iset.pl
+/script install go.py
 ----
 
 See `/help script` for more info.

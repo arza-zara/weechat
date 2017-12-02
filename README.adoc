@@ -6,7 +6,7 @@
 
 image:https://img.shields.io/badge/diaspora*-follow-blue.svg["Diaspora*", link="https://diasp.eu/u/weechat"]
 image:https://img.shields.io/badge/google%2B-follow-blue.svg["Google+", link="https://plus.google.com/+WeeChat"]
-image:https://img.shields.io/badge/devel%20blog-follow-blue.svg["Devel blog", link="http://dev.weechat.org/"]
+image:https://img.shields.io/badge/devel%20blog-follow-blue.svg["Devel blog", link="https://weechat.org/blog/"]
 image:https://img.shields.io/badge/slant-recommend-28acad.svg["Slant", link="http://www.slant.co/topics/1323/~irc-clients-for-linux"]
 image:https://img.shields.io/badge/paypal-donate%20%E2%9D%A4-yellow.svg["Paypal", link="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=4LSMSNLUAJWNS"]
 
@@ -25,7 +25,7 @@ Homepage: https://weechat.org/
 * *Multi-protocols*: WeeChat is designed to support multiple protocols by plugins, like IRC.
 * *Standards-compliant*: the IRC plugin is compliant with RFCs 1459, 2810, 2811, 2812 and 2813.
 * *Small, fast and very light*: the core is and should stay as light and fast as possible.
-* *Customizable and extensible*: there are a lot of options to customize WeeChat, and it is extensible with C plugins and scripts (Perl, Python, Ruby, Lua, Tcl, Scheme and Javascript).
+* *Customizable and extensible*: there are a lot of options to customize WeeChat, and it is extensible with C plugins and scripts (Perl, Python, Ruby, Lua, Tcl, Scheme, JavaScript and PHP).
 * *Fully documented*: there is comprehensive documentation, which is translated into several languages.
 * *Developed from scratch*: WeeChat was built from scratch and is not based on any other client.
 * *Free software*: WeeChat is released under GPLv3.
@@ -51,7 +51,7 @@ Following packages are optional:
 * for i18n: gettext
 * for SSL: gnutls, ca-certificates
 * for spell checking: aspell
-* for scripting: python, perl, ruby, lua, tcl, guile, libv8 (javascript)
+* for scripting: python, perl, ruby, lua, tcl, guile, libv8 (javascript), php
 * for building doc and man page: asciidoctor
 * for building tests: C++ compiler, CppUTest
 
@@ -89,6 +89,25 @@ $ make install
 
 For more information or installation with autotools, please look at
 https://weechat.org/files/doc/devel/weechat_user.en.html#compile_with_autotools[user's guide].
+
+=== Run tests
+
+Following packages are *required* to compile tests:
+
+* libcpputest-dev
+* C++ compiler
+
+Tests must be enabled when compiling WeeChat:
+
+----
+$ cmake .. -DENABLE_TESTS=ON
+----
+
+They can be launched after compilation from the build directory:
+
+----
+$ ctest -V
+----
 
 == Copyright
 
